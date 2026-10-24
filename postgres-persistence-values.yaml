@@ -1,0 +1,21 @@
+image:
+  repository: "pgvector/pgvector"
+  tag: "pg16"
+
+resources: |
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    memory: 1Gi
+
+persistence:
+  enabled: false
+extraVolumes: |
+  - name: postgres-data
+    persistentVolumeClaim:
+      claimName: postgres-data
+extraVolumeMounts: |
+  - name: postgres-data
+    mountPath: /var/lib/postgresql/data
+    subPath: pgdata

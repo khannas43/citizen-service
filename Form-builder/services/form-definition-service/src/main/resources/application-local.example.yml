@@ -1,0 +1,15 @@
+# Example local configuration — copy to application-local.yml (gitignored) or export env vars.
+# Do not commit real credentials.
+#
+#   export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/egov_db
+#   export SPRING_DATASOURCE_USERNAME=egov
+#   export SPRING_DATASOURCE_PASSWORD=replace-me
+#
+# Or activate a local profile after copying this file:
+#   spring.profiles.active=local
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/egov_db
+    username: egov
+    password: replace-me-locally

@@ -1,0 +1,7 @@
+package org.magicsword.family.model;
+
+public record SchemeEligibility(
+        String schemeName,
+        boolean eligible,
+        String reason
+) {}

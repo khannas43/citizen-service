@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caste-certificate-service
+  namespace: egov
+  labels:
+    app: caste-certificate-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: caste-certificate-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: caste-certificate-service
+    spec:
+      containers:
+        - name: caste-certificate-service
+          image: caste-certificate-service:arm64-local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: password
+          startupProbe:
+            httpGet:
+              path: /caste-certificate-service/actuator/health/liveness
+              port: 8080
+            failureThreshold: 80
+            periodSeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /caste-certificate-service/actuator/health/liveness
+              port: 8080
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /caste-certificate-service/actuator/health/readiness
+              port: 8080
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: caste-certificate-service
+  namespace: egov
+spec:
+  selector:
+    app: caste-certificate-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

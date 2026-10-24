@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "form-definition-service Helm values (FB-E5.2)",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["replicas", "httpPort", "image", "securityContext", "podSecurityContext", "db", "ingress", "healthChecks"],
+  "properties": {
+    "replicas": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Positive replica count (non-production placeholder default 1)."
+    },
+    "httpPort": {
+      "type": "integer",
+      "const": 8080
+    },
+    "terminationGracePeriodSeconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 600
+    },
+    "image": {
+      "type": "object",
+      "required": ["repository", "tag", "pullPolicy"],
+      "additionalProperties": false,
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "minLength": 1 },
+        "pullPolicy": {
+          "type": "string",
+          "enum": ["Always", "IfNotPresent", "Never"]
+        }
+      }
+    },
+    "javaToolOptions": {
+      "type": "string",
+      "description": "Optional JAVA_TOOL_OPTIONS; empty by default. Must not activate governance-technical."
+    },
+    "securityContext": {
+      "type": "object",
+      "required": ["runAsNonRoot", "runAsUser", "runAsGroup", "readOnlyRootFilesystem", "allowPrivilegeEscalation", "capabilities", "seccompProfile"],
+      "properties": {
+        "runAsNonRoot": { "const": true },
+        "runAsUser": { "const": 10001 },
+        "runAsGroup": { "const": 10001 },
+        "readOnlyRootFilesystem": { "const": true },
+        "allowPrivilegeEscalation": { "const": false },
+        "capabilities": {
+          "type": "object",
+          "required": ["drop"],
+          "properties": {
+            "drop": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "enum": ["ALL"] }
+            }
+          }
+        },
+        "seccompProfile": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": { "const": "RuntimeDefault" }
+          }
+        }
+      }
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "required": ["runAsNonRoot", "fsGroup", "seccompProfile"],
+      "properties": {
+        "runAsNonRoot": { "const": true },
+        "runAsUser": { "const": 10001 },
+        "runAsGroup": { "const": 10001 },
+        "fsGroup": { "const": 10001 },
+        "seccompProfile": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": { "const": "RuntimeDefault" }
+          }
+        }
+      }
+    },
+    "db": {
+      "type": "object",
+      "required": ["url", "username", "password"],
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "object",
+          "required": ["configMapName", "key"],
+          "additionalProperties": false,
+          "properties": {
+            "configMapName": { "type": "string", "minLength": 1 },
+            "key": { "type": "string", "minLength": 1 }
+          }
+        },
+        "username": {
+          "type": "object",
+          "required": ["secretName", "key"],
+          "additionalProperties": false,
+          "properties": {
+            "secretName": { "type": "string", "minLength": 1 },
+            "key": { "type": "string", "minLength": 1 }
+          }
+        },
+        "password": {
+          "type": "object",
+          "required": ["secretName", "key"],
+          "additionalProperties": false,
+          "properties": {
+            "secretName": { "type": "string", "minLength": 1 },
+            "key": { "type": "string", "minLength": 1 }
+          }
+        },
+        "flyway": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "username": {
+              "type": "object",
+              "required": ["secretName", "key"],
+              "additionalProperties": false,
+              "properties": {
+                "secretName": { "type": "string", "minLength": 1 },
+                "key": { "type": "string", "minLength": 1 }
+              }
+            },
+            "password": {
+              "type": "object",
+              "required": ["secretName", "key"],
+              "additionalProperties": false,
+              "properties": {
+                "secretName": { "type": "string", "minLength": 1 },
+                "key": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "healthChecks": {
+      "type": "object",
+      "required": ["livenessPath", "readinessPath", "startupPath", "liveness", "readiness", "startup"],
+      "properties": {
+        "livenessPath": {
+          "type": "string",
+          "const": "/form-definition-service/actuator/health/liveness"
+        },
+        "readinessPath": {
+          "type": "string",
+          "const": "/form-definition-service/actuator/health/readiness"
+        },
+        "startupPath": {
+          "type": "string",
+          "const": "/form-definition-service/actuator/health"
+        },
+        "liveness": { "$ref": "#/definitions/probeTiming" },
+        "readiness": { "$ref": "#/definitions/probeTiming" },
+        "startup": { "$ref": "#/definitions/probeTiming" }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "required": ["enabled", "zuul", "context"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "zuul": { "type": "boolean" },
+        "context": {
+          "type": "string",
+          "const": "form-definition-service"
+        },
+        "hostName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "waf": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["ClusterIP"] }
+      }
+    }
+  },
+  "definitions": {
+    "probeTiming": {
+      "type": "object",
+      "required": ["initialDelaySeconds", "periodSeconds", "timeoutSeconds", "successThreshold", "failureThreshold"],
+      "properties": {
+        "initialDelaySeconds": { "type": "integer", "minimum": 0, "maximum": 600 },
+        "periodSeconds": { "type": "integer", "minimum": 1, "maximum": 300 },
+        "timeoutSeconds": { "type": "integer", "minimum": 1, "maximum": 60 },
+        "successThreshold": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "failureThreshold": { "type": "integer", "minimum": 1, "maximum": 120 }
+      }
+    }
+  }
+}

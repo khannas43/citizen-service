@@ -1,0 +1,27 @@
+.ct { margin: var(--space-3, 0.75rem) 0; }
+.ct-note { color: var(--color-text-secondary, #4a5568); font-size: 0.85rem; }
+.ct-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.75rem; color: var(--color-text-secondary, #4a5568); margin-bottom: 0.5rem; }
+.ct-legend span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.ct-k { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.ct-k.ct-flag { background: #fff; outline: 2px solid #c62828; }
+.ct-ENTITLEMENT { background: #b9d3f0; color: #0f2f57; }
+.ct-PAYMENT { background: #2f6cb5; color: #fff; }
+.ct-REVERSAL { background: #8a8f98; color: #fff; }
+.ct-EVENT { background: #7b3fa0; color: #fff; }
+.ct-CHANGE, .ct-CERTIFICATE { background: #e0902b; color: #231400; }
+.ct-chart { border: 1px solid var(--color-border, #dde3ee); border-radius: 10px; background: var(--color-surface, #fff); padding: 0.4rem 0.6rem 0.6rem; overflow-x: auto; }
+.ct-axis, .ct-track { position: relative; margin-left: 92px; margin-right: 10px; }
+.ct-axis { height: 18px; }
+.ct-axis span { position: absolute; transform: translateX(-50%); font-size: 0.68rem; color: var(--color-text-secondary, #4a5568); white-space: nowrap; }
+.ct-lane { position: relative; display: flex; align-items: flex-start; border-top: 1px solid var(--color-border, #e8ecf3); }
+.ct-lane-name { position: absolute; left: 0; width: 86px; padding-top: 6px; font-size: 0.75rem; font-weight: 600; color: var(--color-text-secondary, #4a5568); }
+.ct-track { flex: 1; }
+.ct-grid { position: absolute; top: 0; bottom: 0; width: 1px; background: #eef1f6; }
+.ct .ct-item { position: absolute; height: 22px; min-height: 0; border: 0; border-radius: 5px; padding: 0 6px; margin: 0; font-family: inherit; font-size: 11px; font-weight: 500; line-height: 22px; box-sizing: border-box; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.ct-item span { pointer-events: none; }
+.ct .ct-point { width: 14px; height: 14px; min-width: 0; margin-top: 4px; padding: 0; border-radius: 50%; }
+.ct .ct-point.ct-EVENT { border-radius: 2px; transform: rotate(45deg); }
+.ct-flagged { outline: 2px solid #c62828; outline-offset: 1px; z-index: 2; }
+.ct-picked { box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.35); z-index: 3; }
+.ct-item:focus-visible { outline: 3px solid #0f172a; }
+.ct-picked-text { font-size: 0.8rem; margin: 0.5rem 0 0; min-height: 1.2rem; }

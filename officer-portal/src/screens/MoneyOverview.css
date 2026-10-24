@@ -1,0 +1,62 @@
+.money-overview { padding: var(--space-5, 1.25rem); max-width: 1200px; }
+.mo-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4, 1rem);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4, 1rem);
+}
+.mo-page-header h1 { margin: 0 0 var(--space-1, 0.25rem); }
+.mo-page-header .mo-sub { margin: 0; }
+.mo-header-action { flex-shrink: 0; text-decoration: none; white-space: nowrap; }
+.mo-sub { color: var(--color-text-secondary, #4a5568); margin: 0 0 var(--space-4, 1rem); }
+.mo-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--space-3, 0.75rem); margin: 0 0 var(--space-4, 1rem); }
+.mo-kpis > div { background: var(--color-surface, #fff); border: 1px solid var(--color-border, #dde3ee); border-radius: 10px; padding: var(--space-3, 0.75rem) var(--space-4, 1rem); }
+.mo-kpis dt { font-size: var(--text-sm, 0.875rem); color: var(--color-text-secondary, #4a5568); }
+.mo-kpis dd { margin: 0.25rem 0; font-size: 1.6rem; font-weight: 700; color: var(--color-primary, #1b3c74); }
+.mo-kpis small { color: var(--color-text-secondary, #4a5568); }
+.mo-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--space-4, 1rem); margin-bottom: var(--space-4, 1rem); }
+@media (max-width: 800px) { .mo-grid { grid-template-columns: 1fr; } }
+.money-overview table { width: 100%; border-collapse: collapse; }
+.money-overview th, .money-overview td { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--color-border, #dde3ee); }
+.mo-row { cursor: pointer; }
+.mo-row:hover { background: var(--color-primary-pale, #edf2fb); }
+.mo-detail button { margin-right: 0.5rem; }
+.mo-error { color: #9b1c1c; }
+.mo-map-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem; }
+.mo-metric { display: inline-flex; border: 1px solid var(--color-border, #dde3ee); border-radius: 999px; overflow: hidden; background: var(--color-surface, #fff); }
+.mo-metric button { border: 0; background: transparent; padding: 0.35rem 0.9rem; font: inherit; cursor: pointer; color: var(--color-text-secondary, #4a5568); }
+.mo-metric button.active { background: var(--color-primary, #1b3c74); color: #fff; }
+.mo-legend { display: inline-flex; align-items: center; gap: 2px; font-size: 0.75rem; color: var(--color-text-secondary, #4a5568); }
+.mo-legend i { width: 22px; height: 10px; display: inline-block; }
+.mo-legend span:first-child { margin-right: 4px; }
+.mo-legend span:last-child { margin-left: 4px; }
+.mo-note { font-size: 0.75rem; color: var(--color-text-secondary, #4a5568); margin: 0.4rem 0 0; }
+.mo-loop { margin-top: 0; }
+.mo-thin { color: var(--color-text-secondary, #4a5568); }
+.mo-month { margin-bottom: var(--space-4, 1rem); }
+.mo-chart { width: 100%; max-width: 640px; height: auto; display: block; background: var(--color-surface, #fff); border: 1px solid var(--color-border, #dde3ee); border-radius: 8px; }
+.mo-chart-label { font-size: 8px; fill: var(--color-text-secondary, #4a5568); }
+.mo-month-table { margin-top: 0.75rem; font-size: 0.875rem; }
+.mo-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.mo-projection { background: #fff8e6; border: 1px solid #e6c200; border-radius: 10px; padding: var(--space-3, 0.75rem) var(--space-4, 1rem); margin-bottom: var(--space-4, 1rem); }
+.mo-projection h2 { margin: 0 0 0.35rem; font-size: 1.1rem; }
+.mo-projection-estimate { margin: 0.25rem 0; font-size: 1.25rem; }
+.mo-caveat { margin: 0.75rem 0 0; padding: 0.5rem 0.65rem; background: #fff; border-left: 4px solid #c05621; font-weight: 600; color: #744210; }
+.mo-projection-hint { margin: 0; color: var(--color-text-secondary, #4a5568); }
+
+@media print {
+  @page { size: A4; margin: 10mm; }
+  .money-overview { max-width: none; padding: 0; font-size: 9pt; }
+  .mo-kpis { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .mo-kpis dd { font-size: 11pt; }
+  .mo-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .mo-map-bar .mo-metric button:not(.active) { display: none; }
+  .mo-chart { max-width: 100%; border: none; }
+  .mo-month-table { font-size: 7pt; }
+  .mo-print-compact table { font-size: 7pt; }
+  .mo-row { cursor: default; }
+  .mo-detail button, .mo-metric button { display: none; }
+  section { break-inside: avoid; }
+}

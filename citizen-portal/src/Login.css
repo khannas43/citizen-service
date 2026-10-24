@@ -1,0 +1,93 @@
+.login-page {
+  min-height: 100vh;
+  background: var(--page-bg);
+}
+
+.login-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.35rem;
+  color: var(--gov-blue);
+}
+
+.demo-hint {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--role-data-entry-bg);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--role-data-entry-fg);
+}
+
+.demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.demo-chip {
+  background: var(--surface);
+  border: 1px solid var(--gov-blue);
+  color: var(--gov-blue);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.demo-chip:hover {
+  background: var(--gov-blue-light);
+}
+
+.link-btn {
+  display: block;
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: var(--gov-blue);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.header-user-name {
+  opacity: 0.95;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-logout {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--surface);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

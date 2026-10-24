@@ -1,0 +1,16 @@
+Notice regarding your scheme payment
+
+Dear {{personName}},
+
+This is to inform you that a review of your entitlement under {{schemeOrPost}}{{periodClause}} has found a possible overpayment{{amountClause}}.
+
+What we found:
+{{decisionReason}}
+
+You may respond in writing by {{responseDueDate}}. If you disagree, you may appeal as set out below.
+
+{{appealParagraph}}
+
+Yours faithfully,
+Expenditure Integrity Unit
+Digital Gujarat

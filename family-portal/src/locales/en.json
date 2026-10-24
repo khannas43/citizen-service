@@ -1,0 +1,22 @@
+{
+  "appTitle": "Gujarat Government",
+  "familyPortal": "Family Profile Portal",
+  "searchPlaceholder": "Search by name or Aadhaar reference",
+  "searchBtn": "Search",
+  "searching": "Searching…",
+  "noResults": "No persons found.",
+  "back": "Back to search",
+  "tabs": {
+    "tree": "Family Tree",
+    "income": "Income",
+    "schemes": "Schemes"
+  },
+  "totalIncome": "Total family annual income",
+  "eligible": "Eligible",
+  "notEligible": "Not eligible",
+  "enrolled": "Enrolled",
+  "deceased": "Deceased",
+  "ageLabel": "yrs",
+  "applyNow": "Apply Now",
+  "langToggle": "EN | ગુ"
+}

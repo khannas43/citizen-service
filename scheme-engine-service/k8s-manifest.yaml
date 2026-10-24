@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheme-engine-service
+  namespace: egov
+  labels:
+    app: scheme-engine-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheme-engine-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: scheme-engine-service
+    spec:
+      containers:
+        - name: scheme-engine-service
+          image: scheme-engine-service:arm64-local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: password
+            - name: INTERNAL_SERVICE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: internal-service-key
+                  key: key
+                  optional: true
+            - name: OFFICER_JWKS_URI
+              value: "http://keycloak.egov.svc.cluster.local:8080/realms/egov/protocol/openid-connect/certs"
+          startupProbe:
+            httpGet:
+              path: /scheme-engine-service/actuator/health/liveness
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /scheme-engine-service/actuator/health/liveness
+              port: 8080
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /scheme-engine-service/actuator/health/readiness
+              port: 8080
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "150m"
+            limits:
+              memory: "1536Mi"
+              cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scheme-engine-service
+  namespace: egov
+spec:
+  selector:
+    app: scheme-engine-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

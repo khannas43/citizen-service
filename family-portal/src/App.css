@@ -1,0 +1,307 @@
+.family-app {
+  min-height: 100vh;
+}
+
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 1rem;
+  background: var(--gov-blue);
+  color: var(--surface);
+}
+
+.top-header-left {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.top-header-center {
+  font-size: 0.85rem;
+  flex: 1;
+  text-align: center;
+}
+
+.lang-toggle {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--surface);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.landing {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+}
+
+.search-card {
+  width: 100%;
+  max-width: 480px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--gov-blue);
+  color: var(--surface);
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.muted {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+.results-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--page-bg);
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.result-item:hover {
+  background: var(--gov-blue-light);
+}
+
+.profile-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.profile-header {
+  margin-bottom: 1rem;
+}
+
+.profile-header h2 {
+  margin: 0.5rem 0 0;
+  font-size: 1.2rem;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: var(--gov-blue);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.65rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tab.active {
+  color: var(--gov-blue);
+  border-bottom-color: var(--gov-orange);
+  font-weight: 600;
+}
+
+.tab-panel {
+  padding: 1rem;
+}
+
+.flow-wrap {
+  width: 100%;
+  height: 420px;
+}
+
+.node-sub {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.income-panel {
+  padding: 0.5rem 0;
+}
+
+.income-total {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gov-blue);
+}
+
+.income-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.income-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.income-bar-wrap {
+  background: var(--border-light);
+  border-radius: 4px;
+  height: 12px;
+  overflow: hidden;
+}
+
+.income-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.income-amount {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.strike {
+  text-decoration: line-through;
+}
+
+.deceased-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  background: var(--border-light);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.schemes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.scheme-card {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--neutral-bg);
+}
+
+.scheme-card.eligible {
+  background: var(--success-bg);
+  border-color: var(--success-bg);
+}
+
+.scheme-card.ineligible {
+  background: var(--page-bg);
+}
+
+.scheme-icon {
+  font-size: 1.5rem;
+}
+
+.scheme-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.tag-green {
+  background: var(--success-bg);
+  color: var(--success);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.tag-grey {
+  background: var(--neutral-bg);
+  color: var(--neutral);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.tag-enrolled {
+  background: var(--gov-orange-light);
+  color: var(--role-scheme-dept-fg);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.apply-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  background: var(--gov-blue);
+  color: var(--surface);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .top-header-left,
+  .top-header-center {
+    font-size: 0.75rem;
+  }
+
+  .schemes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .income-row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+}

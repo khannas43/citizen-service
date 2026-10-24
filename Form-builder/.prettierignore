@@ -1,0 +1,11 @@
+DG20_FormBuilder_Design_Spec_v1.md
+node_modules/
+dist/
+coverage/
+package-lock.json
+*.tsbuildinfo
+storybook-static/
+packages/*/storybook-static/
+# Frozen Unit E acceptance fixture — SHA-256 drift-checked; do not reformat.
+acceptance/unit-e/unit-e-representative-definition.json
+services/form-definition-service/src/test/resources/acceptance/unit-e-representative-definition.json

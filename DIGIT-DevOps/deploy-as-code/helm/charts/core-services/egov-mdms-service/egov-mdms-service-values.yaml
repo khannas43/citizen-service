@@ -1,0 +1,48 @@
+initContainers:
+  gitSync:
+    repo: "https://github.com/egovernments/egov-mdms-data"
+    branch: "master"
+    image:
+      repository: "registry.k8s.io/git-sync/git-sync"
+      tag: "v4.2.4"
+      pullPolicy: IfNotPresent
+    env: |
+        - name: "GITSYNC_REPO"
+          value: "{{ .Values.initContainers.gitSync.repo }}"
+        - name: "GITSYNC_REF"
+          value: "{{ .Values.initContainers.gitSync.branch }}"
+        - name: "GITSYNC_DEPTH"
+          value: "1"
+        - name: "GITSYNC_ONE_TIME"
+          value: "true"
+        - name: "GITSYNC_ROOT"
+          value: "/work-dir"
+        - name: "GITSYNC_LINK"
+          value: "egov-mdms-data"
+ingress:
+  enabled: false
+image:
+  repository: "egov-mdms-service"
+  tag: "arm64-local"
+  pullPolicy: Never
+healthChecks:
+  enabled: true
+  livenessProbePath: "/egov-mdms-service/health/liveness"
+  readinessProbePath: "/egov-mdms-service/health/readiness"
+extraVolumes: |
+  - name: extra-mdms-data
+    configMap:
+      name: egov-mdms-extra-data
+  - name: extra-mdms-workflow-data
+    configMap:
+      name: egov-mdms-workflow-data
+  - name: extra-mdms-tenant-data
+    configMap:
+      name: egov-mdms-tenant-data
+extraVolumeMounts: |
+  - name: extra-mdms-data
+    mountPath: /work-dir/egov-mdms-data/data/pg/DataSecurity
+  - name: extra-mdms-workflow-data
+    mountPath: /work-dir/egov-mdms-data/data/pg/Workflow
+  - name: extra-mdms-tenant-data
+    mountPath: /work-dir/egov-mdms-data/data/pg/tenant

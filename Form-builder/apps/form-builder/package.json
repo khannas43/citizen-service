@@ -1,0 +1,49 @@
+{
+  "name": "@dg20/form-builder-app",
+  "private": true,
+  "version": "0.1.0",
+  "description": "DG 2.0 Form Builder SPA and host embed surface (FB-D0 / E5.4.3A)",
+  "type": "module",
+  "exports": {
+    "./embed": {
+      "types": "./embed.d.ts",
+      "import": "./dist/embed/embed.js"
+    },
+    "./styles/embed.css": "./dist/embed/embed.css"
+  },
+  "files": [
+    "dist/embed",
+    "embed.d.ts"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "build:embed": "vite build --config vite.embed.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist .vite *.tsbuildinfo",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@dg20/form-contract": "*",
+    "@dg20/form-renderer": "*",
+    "@dg20/form-widgets": "*",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
+    "@vitejs/plugin-react": "^4.5.2",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest-axe": "^0.1.0"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "name": "dg20-unit-e-technical-contract-manifest",
+  "version": "1.0.0",
+  "illustrative": true,
+  "nonAuthoritative": true,
+  "warnings": [
+    "Unit E package acceptance is technical only",
+    "Governance queue is FDS status-derived, not DST",
+    "governance-technical is non-production",
+    "§5 authoritative live-service acceptance remains open"
+  ],
+  "endpoints": {
+    "validation": "/api/v1/form-definitions/validation",
+    "create": "/api/v1/form-definitions",
+    "exactGet": "/api/v1/form-definitions",
+    "technicalLifecycle": "/api/v1/form-definitions/lifecycle-transitions",
+    "technicalClone": "/api/v1/form-definitions/drafts/from-version",
+    "builderAuthenticatedClone": "/api/v1/form-definitions/builder/drafts/from-version",
+    "builderAuthenticatedSubmit": "/api/v1/form-definitions/builder/lifecycle-transitions",
+    "governanceQueue": "/api/v1/form-definitions/governance/queue",
+    "governanceDetail": "/api/v1/form-definitions/governance/detail",
+    "governanceLifecycle": "/api/v1/form-definitions/governance/lifecycle-transitions",
+    "publishedLatest": "/api/v1/form-definitions/published/latest"
+  },
+  "queryCoordinates": {
+    "exactGet": ["serviceId", "version"],
+    "technicalLifecycle": ["serviceId", "version"],
+    "builderAuthenticatedSubmit": ["serviceId", "version"],
+    "builderAuthenticatedClone": ["serviceId", "sourceVersion"],
+    "governanceDetail": ["serviceId", "version"],
+    "governanceLifecycle": ["serviceId", "version"],
+    "governanceQueue": ["afterServiceId", "afterVersion", "limit"],
+    "publishedLatest": ["serviceId"]
+  },
+  "lifecycleTargets": {
+    "technicalSubmit": "submitted",
+    "builderAuthenticatedSubmit": "submitted",
+    "governanceApprove": "approved",
+    "governancePublish": "published"
+  },
+  "governanceRequestBody": {
+    "exactKeys": ["targetStatus"],
+    "forbiddenKeys": ["actorId"],
+    "allowedTargetStatus": ["approved", "published"]
+  },
+  "technicalSubmitRequestBody": {
+    "exactKeys": ["targetStatus", "actorId"],
+    "targetStatus": "submitted"
+  },
+  "builderAuthenticatedSubmitRequestBody": {
+    "exactKeys": ["targetStatus"],
+    "forbiddenKeys": ["actorId"],
+    "targetStatus": "submitted"
+  },
+  "builderAuthenticatedCloneRequestBody": {
+    "exactKeys": [],
+    "forbiddenKeys": ["createdBy", "actorId"]
+  },
+  "queueItemEnvelope": {
+    "exactKeys": ["serviceId", "version", "status"],
+    "allowedStatus": ["submitted", "approved"]
+  },
+  "detailResponse": {
+    "definitionRootKeys": [
+      "serviceId",
+      "version",
+      "status",
+      "jsonSchema",
+      "uiSchema",
+      "meta",
+      "audit"
+    ],
+    "headers": {
+      "etag": "strong",
+      "cacheControl": "no-store"
+    }
+  },
+  "publishedAdapterEnvelope": {
+    "exactKeys": ["serviceId", "version", "definition"],
+    "httpBodyIsDefinitionRoot": true
+  },
+  "strongEtagSyntax": {
+    "pattern": "^\".+\"$",
+    "weakForbidden": true,
+    "wildcardForbidden": true
+  },
+  "formDefinitionStatuses": ["draft", "submitted", "approved", "published", "retired"],
+  "representativeFixture": {
+    "serviceId": "unit-e-technical-acceptance",
+    "version": 1,
+    "initialStatus": "draft",
+    "sha256": "8847a0904c402b7b98822f96741234a0f93230d57f7ecf458f41b66e979c557e",
+    "provenance": "Derived from apps/form-builder/acceptance/unit-d-acceptance-definition.ts via acceptance/unit-e/export-representative-fixture.mjs; serviceId remapped; audit actor remapped."
+  },
+  "packages": {
+    "formContract": "0.1.0",
+    "formWidgets": "0.2.0",
+    "formRenderer": "0.1.0"
+  }
+}

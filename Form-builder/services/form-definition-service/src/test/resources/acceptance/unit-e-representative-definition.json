@@ -1,0 +1,476 @@
+{
+  "serviceId": "unit-e-technical-acceptance",
+  "version": 1,
+  "status": "draft",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "text_short_1": {
+        "type": "string",
+        "maxLength": 120
+      },
+      "email_1": {
+        "type": "string",
+        "format": "email"
+      },
+      "dob_1": {
+        "type": "string",
+        "format": "date"
+      },
+      "section_header_1": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "info_panel_1": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "signature_esign_1": {
+        "type": "object",
+        "properties": {
+          "contextRevision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "signedArtefactRef": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "contextRevision",
+          "signedArtefactRef"
+        ],
+        "additionalProperties": false
+      },
+      "dropdown_master_1": {
+        "type": "string",
+        "x-dg20": {
+          "masterListId": "acceptance-citizen-status"
+        }
+      },
+      "caf_prefill_1": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "CAF",
+              "OVERRIDE"
+            ]
+          }
+        },
+        "required": [
+          "value",
+          "source"
+        ],
+        "additionalProperties": false
+      },
+      "doc_upload_1": {
+        "type": "object",
+        "properties": {
+          "objectRef": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fileName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mimeType": {
+            "type": "string",
+            "enum": [
+              "application/pdf"
+            ]
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1048576
+          },
+          "scanStatus": {
+            "type": "string",
+            "enum": [
+              "CLEAN"
+            ]
+          }
+        },
+        "required": [
+          "objectRef",
+          "fileName",
+          "mimeType",
+          "sizeBytes",
+          "scanStatus"
+        ],
+        "additionalProperties": false,
+        "x-dg20": {
+          "allowedMimeTypes": [
+            "application/pdf"
+          ],
+          "maxFileSizeBytes": 1048576
+        }
+      },
+      "family_repeater_1": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "text_short_1": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "number_1": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "text_short_1"
+          ]
+        },
+        "maxItems": 4,
+        "minItems": 1
+      },
+      "eligibility_declaration_1": {
+        "type": "object",
+        "properties": {
+          "declarationId": {
+            "type": "string",
+            "const": "ACCEPTANCE_DECL_001"
+          },
+          "accepted": {
+            "type": "boolean"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "gu"
+            ]
+          },
+          "consentReceiptRef": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "declarationId",
+          "accepted",
+          "locale",
+          "consentReceiptRef"
+        ],
+        "additionalProperties": false,
+        "x-dg20": {
+          "declarationId": "ACCEPTANCE_DECL_001"
+        }
+      },
+      "fee_field_1": {
+        "type": "object",
+        "properties": {
+          "feeRuleId": {
+            "type": "string",
+            "const": "acceptance-fee-rule-1"
+          },
+          "contextRevision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "currency": {
+            "type": "string",
+            "const": "INR"
+          },
+          "amountMinor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "quoteRef": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "feeRuleId",
+          "contextRevision",
+          "currency",
+          "amountMinor",
+          "quoteRef"
+        ],
+        "additionalProperties": false,
+        "x-dg20": {
+          "feeRuleId": "acceptance-fee-rule-1"
+        }
+      }
+    },
+    "required": []
+  },
+  "uiSchema": {
+    "ui:order": [
+      "text_short_1",
+      "email_1",
+      "dob_1",
+      "section_header_1",
+      "info_panel_1",
+      "signature_esign_1",
+      "dropdown_master_1",
+      "caf_prefill_1",
+      "doc_upload_1",
+      "family_repeater_1",
+      "eligibility_declaration_1",
+      "fee_field_1"
+    ],
+    "text_short_1": {
+      "ui:widget": "text-short"
+    },
+    "email_1": {
+      "ui:widget": "email"
+    },
+    "dob_1": {
+      "ui:widget": "dob"
+    },
+    "section_header_1": {
+      "ui:field": "section-header"
+    },
+    "info_panel_1": {
+      "ui:field": "info-panel"
+    },
+    "signature_esign_1": {
+      "ui:field": "signature-esign"
+    },
+    "dropdown_master_1": {
+      "ui:widget": "dropdown-master"
+    },
+    "caf_prefill_1": {
+      "ui:field": "caf-prefill"
+    },
+    "doc_upload_1": {
+      "ui:field": "doc-upload"
+    },
+    "family_repeater_1": {
+      "ui:field": "family-repeater",
+      "items": {
+        "text_short_1": {
+          "ui:widget": "text-short"
+        },
+        "number_1": {
+          "ui:widget": "number"
+        }
+      }
+    },
+    "eligibility_declaration_1": {
+      "ui:field": "eligibility-declaration"
+    },
+    "fee_field_1": {
+      "ui:field": "fee-field"
+    }
+  },
+  "meta": {
+    "paletteProvenance": [
+      {
+        "fieldId": "text_short_1",
+        "widgetType": "text-short"
+      },
+      {
+        "fieldId": "email_1",
+        "widgetType": "email"
+      },
+      {
+        "fieldId": "dob_1",
+        "widgetType": "dob"
+      },
+      {
+        "fieldId": "section_header_1",
+        "widgetType": "section-header"
+      },
+      {
+        "fieldId": "info_panel_1",
+        "widgetType": "info-panel"
+      },
+      {
+        "fieldId": "signature_esign_1",
+        "widgetType": "signature-esign"
+      },
+      {
+        "fieldId": "dropdown_master_1",
+        "widgetType": "dropdown-master"
+      },
+      {
+        "fieldId": "caf_prefill_1",
+        "widgetType": "caf-prefill"
+      },
+      {
+        "fieldId": "doc_upload_1",
+        "widgetType": "doc-upload"
+      },
+      {
+        "fieldId": "family_repeater_1",
+        "widgetType": "family-repeater"
+      },
+      {
+        "fieldId": "family_repeater_1[].text_short_1",
+        "widgetType": "text-short"
+      },
+      {
+        "fieldId": "family_repeater_1[].number_1",
+        "widgetType": "number"
+      },
+      {
+        "fieldId": "eligibility_declaration_1",
+        "widgetType": "eligibility-declaration"
+      },
+      {
+        "fieldId": "fee_field_1",
+        "widgetType": "fee-field"
+      }
+    ],
+    "bilingual": {
+      "labels": {
+        "text_short_1": {
+          "en": "Short text",
+          "gu": "ટૂંકું લખાણ"
+        },
+        "email_1": {
+          "en": "Email",
+          "gu": "ઇમેઇલ"
+        },
+        "dob_1": {
+          "en": "Date of birth",
+          "gu": "જન્મ તારીખ"
+        },
+        "section_header_1": {
+          "en": "Section header",
+          "gu": "વિભાગ શીર્ષક"
+        },
+        "info_panel_1": {
+          "en": "Info panel",
+          "gu": "માહિતી પેનલ"
+        },
+        "signature_esign_1": {
+          "en": "eSign signature",
+          "gu": "eSign સહી"
+        },
+        "dropdown_master_1": {
+          "en": "Master-data dropdown",
+          "gu": "માસ્ટર-ડેટા ડ્રોપડાઉન"
+        },
+        "caf_prefill_1": {
+          "en": "CAF pre-fill",
+          "gu": "CAF પૂર્વ-ભરણ"
+        },
+        "doc_upload_1": {
+          "en": "Document upload",
+          "gu": "દસ્તાવેજ અપલોડ"
+        },
+        "family_repeater_1": {
+          "en": "Family repeater",
+          "gu": "કુટુંબ સભ્ય પુનરાવર્તક"
+        },
+        "family_repeater_1[].text_short_1": {
+          "en": "Member name",
+          "gu": "સભ્યનું નામ"
+        },
+        "family_repeater_1[].number_1": {
+          "en": "Member age",
+          "gu": "સભ્યની ઉંમર"
+        },
+        "eligibility_declaration_1": {
+          "en": "Eligibility declaration",
+          "gu": "પાત્રતા ઘોષણા"
+        },
+        "fee_field_1": {
+          "en": "Fee field",
+          "gu": "ફી ક્ષેત્ર"
+        }
+      },
+      "help": {
+        "info_panel_1": {
+          "en": "Static help or notice content; produces no form data.",
+          "gu": "સ્થિર મદદ અથવા સૂચના સામગ્રી; કોઈ ફોર્મ ડેટા ઉત્પન્ન કરતું નથી."
+        },
+        "eligibility_declaration_1": {
+          "en": "I confirm the acceptance declaration text.",
+          "gu": "હું સ્વીકૃતિ ઘોષણા લખાણની પુષ્ટિ કરું છું."
+        }
+      },
+      "errors": {}
+    },
+    "prefillBindings": [
+      {
+        "fieldId": "caf_prefill_1",
+        "cafAttribute": "acceptance.citizen.fullName",
+        "confidenceMin": 0.8
+      }
+    ],
+    "integrationBindings": [
+      {
+        "fieldId": "text_short_1",
+        "adapterId": "acceptance-adapter-citizen",
+        "param": "fullName",
+        "direction": "in"
+      },
+      {
+        "fieldId": "family_repeater_1[].text_short_1",
+        "adapterId": "acceptance-adapter-family",
+        "param": "memberName",
+        "direction": "out"
+      }
+    ],
+    "workflowBindings": [
+      {
+        "fieldId": "eligibility_declaration_1",
+        "stage": "acceptance-review"
+      },
+      {
+        "fieldId": "fee_field_1",
+        "stage": "acceptance-payment"
+      }
+    ],
+    "progressiveSteps": [
+      {
+        "stepId": "step_1",
+        "labelEn": "Identity",
+        "labelGu": "ઓળખ",
+        "fieldIds": [
+          "text_short_1",
+          "email_1",
+          "dob_1",
+          "section_header_1",
+          "info_panel_1",
+          "signature_esign_1",
+          "dropdown_master_1"
+        ]
+      },
+      {
+        "stepId": "step_2",
+        "labelEn": "Household and documents",
+        "labelGu": "પરિવાર અને દસ્તાવેજો",
+        "fieldIds": [
+          "caf_prefill_1",
+          "doc_upload_1",
+          "family_repeater_1"
+        ]
+      },
+      {
+        "stepId": "step_3",
+        "labelEn": "Declaration and fee",
+        "labelGu": "ઘોષણા અને ફી",
+        "fieldIds": [
+          "eligibility_declaration_1",
+          "fee_field_1"
+        ]
+      }
+    ]
+  },
+  "audit": {
+    "createdBy": "unit-e-technical-actor",
+    "createdAt": "2026-07-27T00:00:00.000Z"
+  }
+}

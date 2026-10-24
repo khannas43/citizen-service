@@ -1,0 +1,46 @@
+/* Shared with scheme-simulator beneficiary profile popup */
+.ben-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+}
+.ben-modal {
+  background: var(--color-surface); border-radius: var(--radius, 0.5rem);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25); width: min(480px, 94vw);
+  max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;
+}
+.ben-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1rem; border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.ben-modal-title { font-size: 1rem; font-weight: 700; }
+.ben-modal-close {
+  background: none; border: none; font-size: 1.1rem; cursor: pointer;
+  color: var(--color-text-muted); line-height: 1; padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+.ben-modal-close:hover { background: var(--color-surface-raised, #f1f5f9); }
+.ben-modal-loading { padding: 2rem; text-align: center; color: var(--color-text-muted); }
+.ben-modal-body { overflow-y: auto; padding: 0.75rem 1rem; }
+.ben-modal-section { margin-bottom: 1rem; }
+.ben-modal-section-title {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--color-text-muted);
+  margin-bottom: 0.4rem; padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.ben-modal-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 0.28rem 0; font-size: 0.83rem;
+}
+.ben-modal-row span { color: var(--color-text-muted); }
+.ben-modal-row strong { color: var(--color-text); }
+
+.person-profile-link {
+  background: none; border: none; padding: 0; margin: 0;
+  font: inherit; font-weight: 700; color: var(--color-primary, #1b3c74);
+  cursor: pointer; text-align: left; text-decoration: underline;
+  text-decoration-color: rgba(27, 60, 116, 0.35);
+  text-underline-offset: 2px;
+}
+.person-profile-link:hover { color: var(--color-primary-dark, #112952); }

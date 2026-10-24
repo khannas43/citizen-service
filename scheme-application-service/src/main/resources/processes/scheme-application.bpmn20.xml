@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL
+                                 http://www.omg.org/spec/BPMN/20100524/MODEL/BPMN20.xsd"
+             targetNamespace="org.magicsword.schemeapp">
+
+  <process id="schemeApplication" name="Scheme Application" isExecutable="true">
+
+    <startEvent id="start" name="Start"/>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="incomeVerification"/>
+
+    <userTask id="incomeVerification" name="Income Verification Officer"
+              flowable:assignee="income-officer"/>
+
+    <userTask id="schemeApproval" name="Scheme Approval Officer"
+              flowable:candidateGroups="scheme-dept"/>
+
+    <endEvent id="end" name="Approved"/>
+    <endEvent id="escalationEnd" name="Escalated (SLA Breach)"/>
+
+    <boundaryEvent id="timerIncome" attachedToRef="incomeVerification" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT48H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <boundaryEvent id="timerApproval" attachedToRef="schemeApproval" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT48H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow id="flow2" sourceRef="incomeVerification" targetRef="schemeApproval"/>
+    <sequenceFlow id="flow3" sourceRef="schemeApproval" targetRef="end"/>
+
+    <sequenceFlow id="flowTimerIncome" sourceRef="timerIncome" targetRef="escalationEnd"/>
+    <sequenceFlow id="flowTimerApproval" sourceRef="timerApproval" targetRef="escalationEnd"/>
+
+  </process>
+
+</definitions>

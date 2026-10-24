@@ -1,0 +1,126 @@
+{{- /*
+  FB-E5.2 chart-local Deployment.
+
+  Uses common helpers for name / labels / image resolution.
+  Security context, startup probe, terminationGracePeriodSeconds, and /tmp
+  emptyDir are expressed here because the shared common Deployment template
+  does not wire them (common chart is not modified in this increment).
+
+  Flyway remains application-startup (V1–V4). No db-migration initContainer.
+  SPRING_FLYWAY_ENABLED is intentionally NOT forced to false.
+*/ -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "common.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+{{- include "common.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+{{- include "common.labels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+{{- include "common.labels" . | nindent 8 }}
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      containers:
+        - name: {{ template "common.name" . }}
+          image: {{ template "common.image" (dict "Values" .Values "repository" .Values.image.repository "tag" .Values.image.tag) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.httpPort }}
+              protocol: TCP
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          {{- if .Values.lifecycle }}
+          lifecycle:
+            {{- toYaml .Values.lifecycle | nindent 12 }}
+          {{- end }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.healthChecks.startupPath | quote }}
+              port: {{ .Values.httpPort }}
+            initialDelaySeconds: {{ .Values.healthChecks.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthChecks.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthChecks.startup.timeoutSeconds }}
+            successThreshold: {{ .Values.healthChecks.startup.successThreshold }}
+            failureThreshold: {{ .Values.healthChecks.startup.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.healthChecks.livenessPath | quote }}
+              port: {{ .Values.httpPort }}
+            initialDelaySeconds: {{ .Values.healthChecks.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthChecks.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthChecks.liveness.timeoutSeconds }}
+            successThreshold: {{ .Values.healthChecks.liveness.successThreshold }}
+            failureThreshold: {{ .Values.healthChecks.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.healthChecks.readinessPath | quote }}
+              port: {{ .Values.httpPort }}
+            initialDelaySeconds: {{ .Values.healthChecks.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthChecks.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthChecks.readiness.timeoutSeconds }}
+            successThreshold: {{ .Values.healthChecks.readiness.successThreshold }}
+            failureThreshold: {{ .Values.healthChecks.readiness.failureThreshold }}
+          env:
+            - name: SERVER_PORT
+              value: {{ .Values.httpPort | quote }}
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: /form-definition-service
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.db.url.configMapName | quote }}
+                  key: {{ .Values.db.url.key | quote }}
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.username.secretName | quote }}
+                  key: {{ .Values.db.username.key | quote }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.password.secretName | quote }}
+                  key: {{ .Values.db.password.key | quote }}
+            {{- if and .Values.db.flyway .Values.db.flyway.enabled }}
+            - name: SPRING_FLYWAY_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.flyway.username.secretName | quote }}
+                  key: {{ .Values.db.flyway.username.key | quote }}
+            - name: SPRING_FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.flyway.password.secretName | quote }}
+                  key: {{ .Values.db.flyway.password.key | quote }}
+            {{- end }}
+            {{- if .Values.javaToolOptions }}
+            - name: JAVA_TOOL_OPTIONS
+              value: {{ .Values.javaToolOptions | quote }}
+            {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

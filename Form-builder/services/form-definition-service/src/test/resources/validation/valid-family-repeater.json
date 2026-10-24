@@ -1,0 +1,59 @@
+{
+  "serviceId": "illustrative-family-repeater-service",
+  "version": 1,
+  "status": "draft",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "family_members": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "member_name": { "type": "string" },
+            "emergency.contact": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "maxItems": 5,
+        "minItems": 0
+      }
+    },
+    "additionalProperties": false
+  },
+  "uiSchema": {
+    "family_members": {
+      "ui:field": "family-repeater",
+      "items": {
+        "member_name": { "ui:widget": "text-short" },
+        "emergency.contact": { "ui:widget": "text-short" }
+      }
+    },
+    "ui:order": ["family_members"]
+  },
+  "meta": {
+    "paletteProvenance": [
+      { "fieldId": "family_members", "widgetType": "family-repeater" },
+      { "fieldId": "family_members[].member_name", "widgetType": "text-short" },
+      { "fieldId": "family_members[].emergency\\.contact", "widgetType": "text-short" }
+    ],
+    "bilingual": {
+      "labels": {
+        "family_members": { "en": "Family members", "gu": "કુટુંબના સભ્યો" },
+        "family_members[].member_name": { "en": "Member name", "gu": "સભ્યનું નામ" },
+        "family_members[].emergency\\.contact": { "en": "Emergency contact", "gu": "કટોકટી સંપર્ક" }
+      },
+      "help": {},
+      "errors": {}
+    },
+    "prefillBindings": [],
+    "integrationBindings": [],
+    "workflowBindings": [],
+    "progressiveSteps": []
+  },
+  "audit": {
+    "createdBy": "svc-account",
+    "createdAt": "2026-01-01T00:00:00Z"
+  }
+}

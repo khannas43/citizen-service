@@ -1,0 +1,256 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: superset-config
+  namespace: egov
+type: Opaque
+stringData:
+  superset_config.py: |
+    import os
+    from cachelib.redis import RedisCache
+
+    SECRET_KEY = os.environ.get("SUPERSET_SECRET_KEY", "dg20-demo-superset-secret")
+
+    SQLALCHEMY_DATABASE_URI = (
+        f"postgresql+psycopg2://{os.environ['DB_USER']}:{os.environ['DB_PASS']}"
+        f"@{os.environ['DB_HOST']}:{os.environ['DB_PORT']}/{os.environ['DB_NAME']}"
+    )
+
+    CACHE_CONFIG = {
+        "CACHE_TYPE": "RedisCache",
+        "CACHE_DEFAULT_TIMEOUT": 300,
+        "CACHE_KEY_PREFIX": "superset_",
+        "CACHE_REDIS_URL": os.environ.get(
+            "REDIS_URL", "redis://redis-master.egov.svc.cluster.local:6379/1"
+        ),
+    }
+
+    FEATURE_FLAGS = {
+        "ENABLE_TEMPLATE_PROCESSING": True,
+        "DASHBOARD_NATIVE_FILTERS": True,
+        "DASHBOARD_RBAC": False,
+        "EMBEDDED_SUPERSET": True,
+    }
+    CONTENT_SECURITY_POLICY_WARNING = False
+
+    GUEST_TOKEN_JWT_SECRET = os.environ.get(
+        "GUEST_TOKEN_JWT_SECRET", "dg20-demo-guest-secret-key-32b"
+    )
+    GUEST_TOKEN_JWT_ALGO = "HS256"
+    GUEST_TOKEN_JWT_EXP_SECONDS = 86400 * 365
+
+    SUPERSET_WEBSERVER_TIMEOUT = 300
+    ROW_LIMIT = 50000
+
+    # Embedded iframe from officer portal (demo — HTTP, single machine)
+    HTTP_HEADERS = {}
+    TALISMAN_ENABLED = False
+    ENABLE_CORS = True
+    CORS_OPTIONS = {
+        "supports_credentials": True,
+        "allow_headers": ["*"],
+        "resources": ["*"],
+        "origins": os.environ.get(
+            "OFFICER_PORTAL_ORIGINS",
+            "http://localhost:30073,http://127.0.0.1:30073",
+        ).split(","),
+    }
+    PUBLIC_ROLE_LIKE = "Gamma"
+    AUTH_ROLE_PUBLIC = "Public"
+    ENABLE_PROXY_FIX = True
+    SESSION_COOKIE_SAMESITE = "None"
+    SESSION_COOKIE_SECURE = False
+    WTF_CSRF_ENABLED = False
+
+  superset_init.sh: |
+    #!/bin/bash
+    set -e
+    echo "Upgrading Superset metadata DB..."
+    superset db upgrade
+    echo "Initializing Superset roles..."
+    superset init
+    echo "Creating admin user (if missing)..."
+    superset fab create-admin \
+      --username "${ADMIN_USERNAME}" \
+      --firstname "DG20" \
+      --lastname "Admin" \
+      --email "${ADMIN_EMAIL}" \
+      --password "${ADMIN_PASSWORD}" || true
+    echo "Bootstrapping DG20 warehouse, datasets, and dashboard..."
+    python /app/bootstrap/bootstrap_reporting.py
+    echo "Superset init complete."
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: superset-env
+  namespace: egov
+data:
+  ADMIN_USERNAME: admin
+  ADMIN_EMAIL: admin@dg20.local
+  ADMIN_PASSWORD: admin123
+  SUPERSET_SECRET_KEY: dg20-demo-superset-secret-key
+  SUPERSET_PORT: "8088"
+  SUPERSET_BIND_ADDRESS: 0.0.0.0
+  DB_HOST: postgres.egov.svc.cluster.local
+  DB_PORT: "5432"
+  DB_NAME: superset
+  REDIS_URL: redis://redis-master.egov.svc.cluster.local:6379/1
+  OFFICER_PORTAL_ORIGINS: "http://localhost:30073,http://127.0.0.1:30073"
+  GUEST_TOKEN_JWT_SECRET: dg20-demo-guest-secret-key-32b
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: superset-init
+  namespace: egov
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: superset-init
+          image: apache/superset:3.1.3
+          command:
+            - /bin/bash
+            - -c
+            - |
+              pip install -q redis psycopg2-binary flask-cors
+              export PYTHONPATH=/app/pythonpath
+              . /app/pythonpath/superset_init.sh
+          envFrom:
+            - configMapRef:
+                name: superset-env
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: password
+            - name: EGOV_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: username
+            - name: EGOV_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: password
+          volumeMounts:
+            - name: superset-config
+              mountPath: /app/pythonpath
+              readOnly: true
+            - name: superset-bootstrap
+              mountPath: /app/bootstrap
+              readOnly: true
+      volumes:
+        - name: superset-config
+          secret:
+            secretName: superset-config
+        - name: superset-bootstrap
+          configMap:
+            name: superset-bootstrap
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: superset
+  namespace: egov
+  labels:
+    app: superset
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: superset
+  template:
+    metadata:
+      labels:
+        app: superset
+    spec:
+      containers:
+        - name: superset
+          image: apache/superset:3.1.3
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              pip install -q redis psycopg2-binary flask-cors
+              export PYTHONPATH=/app/pythonpath
+              exec /usr/bin/run-server.sh
+          ports:
+            - containerPort: 8088
+          envFrom:
+            - configMapRef:
+                name: superset-env
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: password
+          volumeMounts:
+            - name: superset-config
+              mountPath: /app/pythonpath
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8088
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8088
+            initialDelaySeconds: 120
+            periodSeconds: 60
+            timeoutSeconds: 15
+            failureThreshold: 5
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+      volumes:
+        - name: superset-config
+          secret:
+            secretName: superset-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: superset
+  namespace: egov
+  labels:
+    app: superset
+spec:
+  type: NodePort
+  selector:
+    app: superset
+  ports:
+    - port: 8088
+      targetPort: 8088
+      nodePort: 30076

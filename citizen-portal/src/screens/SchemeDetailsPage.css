@@ -1,0 +1,470 @@
+.scheme-details-authed,
+.scheme-details-page {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+  box-sizing: border-box;
+}
+
+.scheme-details-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.scheme-details-breadcrumb a {
+  color: #1b4f91;
+  font-weight: 600;
+}
+
+.scheme-details-breadcrumb a:hover {
+  color: #e4691f;
+}
+
+.scheme-details-breadcrumb .sep {
+  color: #cbd5e1;
+}
+
+.scheme-details-hero {
+  margin-bottom: 1.25rem;
+}
+
+.scheme-details-hero h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.scheme-details-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.scheme-details-chips .chip {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.scheme-details-chips .chip.muted {
+  background: #e2e8f0;
+}
+
+.scheme-details-chips .status-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.scheme-details-chips .status-upcoming {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.scheme-details-chips .status-ended {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.scheme-details-sample-banner {
+  margin: 0 0 1rem;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  font-size: 0.88rem;
+}
+
+.scheme-details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 1.25rem 1.5rem;
+  align-items: start;
+}
+
+.scheme-details-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.scheme-details-panel.card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem 1.35rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+.scheme-details-panel h2 {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.scheme-details-desc {
+  margin: 0;
+  line-height: 1.55;
+  color: #334155;
+}
+
+.scheme-details-panel .benefit-summary {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.benefit-table-wrap {
+  margin-top: 0.85rem;
+  overflow-x: auto;
+}
+
+.benefit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.benefit-table th,
+.benefit-table td {
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.benefit-table th {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.scheme-details-page .criteria-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.scheme-details-page .criteria-list li {
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fafbfc;
+  font-size: 0.9rem;
+}
+
+.scheme-details-page .crit-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.scheme-details-page .crit-status.met {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.scheme-details-page .crit-status.not-met {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.scheme-details-page .crit-status.needs {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.scheme-details-page .crit-label {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.scheme-details-page .crit-value {
+  color: #475569;
+  font-size: 0.85rem;
+}
+
+.doc-checklist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.doc-checklist li {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.doc-checklist li:last-child {
+  border-bottom: none;
+}
+
+.doc-checklist input[type='checkbox'] {
+  margin-top: 0.15rem;
+  accent-color: #e4691f;
+}
+
+.doc-checklist strong {
+  display: block;
+  color: #0f172a;
+}
+
+.steps-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps-list li {
+  position: relative;
+  padding: 0 0 1rem 2.5rem;
+  border-left: 2px solid #e2e8f0;
+  margin-left: 0.65rem;
+}
+
+.steps-list li:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+
+.steps-list .step-num {
+  position: absolute;
+  left: -0.65rem;
+  top: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: #e4691f;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.faq-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.faq-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.faq-item + .faq-item {
+  margin-top: 0.5rem;
+}
+
+.faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: #f8fafc;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq-question:hover {
+  background: #f1f5f9;
+}
+
+.faq-question:focus-visible {
+  outline: 2px solid #e4691f;
+  outline-offset: -2px;
+}
+
+.faq-answer {
+  padding: 0.75rem 1rem 1rem;
+  margin: 0;
+  line-height: 1.5;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.related-schemes-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.related-schemes-list a {
+  display: block;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #1b4f91;
+}
+
+.related-schemes-list a:hover {
+  border-color: #e4691f;
+  color: #e4691f;
+}
+
+.scheme-details-aside {
+  position: sticky;
+  top: 1rem;
+}
+
+.scheme-details-side-card.card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+}
+
+.scheme-details-side-card .side-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.scheme-details-side-card .btn-primary,
+.scheme-details-side-card .btn-secondary {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.scheme-details-side-card h3 {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.side-helpline {
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+}
+
+.side-helpline a {
+  color: #1b4f91;
+  font-weight: 600;
+}
+
+.side-offices-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.side-offices-list li {
+  padding: 0.55rem 0;
+  border-top: 1px solid #eef2f6;
+  font-size: 0.85rem;
+}
+
+.side-offices-list li:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.side-offices-list a {
+  color: #e4691f;
+  font-weight: 600;
+}
+
+.scheme-details-error-panel {
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.scheme-details-error-panel h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.35rem;
+}
+
+.scheme-details-loading {
+  padding: 2rem 0;
+}
+
+/* Guest .dg-landing section padding leak (`.dg-landing section { padding: 56px 0 }`) */
+.dg-landing .scheme-details-page section,
+.scheme-details-page section {
+  padding: 0;
+  margin: 0;
+  min-height: 0;
+}
+
+/* ...but the panels are cards and need their own padding back (this must outrank the rule above) */
+.dg-landing .scheme-details-page section.scheme-details-panel,
+.scheme-details-page section.scheme-details-panel {
+  padding: 1.25rem 1.35rem;
+}
+
+@media (max-width: 900px) {
+  .scheme-details-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .scheme-details-aside {
+    position: static;
+  }
+
+  .scheme-details-page .criteria-list li {
+    grid-template-columns: 1.4rem 1fr;
+  }
+
+  .scheme-details-page .crit-value {
+    grid-column: 2;
+  }
+}
+
+/* Officer-written guidance under the benefits and eligibility lists */
+.scheme-details-note {
+  margin: 0.85rem 0 0;
+  padding: 0.65rem 0.85rem;
+  background: #fff7ed;
+  border-left: 3px solid #e4691f;
+  border-radius: 4px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #334155;
+}

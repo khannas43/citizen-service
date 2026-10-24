@@ -1,0 +1,32 @@
+initContainers:
+  gitSync:
+    repo: "https://github.com/egovernments/configs"
+    branch: "master"
+    image:
+      repository: "registry.k8s.io/git-sync/git-sync"
+      tag: "v4.2.4"
+      pullPolicy: IfNotPresent
+    env: |
+        - name: "GITSYNC_REPO"
+          value: "{{ .Values.initContainers.gitSync.repo }}"
+        - name: "GITSYNC_REF"
+          value: "{{ .Values.initContainers.gitSync.branch }}"
+        - name: "GITSYNC_DEPTH"
+          value: "1"
+        - name: "GITSYNC_ONE_TIME"
+          value: "true"
+        - name: "GITSYNC_ROOT"
+          value: "/work-dir"
+        - name: "GITSYNC_LINK"
+          value: "configs"
+ingress:
+  enabled: false
+image:
+  repository: "egov-persister"
+  tag: "arm64-local"
+  pullPolicy: Never
+persist-yml-path: "file:///work-dir/configs/egov-persister/egov-workflow-v2-persister.yml"
+healthChecks:
+  enabled: true
+  livenessProbePath: "/common-persist/health/liveness"
+  readinessProbePath: "/common-persist/health/readiness"

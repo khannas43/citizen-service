@@ -1,0 +1,8 @@
+.data-hub { padding: var(--space-4, 1rem) var(--space-5, 1.25rem) 0; }
+.dh-tabs { display: flex; gap: var(--space-2, 0.5rem); border-bottom: 1px solid var(--color-border, #dde3ee); }
+.dh-tabs button {
+  border: 0; border-bottom: 3px solid transparent; background: transparent; padding: 0.55rem 1.1rem;
+  font: inherit; font-weight: 600; color: var(--color-text-secondary, #4a5568); cursor: pointer;
+}
+.dh-tabs button.active { color: var(--color-primary, #1b3c74); border-bottom-color: var(--color-primary, #1b3c74); }
+.dh-tabs button:focus-visible { outline: 3px solid #0f172a; outline-offset: -3px; }

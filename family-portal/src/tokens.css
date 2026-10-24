@@ -1,0 +1,237 @@
+/* =====================================================
+   DG 2.0 — Design Tokens (shared across all portals)
+   ===================================================== */
+
+/* ── Colour palette ── */
+:root {
+  /* Brand */
+  --gov-blue:        #1a3c5e;
+  --gov-blue-mid:    #2c5f8a;
+  --gov-blue-light:  #e8f0f8;
+  --gov-orange:      #f47920;
+  --gov-orange-light:#fff3e0;
+
+  /* Semantic */
+  --success:         #2e7d32;
+  --success-bg:      #e8f5e9;
+  --warning:         #f57f17;
+  --warning-bg:      #fff8e1;
+  --danger:          #c62828;
+  --danger-bg:       #ffebee;
+  --neutral:         #555555;
+  --neutral-bg:      #eeeeee;
+
+  /* Surface */
+  --surface:         #ffffff;
+  --page-bg:         #f5f6fa;
+  --border:          #e5e7eb;
+  --border-light:    #f0f0f0;
+
+  /* Text */
+  --text-primary:    #1a1a2e;
+  --text-secondary:  #666666;
+  --text-hint:       #999999;
+}
+
+/* ── Typography ── */
+:root {
+  --font-body:    'Noto Sans', system-ui, -apple-system, sans-serif;
+  --font-gu:      'Noto Sans Gujarati', 'Noto Sans', system-ui, sans-serif;
+  --font-mono:    ui-monospace, 'Cascadia Code', monospace;
+
+  --text-xs:   0.75rem;
+  --text-sm:   0.85rem;
+  --text-base: 1rem;
+  --text-lg:   1.1rem;
+  --text-xl:   1.35rem;
+  --text-2xl:  1.75rem;
+  --text-hero: 2rem;
+
+  --weight-normal:   400;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+}
+
+/* ── Spacing (8px grid) ── */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+}
+
+/* ── Radii + Shadows ── */
+:root {
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-full: 999px;
+
+  --shadow-card:  0 2px 8px rgba(0,0,0,0.06);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.10);
+  --shadow-modal: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+/* ── Role badge colours (officer portal) ── */
+:root {
+  --role-data-entry-bg:   #e3f2fd;
+  --role-data-entry-fg:   #1565c0;
+  --role-talati-bg:       #f3e5f5;
+  --role-talati-fg:       #7b1fa2;
+  --role-revenue-bg:      #e0f2f1;
+  --role-revenue-fg:      #00695c;
+  --role-scheme-dept-bg:  #fff3e0;
+  --role-scheme-dept-fg:  #e65100;
+  --role-dept-admin-bg:   var(--gov-blue-light);
+  --role-dept-admin-fg:   var(--gov-blue);
+}
+
+/* ── Animations ── */
+@keyframes dg-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+@keyframes dg-flash-in {
+  0%   { background-color: var(--warning-bg); }
+  100% { background-color: transparent; }
+}
+
+@keyframes dg-slide-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes dg-slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes dg-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes dg-count-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utility animation classes ── */
+.dg-flash      { animation: dg-flash-in 2s ease-out; }
+.dg-slide-up   { animation: dg-slide-up 0.25s ease-out; }
+.dg-slide-right{ animation: dg-slide-in-right 0.3s ease-out; }
+.dg-fade-in    { animation: dg-fade-in 0.2s ease-out; }
+
+/* ── Base badge ── */
+.dg-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
+}
+
+/* Engine badges */
+.dg-badge-flw {
+  background: var(--success);
+  color: var(--surface);
+}
+
+.dg-badge-dgt {
+  background: var(--gov-blue-mid);
+  color: var(--surface);
+}
+
+/* Beneficiary status badges */
+.dg-badge-identified {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.dg-badge-confirmed {
+  background: var(--gov-blue-light);
+  color: var(--gov-blue);
+}
+
+.dg-badge-active {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.dg-badge-removed {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* Role badges (officer portal) */
+.dg-role-data-entry  { background: var(--role-data-entry-bg);  color: var(--role-data-entry-fg); }
+.dg-role-talati      { background: var(--role-talati-bg);      color: var(--role-talati-fg); }
+.dg-role-revenue     { background: var(--role-revenue-bg);     color: var(--role-revenue-fg); }
+.dg-role-scheme-dept { background: var(--role-scheme-dept-bg); color: var(--role-scheme-dept-fg); }
+.dg-role-dept-admin  { background: var(--role-dept-admin-bg);  color: var(--role-dept-admin-fg); }
+
+/* SLA countdown badges */
+.dg-sla-green {
+  background: var(--success-bg);
+  color: var(--success);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.dg-sla-amber {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.dg-sla-red {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  animation: dg-pulse 1.5s ease-in-out infinite;
+}
+
+/* Card with optional left stripe */
+.dg-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.dg-card-stripe-pending    { border-left: 4px solid var(--gov-orange); }
+.dg-card-stripe-approved   { border-left: 4px solid var(--success); }
+.dg-card-stripe-escalated  { border-left: 4px solid var(--danger); }
+.dg-card-stripe-identified { border-left: 4px solid var(--warning); }
+.dg-card-stripe-confirmed  { border-left: 4px solid var(--gov-blue-mid); }
+
+/* Gujarati text */
+.dg-gu {
+  font-family: var(--font-gu);
+  line-height: 1.65;
+}
+
+/* Live indicator dot */
+.dg-live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: dg-pulse 1.5s ease-in-out infinite;
+  margin-right: var(--space-2);
+  vertical-align: middle;
+}

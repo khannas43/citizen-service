@@ -1,0 +1,5 @@
+id,domain,status,verified_at,verified_by,verification_note,updated_at
+259a7eb0-5863-50bf-ac3f-b4ebd8ca2012,BENEFICIARY,CLOSED,2024-05-18 09:00:00,7817b01b-fb92-4113-b6bc-629db405f659,Recovery reached the treasury account.,2024-05-18 09:00:00
+8859ce1a-c782-54bf-91cc-61109af4f1e0,BENEFICIARY,CLOSED,2024-05-30 09:00:00,7817b01b-fb92-4113-b6bc-629db405f659,Recovery reached the treasury account.,2024-05-30 09:00:00
+8bd2f288-d393-5d7e-bdd5-734d0b659c8e,BENEFICIARY,CLOSED,2024-06-07 09:00:00,7817b01b-fb92-4113-b6bc-629db405f659,Recovery reached the treasury account.,2024-06-07 09:00:00
+b7f8e0a3-1069-5c9a-9b48-a17c33a952ce,BENEFICIARY,CLOSED,2024-05-25 09:00:00,7817b01b-fb92-4113-b6bc-629db405f659,Recovery reached the treasury account.,2024-05-25 09:00:00

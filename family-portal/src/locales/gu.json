@@ -1,0 +1,22 @@
+{
+  "appTitle": "ગુજરાત સરકાર",
+  "familyPortal": "કુટુંબ પ્રોફાઇલ પોર્ટલ",
+  "searchPlaceholder": "નામ અથવા આધાર રેફ દ્વારા શોધો",
+  "searchBtn": "શોધો",
+  "searching": "શોધી રહ્યા છીએ…",
+  "noResults": "કોઈ વ્યક્તિ મળી નથી.",
+  "back": "શોધ પર પાછા",
+  "tabs": {
+    "tree": "કુટુંબ વૃક્ષ",
+    "income": "આવક",
+    "schemes": "યોજનાઓ"
+  },
+  "totalIncome": "કુલ કુટુંબ આવક",
+  "eligible": "પાત્ર",
+  "notEligible": "અપાત્ર",
+  "enrolled": "નોંધાયેલ",
+  "deceased": "મૃત",
+  "ageLabel": "વર્ષ",
+  "applyNow": "હવે અરજી કરો",
+  "langToggle": "EN | ગુ"
+}

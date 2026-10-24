@@ -1,0 +1,100 @@
+{
+  "before": {
+    "openAlerts": 447,
+    "flaggedAmount": 520000.0,
+    "confirmedAmount": 965000.0,
+    "recoveredAmount": 965000.0,
+    "fixedFindings": 88,
+    "recurredFindings": 13,
+    "recurrenceRate": 14.8,
+    "avgDaysToMasterCorrection": 7.6,
+    "verifiedClosedCases": 124,
+    "awaitingVerification": 19
+  },
+  "after_plan": {
+    "openAlerts": 447,
+    "flaggedAmount": 520000.0,
+    "confirmedAmount": 965000.0,
+    "recoveredAmount": 965000.0,
+    "fixedFindings": 88,
+    "recurredFindings": 13,
+    "recurrenceRate": 14.8,
+    "avgDaysToMasterCorrection": 7.6,
+    "verifiedClosedCases": 124,
+    "awaitingVerification": 19
+  },
+  "byMonth": [
+    {
+      "month": "2025-11",
+      "flagged": 50500.0,
+      "confirmed": 50500.0,
+      "recovered": 50500.0
+    },
+    {
+      "month": "2025-12",
+      "flagged": 61000.0,
+      "confirmed": 50500.0,
+      "recovered": 61000.0
+    },
+    {
+      "month": "2026-01",
+      "flagged": 68500.0,
+      "confirmed": 4000.0,
+      "recovered": 13000.0
+    },
+    {
+      "month": "2026-02",
+      "flagged": 102500.0,
+      "confirmed": 20500.0,
+      "recovered": 74500.0
+    },
+    {
+      "month": "2026-03",
+      "flagged": 117000.0,
+      "confirmed": 66000.0,
+      "recovered": 24000.0
+    },
+    {
+      "month": "2026-04",
+      "flagged": 93500.0,
+      "confirmed": 64500.0,
+      "recovered": 52500.0
+    },
+    {
+      "month": "2026-05",
+      "flagged": 242500.0,
+      "confirmed": 12000.0,
+      "recovered": 54000.0
+    },
+    {
+      "month": "2026-06",
+      "flagged": 201500.0,
+      "confirmed": 119000.0,
+      "recovered": 136000.0
+    },
+    {
+      "month": "2026-07",
+      "flagged": 275000.0,
+      "confirmed": 39500.0,
+      "recovered": 69500.0
+    },
+    {
+      "month": "2026-08",
+      "flagged": 215500.0,
+      "confirmed": 200500.0,
+      "recovered": 145500.0
+    },
+    {
+      "month": "2026-09",
+      "flagged": 449000.0,
+      "confirmed": 151000.0,
+      "recovered": 118000.0
+    },
+    {
+      "month": "2026-10",
+      "flagged": 268500.0,
+      "confirmed": 187000.0,
+      "recovered": 166500.0
+    }
+  ]
+}

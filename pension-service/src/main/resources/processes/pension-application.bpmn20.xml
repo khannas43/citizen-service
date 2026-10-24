@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL
+                                 http://www.omg.org/spec/BPMN/20100524/MODEL/BPMN20.xsd"
+             targetNamespace="org.magicsword.pension">
+
+  <process id="pensionApplication" name="Pension Application" isExecutable="true">
+
+    <startEvent id="start" name="Start"/>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="revenueVerification"/>
+
+    <userTask id="revenueVerification" name="Revenue Officer Verification"
+              flowable:assignee="revenue-officer"/>
+
+    <userTask id="sanctioningOfficer" name="Pension Sanctioning Officer"
+              flowable:candidateGroups="pension-dept"/>
+
+    <userTask id="disbursementInit" name="Disbursement Initiated"
+              flowable:candidateGroups="treasury"/>
+
+    <endEvent id="end" name="Approved"/>
+    <endEvent id="escalationEnd" name="Escalated (SLA Breach)"/>
+
+    <boundaryEvent id="timerRevenue" attachedToRef="revenueVerification" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT48H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <boundaryEvent id="timerSanction" attachedToRef="sanctioningOfficer" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT48H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <boundaryEvent id="timerDisburse" attachedToRef="disbursementInit" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT48H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow id="flow2" sourceRef="revenueVerification" targetRef="sanctioningOfficer"/>
+    <sequenceFlow id="flow3" sourceRef="sanctioningOfficer" targetRef="disbursementInit"/>
+    <sequenceFlow id="flow4" sourceRef="disbursementInit" targetRef="end"/>
+
+    <sequenceFlow id="flowTimerRevenue" sourceRef="timerRevenue" targetRef="escalationEnd"/>
+    <sequenceFlow id="flowTimerSanction" sourceRef="timerSanction" targetRef="escalationEnd"/>
+    <sequenceFlow id="flowTimerDisburse" sourceRef="timerDisburse" targetRef="escalationEnd"/>
+
+  </process>
+
+</definitions>

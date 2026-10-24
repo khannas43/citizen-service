@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL
+                                 http://www.omg.org/spec/BPMN/20100524/MODEL/BPMN20.xsd"
+             targetNamespace="org.magicsword.caste">
+
+  <process id="casteCertificateApproval" name="Caste Certificate Approval" isExecutable="true">
+
+    <startEvent id="start" name="Start"/>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="dataEntryReview"/>
+
+    <userTask id="dataEntryReview" name="Data Entry Officer Review"
+              flowable:assignee="${assignee}">
+      <documentation>Review submitted caste certificate application for completeness.</documentation>
+    </userTask>
+
+    <boundaryEvent id="dataEntryTimer" attachedToRef="dataEntryReview" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT24H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow id="flow2" sourceRef="dataEntryReview" targetRef="talatiVerification"/>
+    <sequenceFlow id="flowTimerData" sourceRef="dataEntryTimer" targetRef="escalationEnd"/>
+
+    <userTask id="talatiVerification" name="Talati Verification"
+              flowable:candidateGroups="talati">
+      <documentation>Talati verifies caste claim against village records.</documentation>
+    </userTask>
+
+    <boundaryEvent id="talatiTimer" attachedToRef="talatiVerification" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT24H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow id="flow3" sourceRef="talatiVerification" targetRef="end"/>
+    <sequenceFlow id="flowTimerTalati" sourceRef="talatiTimer" targetRef="escalationEnd"/>
+
+    <endEvent id="end" name="Approved"/>
+    <endEvent id="escalationEnd" name="Escalated (SLA Breach)"/>
+
+  </process>
+
+</definitions>

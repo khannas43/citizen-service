@@ -1,0 +1,29 @@
+{{- /*
+  ClusterIP Service. zuul/route-path is set only when ingress.zuul is true.
+  Defaults keep ingress.zuul=false so no Zuul annotation is emitted.
+*/ -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "common.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+{{- include "common.labels" . | nindent 4 }}
+  {{- if or .Values.ingress.zuul (and .Values.service .Values.service.additionalAnnotations) }}
+  annotations:
+    {{- if .Values.ingress.zuul }}
+    zuul/route-path: {{ .Values.ingress.context | quote }}
+    {{- end }}
+    {{- if and .Values.service .Values.service.additionalAnnotations }}
+    {{- tpl .Values.service.additionalAnnotations . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  selector:
+{{- include "common.labels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.httpPort }}
+      targetPort: {{ .Values.httpPort }}
+      protocol: TCP

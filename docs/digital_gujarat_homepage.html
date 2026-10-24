@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Gujarat 2.0 — Government of Gujarat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#003087;--navy-dark:#001f5e;--orange:#FF6200;--gold:#F5A623;
+  --green:#006B3C;--white:#ffffff;--light:#F5F7FA;--border:#DDE3EE;
+  --text:#1A1A2E;--muted:#5A6478;
+}
+body{font-family:'Noto Sans',sans-serif;background:#fff;color:var(--text);font-size:14px}
+
+/* ── GOI BAR ── */
+.goi-bar{background:#1a1a2e;color:#aaa;font-size:11px;padding:5px 20px;display:flex;justify-content:space-between;align-items:center}
+.goi-bar-left{display:flex;align-items:center;gap:10px}
+.goi-bar a{color:#aaa;text-decoration:none;margin-left:10px;font-size:10.5px}
+.goi-bar a:hover{color:#fff}
+
+/* ── HEADER ── */
+header{background:#fff;border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.header-left{display:flex;align-items:center;gap:8px}
+.emblem-wrap{display:flex;align-items:center;gap:12px;padding-right:16px;border-right:1px solid var(--border)}
+.header-brand{padding-left:16px}
+.brand-line1{font-size:10px;color:var(--muted);letter-spacing:.3px}
+.brand-line2{font-size:18px;font-weight:700;color:var(--navy);line-height:1.1}
+.brand-line3{font-size:10px;color:var(--muted)}
+.header-right{display:flex;align-items:center;gap:8px}
+
+/* ── DROPDOWN ── */
+.dd-wrap{position:relative;display:inline-block}
+.dd-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .18s}
+.dd-btn.citizen{background:var(--orange);color:#fff}
+.dd-btn.citizen:hover{background:#e05500}
+.dd-btn.officer{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+.dd-btn.officer:hover{background:var(--light)}
+.dd-btn .chevron{font-size:10px;transition:transform .18s;display:inline-block}
+.dd-wrap:hover .chevron{transform:rotate(180deg)}
+.dd-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:210px;z-index:200;overflow:hidden}
+.dd-wrap:hover .dd-menu,.dd-menu:hover{display:block}
+.dd-menu-hdr{background:var(--light);padding:8px 14px;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.dd-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;text-decoration:none;color:var(--text);transition:background .15s}
+.dd-item:hover{background:var(--light)}
+.di-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.di-label{font-size:13px;font-weight:500}
+.di-sub{font-size:11px;color:var(--muted)}
+
+/* ── NAV ── */
+nav{background:var(--navy);border-bottom:3px solid var(--orange)}
+nav ul{display:flex;list-style:none;padding:0 20px;margin:0;overflow-x:auto}
+nav ul li a{display:block;padding:10px 14px;color:rgba(255,255,255,.78);text-decoration:none;font-size:12.5px;font-weight:500;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .15s}
+nav ul li a:hover,nav ul li a.active{color:#fff;border-bottom-color:var(--gold)}
+
+/* ── MARQUEE ── */
+.marquee-bar{background:var(--orange);color:#fff;padding:6px 0;font-size:12px;font-weight:500;overflow:hidden;display:flex;align-items:center}
+.mq-label{background:var(--navy);color:#fff;padding:0 14px;font-size:10px;font-weight:700;letter-spacing:.8px;height:28px;line-height:28px;flex-shrink:0;margin-right:12px}
+.mq-outer{overflow:hidden;flex:1}
+.mq-track{display:flex;gap:40px;animation:scrolll 32s linear infinite;white-space:nowrap}
+.mq-track span{white-space:nowrap}
+@keyframes scrolll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ── HERO ── */
+.hero{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:stretch;min-height:400px;overflow:hidden}
+.hero-left{flex:0 0 52%;padding:40px 28px 40px 24px;display:flex;flex-direction:column;justify-content:center}
+.hero-badge{display:inline-block;background:#FFF0E6;color:var(--orange);font-size:10.5px;font-weight:700;padding:4px 12px;border-radius:2px;letter-spacing:.8px;margin-bottom:14px;border:1px solid #FFD4B8}
+.hero h1{font-size:30px;font-weight:700;line-height:1.25;color:var(--navy);margin-bottom:12px}
+.hero h1 span{color:var(--orange)}
+.hero p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px;max-width:460px}
+.hero-ctas{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.hero-ctas .primary{background:var(--orange);color:#fff;padding:10px 22px;border-radius:4px;border:none;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.hero-ctas .primary:hover{background:#e05500}
+.hero-ctas .secondary{background:#fff;color:var(--navy);padding:10px 22px;border-radius:4px;border:1.5px solid var(--navy);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.hero-ctas .secondary:hover{background:var(--light)}
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap}
+.hero-pill{display:flex;align-items:center;gap:5px;background:var(--light);border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-size:11px;color:var(--muted)}
+.hero-right{flex:0 0 48%;overflow:hidden;border-left:1px solid var(--border)}
+.hero-right svg{display:block;width:100%;height:100%;min-height:400px}
+
+/* ── STATS ── */
+.stats-strip{background:var(--navy);display:flex;justify-content:space-around;padding:16px 20px}
+.stat-item{text-align:center;color:#fff}
+.stat-item .sn{font-size:22px;font-weight:700;color:var(--gold)}
+.stat-item .sl{font-size:10px;opacity:.7;margin-top:2px}
+.stat-div{width:1px;background:rgba(255,255,255,.15)}
+
+/* ── SECTION ── */
+.section{padding:32px 20px;background:#fff}
+.section-alt{background:var(--light)}
+.sec-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;border-left:3px solid var(--orange);padding-left:10px}
+.sec-hdr h2{font-size:18px;font-weight:700;color:var(--navy)}
+.sec-hdr a{font-size:12px;color:var(--orange);text-decoration:none;font-weight:600}
+
+/* ── SERVICE CARDS ── */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.svc-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .18s;text-decoration:none;color:var(--text);display:block}
+.svc-card:hover{border-color:var(--orange);box-shadow:0 4px 16px rgba(0,48,135,.08);transform:translateY(-2px)}
+.svc-ic{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:18px}
+.svc-card h3{font-size:12.5px;font-weight:600;color:var(--navy);margin-bottom:3px;line-height:1.3}
+.svc-card p{font-size:10.5px;color:var(--muted)}
+
+/* ── JOURNEY ── */
+.journey{display:flex;position:relative;margin-top:20px}
+.jstep{flex:1;text-align:center;padding:0 6px;position:relative}
+.jstep:not(:last-child)::after{content:'';position:absolute;top:17px;right:0;width:50%;height:2px;background:var(--border)}
+.jstep:not(:first-child)::before{content:'';position:absolute;top:17px;left:0;width:50%;height:2px;background:var(--border)}
+.jnum{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;position:relative;z-index:1}
+.jtitle{font-size:12.5px;font-weight:600;color:var(--navy);margin-bottom:3px}
+.jdesc{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* ── AI BANNER ── */
+.ai-banner{background:var(--navy);padding:28px 24px;display:flex;align-items:flex-start;gap:24px}
+.ai-ic{width:54px;height:54px;background:rgba(255,255,255,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid rgba(255,255,255,.2);font-size:22px;color:var(--gold)}
+.ai-banner h2{font-size:17px;font-weight:700;color:#fff;margin-bottom:6px}
+.ai-banner p{font-size:12.5px;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:12px}
+.ai-tags{display:flex;gap:8px;flex-wrap:wrap}
+.ai-tag{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);padding:3px 10px;border-radius:100px;font-size:11px;color:rgba(255,255,255,.85)}
+
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px 20px 32px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.panel-hdr{background:var(--navy);color:#fff;padding:10px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.ph-dot{width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.ni{padding:10px 14px;border-bottom:1px solid #f0f2f7;display:flex;gap:10px;align-items:flex-start}
+.ni:last-child{border-bottom:none}
+.ni-date{background:var(--navy);color:#fff;border-radius:3px;padding:3px 7px;font-size:9.5px;font-weight:700;white-space:nowrap;text-align:center;line-height:1.5;flex-shrink:0}
+.ni-text{font-size:12px;line-height:1.5;color:var(--text)}
+.ni-tag{display:inline-block;background:#E6EEFF;color:var(--navy);font-size:9.5px;padding:1px 6px;border-radius:2px;margin-top:3px;font-weight:700}
+
+/* ── FOOTER ── */
+footer{background:var(--navy-dark);color:rgba(255,255,255,.65);padding:24px 20px 14px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:20px;margin-bottom:18px}
+.fb-name{font-size:14px;font-weight:700;color:#fff;margin:6px 0 4px}
+.footer-col h4{font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:5px}
+.footer-col ul li a{color:rgba(255,255,255,.55);text-decoration:none;font-size:11.5px}
+.footer-col ul li a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:12px;display:flex;justify-content:space-between;font-size:10.5px;opacity:.45}
+
+/* ── CHATBOT ── */
+.chatbot-wrap{position:fixed;bottom:24px;right:24px;z-index:999}
+.cb-btn{width:54px;height:54px;border-radius:50%;background:var(--orange);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,98,0,.45);font-size:22px;color:#fff;position:relative;transition:transform .2s}
+.cb-btn:hover{transform:scale(1.08)}
+.cb-badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:#c0392b;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700}
+.cb-panel{display:none;position:absolute;bottom:64px;right:0;width:310px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.16);overflow:hidden}
+.cb-panel.open{display:block}
+.cb-head{background:var(--navy);padding:12px 14px;display:flex;align-items:center;gap:10px;color:#fff}
+.cb-av{width:34px;height:34px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.cb-name{font-size:13px;font-weight:600}
+.cb-status{font-size:10.5px;opacity:.75}
+.cb-close{margin-left:auto;cursor:pointer;opacity:.7;font-size:18px;background:none;border:none;color:#fff}
+.cb-langs{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid var(--border)}
+.cb-lang{flex:1;padding:5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;text-align:center;background:#fff;transition:all .15s}
+.cb-lang.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.cb-msgs{padding:12px;height:190px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.cb-msg{max-width:85%;padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.5}
+.cb-msg.bot{background:var(--light);border:1px solid var(--border);align-self:flex-start;border-radius:2px 8px 8px 8px}
+.cb-msg.user{background:var(--navy);color:#fff;align-self:flex-end;border-radius:8px 2px 8px 8px}
+.cb-input-row{display:flex;border-top:1px solid var(--border);padding:8px}
+.cb-input-row input{flex:1;border:1px solid var(--border);border-radius:4px;padding:7px 10px;font-size:12px;outline:none;font-family:inherit}
+.cb-input-row input:focus{border-color:var(--navy)}
+.cb-input-row button{margin-left:6px;background:var(--orange);color:#fff;border:none;border-radius:4px;padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero{flex-direction:column}
+  .hero-left{flex:none;padding:28px 16px}
+  .hero-right{flex:none;min-height:260px;border-left:none;border-top:1px solid var(--border)}
+  .two-col{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .stats-strip{flex-wrap:wrap;gap:12px}
+  .stat-div{display:none}
+  nav ul{gap:0}
+}
+@media(max-width:480px){
+  .footer-grid{grid-template-columns:1fr}
+  .svc-grid{grid-template-columns:repeat(2,1fr)}
+  .header-brand .brand-line2{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- GOI BAR -->
+<div class="goi-bar">
+  <div class="goi-bar-left">
+    <svg height="20" viewBox="0 0 120 52" xmlns="http://www.w3.org/2000/svg" aria-label="Government of India emblem" role="img">
+      <ellipse cx="60" cy="48" rx="28" ry="4" fill="#c8a84b" opacity=".8"/>
+      <ellipse cx="44" cy="47" rx="8" ry="5" fill="#c8a84b" opacity=".7"/>
+      <ellipse cx="60" cy="46" rx="10" ry="6" fill="#c8a84b" opacity=".8"/>
+      <ellipse cx="76" cy="47" rx="8" ry="5" fill="#c8a84b" opacity=".7"/>
+      <rect x="38" y="32" width="44" height="8" rx="2" fill="#c8a84b"/>
+      <circle cx="60" cy="36" r="5" fill="none" stroke="#001f5e" stroke-width="1.2"/>
+      <circle cx="60" cy="36" r="1.5" fill="#001f5e"/>
+      <line x1="60" y1="31.2" x2="60" y2="33" stroke="#001f5e" stroke-width=".8"/>
+      <line x1="60" y1="39" x2="60" y2="40.8" stroke="#001f5e" stroke-width=".8"/>
+      <line x1="55.2" y1="36" x2="57" y2="36" stroke="#001f5e" stroke-width=".8"/>
+      <line x1="63" y1="36" x2="64.8" y2="36" stroke="#001f5e" stroke-width=".8"/>
+      <line x1="56.5" y1="32.5" x2="57.8" y2="33.8" stroke="#001f5e" stroke-width=".8"/>
+      <line x1="62.2" y1="38.2" x2="63.5" y2="39.5" stroke="#001f5e" stroke-width=".8"/>
+      <line x1="63.5" y1="32.5" x2="62.2" y2="33.8" stroke="#001f5e" stroke-width=".8"/>
+      <line x1="57.8" y1="38.2" x2="56.5" y2="39.5" stroke="#001f5e" stroke-width=".8"/>
+      <ellipse cx="60" cy="22" rx="7" ry="9" fill="#c8a84b"/>
+      <circle cx="60" cy="11" r="7" fill="#c8a84b"/>
+      <circle cx="60" cy="11" r="9" fill="none" stroke="#b8860b" stroke-width="2.5" stroke-dasharray="2,1.5"/>
+      <circle cx="57.5" cy="10" r="1" fill="#6b4a00"/>
+      <circle cx="62.5" cy="10" r="1" fill="#6b4a00"/>
+      <path d="M57.5 13 Q60 15 62.5 13" fill="none" stroke="#6b4a00" stroke-width=".8"/>
+      <ellipse cx="46" cy="23" rx="5" ry="7" fill="#b8a040" opacity=".85"/>
+      <circle cx="46" cy="14" r="5.5" fill="#b8a040" opacity=".85"/>
+      <ellipse cx="74" cy="23" rx="5" ry="7" fill="#b8a040" opacity=".85"/>
+      <circle cx="74" cy="14" r="5.5" fill="#b8a040" opacity=".85"/>
+    </svg>
+    <span style="color:#888;font-size:10px">भारत सरकार &nbsp;|&nbsp; Government of India &nbsp;|&nbsp; Government of Gujarat &nbsp;|&nbsp; DST</span>
+  </div>
+  <div>
+    <a href="#">Skip to content</a>
+    <a href="#">A-</a><a href="#">A</a><a href="#">A+</a>
+    <a href="#">Screen Reader</a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="emblem-wrap">
+      <!-- GoI Emblem large -->
+      <svg width="44" height="54" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" aria-label="Government of India" role="img">
+        <ellipse cx="60" cy="130" rx="34" ry="6" fill="#c8a84b" opacity=".8"/>
+        <ellipse cx="42" cy="128" rx="10" ry="7" fill="#c8a84b" opacity=".65"/>
+        <ellipse cx="60" cy="126" rx="13" ry="9" fill="#c8a84b" opacity=".8"/>
+        <ellipse cx="78" cy="128" rx="10" ry="7" fill="#c8a84b" opacity=".65"/>
+        <rect x="30" y="98" width="60" height="14" rx="3" fill="#c8a84b"/>
+        <circle cx="60" cy="105" r="8" fill="none" stroke="#001f5e" stroke-width="1.8"/>
+        <circle cx="60" cy="105" r="2" fill="#001f5e"/>
+        <line x1="60" y1="97.2" x2="60" y2="101" stroke="#001f5e" stroke-width="1.2"/>
+        <line x1="60" y1="109" x2="60" y2="112.8" stroke="#001f5e" stroke-width="1.2"/>
+        <line x1="52.2" y1="105" x2="56" y2="105" stroke="#001f5e" stroke-width="1.2"/>
+        <line x1="64" y1="105" x2="67.8" y2="105" stroke="#001f5e" stroke-width="1.2"/>
+        <line x1="54.3" y1="99.3" x2="56.8" y2="101.8" stroke="#001f5e" stroke-width="1.2"/>
+        <line x1="63.2" y1="108.2" x2="65.7" y2="110.7" stroke="#001f5e" stroke-width="1.2"/>
+        <line x1="65.7" y1="99.3" x2="63.2" y2="101.8" stroke="#001f5e" stroke-width="1.2"/>
+        <line x1="56.8" y1="108.2" x2="54.3" y2="110.7" stroke="#001f5e" stroke-width="1.2"/>
+        <ellipse cx="60" cy="72" rx="11" ry="16" fill="#c8a84b"/>
+        <circle cx="60" cy="48" r="14" fill="#c8a84b"/>
+        <circle cx="60" cy="48" r="18" fill="none" stroke="#b8860b" stroke-width="5" stroke-dasharray="3,2.5"/>
+        <circle cx="55" cy="44" r="2.2" fill="#6b4a00"/>
+        <circle cx="65" cy="44" r="2.2" fill="#6b4a00"/>
+        <circle cx="60" cy="50" r="1.5" fill="#6b4a00"/>
+        <path d="M55 52 Q60 57 65 52" fill="none" stroke="#6b4a00" stroke-width="1.4"/>
+        <line x1="42" y1="48" x2="52" y2="50" stroke="#a07820" stroke-width=".8"/>
+        <line x1="68" y1="50" x2="78" y2="48" stroke="#a07820" stroke-width=".8"/>
+        <ellipse cx="36" cy="75" rx="8" ry="13" fill="#b8a040" opacity=".85"/>
+        <circle cx="36" cy="56" r="11" fill="#b8a040" opacity=".85"/>
+        <circle cx="36" cy="56" r="14" fill="none" stroke="#a09030" stroke-width="4" stroke-dasharray="2.5,2" opacity=".75"/>
+        <ellipse cx="84" cy="75" rx="8" ry="13" fill="#b8a040" opacity=".85"/>
+        <circle cx="84" cy="56" r="11" fill="#b8a040" opacity=".85"/>
+        <circle cx="84" cy="56" r="14" fill="none" stroke="#a09030" stroke-width="4" stroke-dasharray="2.5,2" opacity=".75"/>
+        <text x="60" y="140" text-anchor="middle" fill="#8B6914" font-size="9" font-family="sans-serif" font-weight="700">सत्यमेव जयते</text>
+      </svg>
+      <!-- Gujarat Emblem -->
+      <svg width="36" height="50" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" aria-label="Government of Gujarat" role="img">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#FF6200" stroke-width="3"/>
+        <circle cx="50" cy="50" r="36" fill="#003087"/>
+        <ellipse cx="50" cy="40" rx="10" ry="12" fill="#F5A623"/>
+        <circle cx="50" cy="27" r="9" fill="#F5A623"/>
+        <circle cx="50" cy="27" r="12" fill="none" stroke="#FF8C00" stroke-width="3" stroke-dasharray="2.5,2"/>
+        <circle cx="46" cy="25" r="1.5" fill="#4a2800"/>
+        <circle cx="54" cy="25" r="1.5" fill="#4a2800"/>
+        <path d="M46 29 Q50 33 54 29" fill="none" stroke="#4a2800" stroke-width="1"/>
+        <ellipse cx="34" cy="43" rx="7" ry="10" fill="#E8961A" opacity=".8" transform="rotate(-15 34 43)"/>
+        <circle cx="33" cy="32" r="7" fill="#E8961A" opacity=".8"/>
+        <ellipse cx="66" cy="43" rx="7" ry="10" fill="#E8961A" opacity=".8" transform="rotate(15 66 43)"/>
+        <circle cx="67" cy="32" r="7" fill="#E8961A" opacity=".8"/>
+        <rect x="30" y="52" width="40" height="6" rx="2" fill="#F5A623"/>
+        <ellipse cx="50" cy="62" rx="22" ry="5" fill="#F5A623" opacity=".7"/>
+        <ellipse cx="38" cy="60" rx="7" ry="5" fill="#F5A623" opacity=".65"/>
+        <ellipse cx="50" cy="58" rx="9" ry="6" fill="#F5A623" opacity=".8"/>
+        <ellipse cx="62" cy="60" rx="7" ry="5" fill="#F5A623" opacity=".65"/>
+        <text x="50" y="78" text-anchor="middle" fill="#fff" font-size="6.5" font-family="sans-serif" font-weight="700">GUJARAT</text>
+        <text x="50" y="87" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="4.5" font-family="sans-serif">Government of Gujarat</text>
+      </svg>
+    </div>
+    <div class="header-brand">
+      <div class="brand-line1">DigITal Gujarat 2.0 &nbsp;|&nbsp; ડિજિટલ ગુજરાત ૨.૦</div>
+      <div class="brand-line2">Government of Gujarat</div>
+      <div class="brand-line3">Dept. of Science &amp; Technology &nbsp;·&nbsp; Unified Citizen Service Delivery Platform</div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <!-- Officer Login Dropdown -->
+    <div class="dd-wrap">
+      <button class="dd-btn officer" aria-haspopup="true">
+        <i class="ti ti-shield-lock" style="font-size:14px" aria-hidden="true"></i>
+        Officer Login <span class="chevron">▾</span>
+      </button>
+      <div class="dd-menu">
+        <div class="dd-menu-hdr">Officer Access</div>
+        <a class="dd-item" href="#">
+          <div class="di-icon" style="background:#E6EEFF"><i class="ti ti-user-check" style="color:#003087" aria-hidden="true"></i></div>
+          <div><div class="di-label">Talati / Revenue Officer</div><div class="di-sub">Certificate approvals</div></div>
+        </a>
+        <a class="dd-item" href="#">
+          <div class="di-icon" style="background:#E6F4EE"><i class="ti ti-building" style="color:#006B3C" aria-hidden="true"></i></div>
+          <div><div class="di-label">Dept. Administrator</div><div class="di-sub">Scheme &amp; policy mgmt</div></div>
+        </a>
+        <a class="dd-item" href="#">
+          <div class="di-icon" style="background:#FFF0E6"><i class="ti ti-chart-bar" style="color:#FF6200" aria-hidden="true"></i></div>
+          <div><div class="di-label">IT Secretary / Admin</div><div class="di-sub">Platform operations</div></div>
+        </a>
+        <a class="dd-item" href="#">
+          <div class="di-icon" style="background:#F0E6FF"><i class="ti ti-shield" style="color:#6B21A8" aria-hidden="true"></i></div>
+          <div><div class="di-label">Sanctioning Officer</div><div class="di-sub">Pension disbursements</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Citizen Login Dropdown -->
+    <div class="dd-wrap">
+      <button class="dd-btn citizen" aria-haspopup="true">
+        <i class="ti ti-user-circle" style="font-size:14px" aria-hidden="true"></i>
+        Citizen Login <span class="chevron">▾</span>
+      </button>
+      <div class="dd-menu">
+        <div class="dd-menu-hdr">Citizen Access</div>
+        <a class="dd-item" href="#">
+          <div class="di-icon" style="background:#FFF0E6"><i class="ti ti-fingerprint" style="color:#FF6200" aria-hidden="true"></i></div>
+          <div><div class="di-label">Login with Aadhaar OTP</div><div class="di-sub">Quick eKYC — recommended</div></div>
+        </a>
+        <a class="dd-item" href="#">
+          <div class="di-icon" style="background:#E6EEFF"><i class="ti ti-phone" style="color:#003087" aria-hidden="true"></i></div>
+          <div><div class="di-label">Mobile Number OTP</div><div class="di-sub">Registered mobile</div></div>
+        </a>
+        <a class="dd-item" href="#">
+          <div class="di-icon" style="background:#E6F4EE"><i class="ti ti-user-plus" style="color:#006B3C" aria-hidden="true"></i></div>
+          <div><div class="di-label">New Registration</div><div class="di-sub">First-time citizen</div></div>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav aria-label="Main navigation">
+  <ul>
+    <li><a href="#" class="active">Home</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">Schemes</a></li>
+    <li><a href="#">Track Application</a></li>
+    <li><a href="#">Family Dashboard</a></li>
+    <li><a href="#">Grievances</a></li>
+    <li><a href="#">About DG 2.0</a></li>
+  </ul>
+</nav>
+
+<!-- MARQUEE -->
+<div class="marquee-bar" aria-live="polite">
+  <div class="mq-label">LIVE UPDATES</div>
+  <div class="mq-outer">
+    <div class="mq-track">
+      <span>CM Digital Literacy Scheme — Apply Now &nbsp;●&nbsp;</span>
+      <span>OBC Post-Matric Scholarship 2026–27 open till 31 July &nbsp;●&nbsp;</span>
+      <span>BPL Ration Card renewals — apply online or visit nearest JSK centre &nbsp;●&nbsp;</span>
+      <span>Santwana Sahay (Widow Pension) June 2026 disbursements released &nbsp;●&nbsp;</span>
+      <span>Digital Gujarat 2.0 Live — 500+ services across 20+ departments &nbsp;●&nbsp;</span>
+      <span>CM Digital Literacy Scheme — Apply Now &nbsp;●&nbsp;</span>
+      <span>OBC Post-Matric Scholarship 2026–27 open till 31 July &nbsp;●&nbsp;</span>
+      <span>BPL Ration Card renewals — apply online or visit nearest JSK centre &nbsp;●&nbsp;</span>
+      <span>Santwana Sahay (Widow Pension) June 2026 disbursements released &nbsp;●&nbsp;</span>
+      <span>Digital Gujarat 2.0 Live — 500+ services across 20+ departments &nbsp;●&nbsp;</span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-badge">DIGITAL GUJARAT 2.0 &nbsp;●&nbsp; UNIFIED CITIZEN PLATFORM</div>
+    <h1>One Platform.<br><span>Every Citizen.</span><br>Every Service.</h1>
+    <p>Apply for certificates, discover scheme benefits, track applications in real-time, and access 500+ government services — in Gujarati or English, on your phone or computer, from anywhere in Gujarat.</p>
+    <div class="hero-ctas">
+      <button class="primary" onclick="alert('Opening citizen services...')">
+        <i class="ti ti-device-mobile" aria-hidden="true"></i> Access Services
+      </button>
+      <button class="secondary" onclick="alert('Track your application...')">
+        <i class="ti ti-search" aria-hidden="true"></i> Track Application
+      </button>
+    </div>
+    <div class="hero-pills">
+      <span class="hero-pill"><i class="ti ti-language" style="font-size:13px;color:var(--orange)" aria-hidden="true"></i> Gujarati + English</span>
+      <span class="hero-pill"><i class="ti ti-device-mobile" style="font-size:13px;color:var(--orange)" aria-hidden="true"></i> Android App</span>
+      <span class="hero-pill"><i class="ti ti-brain" style="font-size:13px;color:var(--orange)" aria-hidden="true"></i> AI-Powered</span>
+      <span class="hero-pill"><i class="ti ti-clock" style="font-size:13px;color:var(--orange)" aria-hidden="true"></i> 24h Delivery</span>
+    </div>
+  </div>
+
+  <!-- HERO ILLUSTRATION -->
+  <div class="hero-right">
+    <svg width="100%" viewBox="0 0 680 420" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Citizens receiving Digital Gujarat services illustration">
+      <title>Digital Gujarat 2.0 hero illustration</title>
+      <desc>Citizens in traditional Gujarat attire at a Jan Seva Kendra digital service centre</desc>
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a6b"/><stop offset="55%" stop-color="#2c5faa"/><stop offset="100%" stop-color="#5b8fd4"/></linearGradient>
+        <linearGradient id="gnd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8d8a0"/><stop offset="100%" stop-color="#a0b870"/></linearGradient>
+        <linearGradient id="flr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e8e0d0"/><stop offset="100%" stop-color="#d4c8b4"/></linearGradient>
+        <linearGradient id="dsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8a870"/><stop offset="100%" stop-color="#a88850"/></linearGradient>
+        <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1f5c"/><stop offset="100%" stop-color="#0d3080"/></linearGradient>
+      </defs>
+      <rect width="680" height="420" fill="url(#sky)"/>
+      <ellipse cx="340" cy="420" rx="380" ry="100" fill="url(#gnd)"/>
+      <ellipse cx="340" cy="420" rx="340" ry="80" fill="#b8cc90"/>
+      <circle cx="88" cy="72" r="34" fill="#f0d060" opacity=".9"/>
+      <ellipse cx="88" cy="72" rx="34" ry="34" fill="none" stroke="#f5e070" stroke-width="8" opacity=".25"/>
+      <ellipse cx="560" cy="140" rx="55" ry="28" fill="#ffffff" opacity=".18"/>
+      <ellipse cx="600" cy="128" rx="40" ry="22" fill="#ffffff" opacity=".14"/>
+      <ellipse cx="130" cy="110" rx="50" ry="22" fill="#ffffff" opacity=".12"/>
+      <ellipse cx="165" cy="100" rx="36" ry="18" fill="#ffffff" opacity=".1"/>
+      <rect x="20" y="200" width="10" height="80" fill="#8B6914" rx="2"/>
+      <ellipse cx="25" cy="190" rx="22" ry="28" fill="#2d6a1f"/>
+      <ellipse cx="18" cy="200" rx="16" ry="20" fill="#3a7a28"/>
+      <ellipse cx="32" cy="198" rx="14" ry="18" fill="#256018"/>
+      <rect x="630" y="210" width="8" height="60" fill="#8B6914" rx="2"/>
+      <ellipse cx="634" cy="202" rx="18" ry="22" fill="#2d6a1f"/>
+      <rect x="598" y="258" width="82" height="62" rx="4" fill="#d4a060"/>
+      <rect x="598" y="254" width="82" height="8" rx="3" fill="#c09050"/>
+      <rect x="608" y="268" width="18" height="24" fill="#8B6914"/>
+      <rect x="638" y="268" width="18" height="24" fill="#8B6914"/>
+      <rect x="656" y="262" width="16" height="6" fill="#b08040"/>
+      <rect x="0" y="278" width="680" height="142" fill="url(#flr)"/>
+      <rect x="0" y="276" width="680" height="5" fill="#c0b090"/>
+      <line x1="0" y1="295" x2="680" y2="295" stroke="#d0c4a8" stroke-width="0.5"/>
+      <line x1="0" y1="320" x2="680" y2="320" stroke="#d0c4a8" stroke-width="0.5"/>
+      <rect x="118" y="296" width="304" height="10" rx="3" fill="#003087"/>
+      <rect x="118" y="306" width="304" height="6" fill="#FF6200"/>
+      <rect x="198" y="256" width="144" height="52" rx="4" fill="#003087"/>
+      <text x="270" y="276" text-anchor="middle" fill="#F5A623" font-size="9.5" font-family="sans-serif" font-weight="700">Digital Gujarat 2.0</text>
+      <text x="270" y="290" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="7" font-family="sans-serif">Jan Seva Kendra — Bavla, Ahmedabad</text>
+      <rect x="198" y="250" width="5" height="58" fill="#FF9933"/>
+      <rect x="337" y="250" width="5" height="58" fill="#FF9933"/>
+      <rect x="128" y="312" width="264" height="108" rx="6" fill="url(#dsk)"/>
+      <rect x="128" y="308" width="264" height="12" rx="4" fill="#b89050"/>
+      <rect x="130" y="320" width="260" height="2" fill="#907030"/>
+      <rect x="218" y="234" width="132" height="90" rx="5" fill="#1a1a2e"/>
+      <rect x="222" y="238" width="124" height="80" rx="3" fill="url(#scr)"/>
+      <rect x="276" y="324" width="14" height="10" rx="1" fill="#333"/>
+      <rect x="264" y="334" width="38" height="4" rx="1" fill="#555"/>
+      <rect x="226" y="242" width="116" height="14" rx="2" fill="#003087"/>
+      <text x="284" y="252" text-anchor="middle" fill="#F5A623" font-size="7.5" font-family="sans-serif" font-weight="700">Digital Gujarat 2.0</text>
+      <rect x="226" y="259" width="54" height="28" rx="3" fill="#FF6200"/>
+      <text x="253" y="270" text-anchor="middle" fill="#fff" font-size="6.5" font-family="sans-serif" font-weight="600">Caste Cert</text>
+      <text x="253" y="281" text-anchor="middle" fill="#ffe0b0" font-size="6" font-family="sans-serif">Approved ✓</text>
+      <rect x="284" y="259" width="54" height="28" rx="3" fill="#006B3C"/>
+      <text x="311" y="270" text-anchor="middle" fill="#fff" font-size="6.5" font-family="sans-serif" font-weight="600">OBC Scholar</text>
+      <text x="311" y="281" text-anchor="middle" fill="#b0ffc0" font-size="6" font-family="sans-serif">Eligible ✓</text>
+      <rect x="226" y="291" width="112" height="22" rx="2" fill="#0a2560"/>
+      <text x="282" y="300" text-anchor="middle" fill="#90caf9" font-size="6.5" font-family="sans-serif">Priya Patel | Bavla | OBC</text>
+      <text x="282" y="309" text-anchor="middle" fill="#64b5f6" font-size="6" font-family="sans-serif">3 schemes eligible</text>
+      <!-- Officer (female, blue saree) -->
+      <ellipse cx="180" cy="276" rx="17" ry="16" fill="#c07840"/>
+      <ellipse cx="180" cy="268" rx="13" ry="9" fill="#1a0800"/>
+      <ellipse cx="180" cy="266" rx="13" ry="6" fill="#222"/>
+      <circle cx="176" cy="275" r="2" fill="#5c2800"/>
+      <circle cx="184" cy="275" r="2" fill="#5c2800"/>
+      <path d="M175 280 Q180 284 185 280" fill="none" stroke="#5c2800" stroke-width="1.2"/>
+      <circle cx="180" cy="272" r="1.5" fill="#cc0000"/>
+      <circle cx="192" cy="276" r="2" fill="#d4a060"/>
+      <rect x="168" y="290" width="24" height="32" rx="3" fill="#3F51B5"/>
+      <path d="M168 294 Q160 308 156 322" fill="none" stroke="#c08040" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="155" cy="324" r="5" fill="#c08040"/>
+      <path d="M192" cy="294" L200,308 L208,316" fill="none" stroke="#c08040" stroke-width="6" stroke-linecap="round"/>
+      <path d="M192 294 Q200 308 208 316" fill="none" stroke="#c08040" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="209" cy="317" r="5" fill="#c08040"/>
+      <ellipse cx="180" cy="324" rx="18" ry="8" fill="#3a47a0"/>
+      <path d="M168 298 L192 298" stroke="#7986CB" stroke-width="1.5"/>
+      <!-- Farmer (white kurta, Gandhi topi) -->
+      <ellipse cx="378" cy="262" rx="18" ry="17" fill="#8B5E3C"/>
+      <rect x="360" y="246" width="36" height="12" rx="4" fill="#F0F0F0"/>
+      <rect x="360" y="248" width="12" height="7" rx="1" fill="#FF9933"/>
+      <rect x="372" y="248" width="12" height="7" rx="1" fill="#ffffff"/>
+      <rect x="384" y="248" width="12" height="7" rx="1" fill="#138808"/>
+      <circle cx="374" cy="259" r="2" fill="#5c3010"/>
+      <circle cx="382" cy="259" r="2" fill="#5c3010"/>
+      <path d="M373 265 Q378 269 383 265" fill="none" stroke="#5c3010" stroke-width="1.2"/>
+      <path d="M372 262 Q378 264 384 262" fill="none" stroke="#5c3010" stroke-width="1.8"/>
+      <rect x="360" y="278" width="36" height="42" rx="3" fill="#F5F5DC"/>
+      <rect x="360" y="318" width="14" height="18" rx="2" fill="#8B4513"/>
+      <rect x="382" y="318" width="14" height="18" rx="2" fill="#8B4513"/>
+      <line x1="378" y1="280" x2="378" y2="318" stroke="#ddd" stroke-width="1"/>
+      <path d="M360 290 Q344 303 334 314" fill="none" stroke="#8B5E3C" stroke-width="6" stroke-linecap="round"/>
+      <rect x="318" y="306" width="22" height="30" rx="2" fill="#FFF9C4" transform="rotate(-8 329 321)"/>
+      <rect x="316" y="304" width="22" height="30" rx="2" fill="#FFF9C4"/>
+      <line x1="320" y1="311" x2="334" y2="311" stroke="#bbb" stroke-width="0.8"/>
+      <line x1="320" y1="317" x2="334" y2="317" stroke="#bbb" stroke-width="0.8"/>
+      <line x1="320" y1="323" x2="332" y2="323" stroke="#bbb" stroke-width="0.8"/>
+      <path d="M396 290 Q410 281 418 272" fill="none" stroke="#8B5E3C" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="419" cy="270" r="5" fill="#8B5E3C"/>
+      <!-- Young woman (red saree, mobile) -->
+      <ellipse cx="476" cy="260" rx="17" ry="16" fill="#C4885A"/>
+      <ellipse cx="476" cy="249" rx="13" ry="9" fill="#1a0500"/>
+      <ellipse cx="485" cy="248" rx="7" ry="6" fill="#1a0500"/>
+      <circle cx="476" cy="255" r="1.8" fill="#cc0000"/>
+      <circle cx="471" cy="259" r="2" fill="#5c3010"/>
+      <circle cx="481" cy="259" r="2" fill="#5c3010"/>
+      <path d="M470 265 Q476 269 482 265" fill="none" stroke="#5c3010" stroke-width="1.2"/>
+      <circle cx="491" cy="261" r="2" fill="#d4a020"/>
+      <rect x="459" y="276" width="34" height="38" rx="3" fill="#C0392B"/>
+      <path d="M459 282 Q451 296 449 308" fill="none" stroke="#C4885A" stroke-width="6" stroke-linecap="round"/>
+      <rect x="438" y="301" width="18" height="28" rx="3" fill="#1a1a2e"/>
+      <rect x="440" y="304" width="14" height="22" rx="1" fill="#0a2560"/>
+      <rect x="440" y="304" width="14" height="7" rx="1" fill="#003087"/>
+      <circle cx="447" cy="319" r="5" fill="#FF6200"/>
+      <text x="447" y="322" text-anchor="middle" fill="#fff" font-size="5.5" font-family="sans-serif" font-weight="700">DG</text>
+      <rect x="453" y="297" width="30" height="14" rx="5" fill="#FF6200"/>
+      <text x="468" y="307" text-anchor="middle" fill="#fff" font-size="6" font-family="sans-serif" font-weight="600">Approved!</text>
+      <path d="M493 282 Q508 272 514 262" fill="none" stroke="#C4885A" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="515" cy="260" r="5" fill="#C4885A"/>
+      <rect x="459" y="312" width="34" height="30" rx="2" fill="#922B21"/>
+      <rect x="459" y="340" width="14" height="14" rx="2" fill="#7B3A00"/>
+      <rect x="479" y="340" width="14" height="14" rx="2" fill="#7B3A00"/>
+      <!-- Child -->
+      <circle cx="544" cy="298" r="13" fill="#C4885A"/>
+      <ellipse cx="544" cy="287" rx="10" ry="7" fill="#1a0500"/>
+      <ellipse cx="544" cy="306" rx="10" ry="22" fill="#7B68EE"/>
+      <circle cx="540" cy="297" r="1.8" fill="#5c3010"/>
+      <circle cx="548" cy="297" r="1.8" fill="#5c3010"/>
+      <path d="M539 302 Q544 305 549 302" fill="none" stroke="#5c3010" stroke-width="1"/>
+      <rect x="534" y="326" width="10" height="14" rx="2" fill="#6050cc"/>
+      <rect x="546" y="326" width="10" height="14" rx="2" fill="#6050cc"/>
+      <!-- Floating UI cards -->
+      <rect x="14" y="148" width="122" height="50" rx="8" fill="rgba(255,255,255,0.96)"/>
+      <rect x="14" y="148" width="4" height="50" rx="2" fill="#FF6200"/>
+      <text x="26" y="164" fill="#003087" font-size="8.5" font-family="sans-serif" font-weight="700">Scheme Eligibility</text>
+      <text x="26" y="176" fill="#333" font-size="7.5" font-family="sans-serif">3 schemes identified ✓</text>
+      <text x="26" y="191" fill="#FF6200" font-size="7" font-family="sans-serif">BPL · OBC Scholar · Pension</text>
+      <rect x="398" y="116" width="140" height="50" rx="8" fill="rgba(255,255,255,0.96)"/>
+      <rect x="398" y="116" width="4" height="50" rx="2" fill="#006B3C"/>
+      <text x="410" y="132" fill="#003087" font-size="8.5" font-family="sans-serif" font-weight="700">Certificate Ready</text>
+      <text x="410" y="144" fill="#333" font-size="7.5" font-family="sans-serif">Caste Cert (OBC) — Approved</text>
+      <text x="410" y="159" fill="#006B3C" font-size="7" font-family="sans-serif">Download · Add to DigiLocker</text>
+      <rect x="44" y="210" width="110" height="44" rx="8" fill="#003087"/>
+      <rect x="44" y="210" width="4" height="44" rx="2" fill="#F5A623"/>
+      <text x="56" y="225" fill="#F5A623" font-size="8" font-family="sans-serif" font-weight="700">DG Sahayak AI</text>
+      <text x="56" y="237" fill="rgba(255,255,255,.85)" font-size="7.5" font-family="sans-serif">Available in Gujarati</text>
+      <text x="56" y="248" fill="rgba(255,255,255,.55)" font-size="6.5" font-family="sans-serif">ગુજરાતીમાં સહાય</text>
+      <rect x="498" y="174" width="132" height="44" rx="8" fill="rgba(255,255,255,0.96)"/>
+      <rect x="498" y="174" width="4" height="44" rx="2" fill="#C0392B"/>
+      <text x="510" y="190" fill="#003087" font-size="8.5" font-family="sans-serif" font-weight="700">Family Dashboard</text>
+      <text x="510" y="202" fill="#333" font-size="7.5" font-family="sans-serif">6 members · 3 eligible schemes</text>
+      <text x="510" y="212" fill="#C0392B" font-size="7" font-family="sans-serif">Savitaben: Old Age Pension</text>
+      <!-- Decorative stars -->
+      <circle cx="555" cy="168" r="3" fill="#F5A623" opacity=".9"/>
+      <circle cx="568" cy="156" r="2" fill="#F5A623" opacity=".7"/>
+      <circle cx="578" cy="173" r="2.5" fill="#F5A623" opacity=".6"/>
+      <circle cx="538" cy="180" r="2" fill="#ffffff" opacity=".5"/>
+      <circle cx="593" cy="166" r="1.5" fill="#ffffff" opacity=".6"/>
+      <!-- Footer strip -->
+      <rect x="0" y="388" width="680" height="32" fill="#003087"/>
+      <rect x="0" y="384" width="680" height="5" fill="#FF6200"/>
+      <text x="340" y="408" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="8" font-family="sans-serif">Digital Gujarat 2.0 · Dept. of Science &amp; Technology · Government of Gujarat</text>
+    </svg>
+  </div>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats-strip" role="region" aria-label="Platform statistics">
+  <div class="stat-item"><div class="sn">6 Cr+</div><div class="sl">Citizens Served</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="sn">500+</div><div class="sl">Government Services</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="sn">14,112</div><div class="sl">e-Gram Panchayats</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="sn">344</div><div class="sl">Jan Seva Kendras</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="sn">24h</div><div class="sl">Avg. Certificate Delivery</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="sn">98.2%</div><div class="sl">Platform Uptime</div></div>
+</div>
+
+<!-- TOP SERVICES -->
+<section class="section" aria-label="Top citizen services">
+  <div class="sec-hdr">
+    <h2><i class="ti ti-apps" style="font-size:17px;vertical-align:-3px;margin-right:6px;color:var(--orange)" aria-hidden="true"></i>Top Citizen Services</h2>
+    <a href="#">Browse all 500+ →</a>
+  </div>
+  <div class="svc-grid">
+    <a class="svc-card" href="#"><div class="svc-ic" style="background:#FFF0E6"><i class="ti ti-id-badge" style="color:#FF6200" aria-hidden="true"></i></div><h3>Caste Certificate</h3><p>SC / ST / OBC / NT</p></a>
+    <a class="svc-card" href="#"><div class="svc-ic" style="background:#E6EEFF"><i class="ti ti-map-pin" style="color:#003087" aria-hidden="true"></i></div><h3>Domicile Certificate</h3><p>Residence proof</p></a>
+    <a class="svc-card" href="#"><div class="svc-ic" style="background:#E6F4EE"><i class="ti ti-heart" style="color:#006B3C" aria-hidden="true"></i></div><h3>Marriage Certificate</h3><p>Civil registration</p></a>
+    <a class="svc-card" href="#"><div class="svc-ic" style="background:#FFF0E6"><i class="ti ti-cash" style="color:#FF6200" aria-hidden="true"></i></div><h3>Income Certificate</h3><p>Schemes &amp; scholarships</p></a>
+    <a class="svc-card" href="#"><div class="svc-ic" style="background:#F0E6FF"><i class="ti ti-user-check" style="color:#6B21A8" aria-hidden="true"></i></div><h3>Senior Citizen Card</h3><p>Age &amp; pension benefits</p></a>
+    <a class="svc-card" href="#"><div class="svc-ic" style="background:#E6EEFF"><i class="ti ti-school" style="color:#003087" aria-hidden="true"></i></div><h3>OBC Scholarship</h3><p>Post-matric &amp; pre-matric</p></a>
+    <a class="svc-card" href="#"><div class="svc-ic" style="background:#E6F4EE"><i class="ti ti-wheat" style="color:#006B3C" aria-hidden="true"></i></div><h3>Ration Card (BPL)</h3><p>Food &amp; Civil Supplies</p></a>
+    <a class="svc-card" href="#"><div class="svc-ic" style="background:#FFF0E6"><i class="ti ti-heart-handshake" style="color:#FF6200" aria-hidden="true"></i></div><h3>Widow Pension</h3><p>Santwana Sahay Yojana</p></a>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section section-alt" aria-label="How to apply">
+  <div class="sec-hdr"><h2><i class="ti ti-route" style="font-size:17px;vertical-align:-3px;margin-right:6px;color:var(--orange)" aria-hidden="true"></i>Apply in 4 Easy Steps</h2></div>
+  <div class="journey">
+    <div class="jstep"><div class="jnum">1</div><div class="jtitle">Login with Aadhaar</div><div class="jdesc">OTP eKYC — your profile &amp; family details auto-populate from the registry</div></div>
+    <div class="jstep"><div class="jnum">2</div><div class="jtitle">Select Service</div><div class="jdesc">Browse 500+ services or ask the AI chatbot in Gujarati or English</div></div>
+    <div class="jstep"><div class="jnum">3</div><div class="jtitle">Submit Application</div><div class="jdesc">Form auto-fills from Aadhaar eKYC — attach documents from DigiLocker</div></div>
+    <div class="jstep"><div class="jnum">4</div><div class="jtitle">Track &amp; Receive</div><div class="jdesc">Real-time status updates — download certificate once approved</div></div>
+  </div>
+</section>
+
+<!-- AI BANNER -->
+<div class="ai-banner" role="region" aria-label="AI-powered platform features">
+  <div class="ai-ic"><i class="ti ti-brain" aria-hidden="true"></i></div>
+  <div>
+    <h2>AI-Powered Proactive Government</h2>
+    <p>DG 2.0 uses on-premise Indic AI (Sarvam 30B at GSDC, Gandhinagar) to automatically identify eligible citizens for schemes, provide Gujarati-language service guidance, detect fraud in real-time, and deliver benefits proactively — before citizens need to ask.</p>
+    <div class="ai-tags">
+      <span class="ai-tag">Gujarati AI Chatbot</span>
+      <span class="ai-tag">Proactive Eligibility Engine</span>
+      <span class="ai-tag">Real-time Fraud Detection</span>
+      <span class="ai-tag">Smart Notifications</span>
+      <span class="ai-tag">Explainable AI Decisions</span>
+      <span class="ai-tag">Event-Driven Automation</span>
+    </div>
+  </div>
+</div>
+
+<!-- NOTICES + SCHEMES -->
+<div class="two-col" role="region" aria-label="Notices and schemes">
+  <div class="panel">
+    <div class="panel-hdr"><div class="ph-dot"></div>Notices &amp; Circulars</div>
+    <div class="ni"><div class="ni-date">22 JUN<br>2026</div><div><div class="ni-text">CM Digital Literacy Scheme — online registration begins. Eligible: age 18–35, family income below ₹3 lakh.</div><span class="ni-tag">NEW</span></div></div>
+    <div class="ni"><div class="ni-date">15 JUN<br>2026</div><div><div class="ni-text">OBC Post-Matric Scholarship 2026–27 — applications accepted until 31 July 2026.</div><span class="ni-tag">DEADLINE</span></div></div>
+    <div class="ni"><div class="ni-date">08 JUN<br>2026</div><div><div class="ni-text">Santwana Sahay Yojana — June 2026 disbursements of ₹1,250/month released.</div><span class="ni-tag" style="background:#E6F4EE;color:#006B3C">DISBURSEMENT</span></div></div>
+    <div class="ni"><div class="ni-date">01 JUN<br>2026</div><div><div class="ni-text">Digital Gujarat 2.0 goes live — 500+ services available on web and Android app.</div><span class="ni-tag" style="background:#FFF0E6;color:#FF6200">LAUNCH</span></div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-hdr"><div class="ph-dot"></div>Popular Schemes — Check Eligibility</div>
+    <div class="ni"><div class="ni-date" style="background:#006B3C">SC/ST<br>OBC</div><div><div class="ni-text">Post-Matric Scholarship — Class 11 and above. Income below ₹2.5 lakh.</div><span class="ni-tag">SCHOLARSHIP</span></div></div>
+    <div class="ni"><div class="ni-date" style="background:#FF6200">ALL</div><div><div class="ni-text">Old Age Pension (IGNOAPS) — Citizens aged 60+. Family income below ₹2 lakh/year.</div><span class="ni-tag">PENSION</span></div></div>
+    <div class="ni"><div class="ni-date" style="background:#6B21A8">BPL</div><div><div class="ni-text">Antyodaya Ration Card — Poorest families. Automatically identified by platform.</div><span class="ni-tag" style="background:#F0E6FF;color:#6B21A8">FOOD</span></div></div>
+    <div class="ni"><div class="ni-date" style="background:#8B4513">NT</div><div><div class="ni-text">Santwana Sahay — Widows, any caste. Monthly pension ₹1,250. No age limit.</div><span class="ni-tag">PENSION</span></div></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer role="contentinfo">
+  <div class="footer-grid">
+    <div>
+      <div style="font-size:9px;opacity:.4;letter-spacing:.6px;text-transform:uppercase">Government of Gujarat</div>
+      <div class="fb-name">Digital Gujarat 2.0</div>
+      <p style="font-size:11px;line-height:1.6">Unified Citizen Service Delivery Platform. Built on open-source microservices architecture at GSDC, Gandhinagar. Serving 6 crore citizens across Gujarat.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#">Revenue Certificates</a></li>
+        <li><a href="#">Pension Schemes</a></li>
+        <li><a href="#">Scholarships</a></li>
+        <li><a href="#">Ration Card</a></li>
+        <li><a href="#">Land Records</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="#">Track Application</a></li>
+        <li><a href="#">Raise Grievance</a></li>
+        <li><a href="#">FAQs</a></li>
+        <li><a href="#">JSK Locator</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>About</h4>
+      <ul>
+        <li><a href="#">About DG 2.0</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+        <li><a href="#">Accessibility (WCAG 2.1)</a></li>
+        <li><a href="#">DST Gujarat</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Government of Gujarat. All rights reserved. | NIC Hosted | GIGW Compliant</span>
+    <span>Last updated: 24 June 2026 | Version 2.0.1</span>
+  </div>
+</footer>
+
+<!-- CHATBOT BUBBLE -->
+<div class="chatbot-wrap" role="complementary" aria-label="AI chatbot assistant">
+  <div class="cb-panel" id="cbPanel">
+    <div class="cb-head">
+      <div class="cb-av"><i class="ti ti-message-chatbot" style="font-size:16px;color:#fff" aria-hidden="true"></i></div>
+      <div><div class="cb-name">DG Sahayak</div><div class="cb-status">AI Assistant — Gujarati &amp; English</div></div>
+      <button class="cb-close" id="cbClose" aria-label="Close chatbot">✕</button>
+    </div>
+    <div class="cb-langs">
+      <button class="cb-lang active" id="langEn" onclick="setLang('en')">English</button>
+      <button class="cb-lang" id="langGu" onclick="setLang('gu')">ગુજરાતી</button>
+    </div>
+    <div class="cb-msgs" id="cbMsgs">
+      <div class="cb-msg bot">Kem cho! 🙏 I am <strong>DG Sahayak</strong>, your Digital Gujarat assistant. How can I help you today?</div>
+      <div class="cb-msg bot">You can ask me: <em>Check scheme eligibility · Apply for certificate · Track application · Find services</em></div>
+    </div>
+    <div class="cb-input-row">
+      <input type="text" id="cbInput" placeholder="Type your query..." aria-label="Chat message input">
+      <button id="cbSend">Send</button>
+    </div>
+  </div>
+  <button class="cb-btn" id="cbToggle" aria-label="Open AI chat assistant" aria-expanded="false">
+    <i class="ti ti-message-chatbot" aria-hidden="true"></i>
+    <span class="cb-badge" aria-hidden="true">1</span>
+  </button>
+</div>
+
+<script>
+var cbOpen=false,lang='en';
+var R={
+  en:{
+    caste:"To apply for a Caste Certificate, I'll need your name, caste category (SC/ST/OBC/NT), and Aadhaar reference. Shall I start the application?",
+    pension:"For Old Age Pension (IGNOAPS): age 60+, family income below ₹2 lakh/year. Your family appears eligible! Shall I help you apply?",
+    status:"Please enter your tracking number (starts with FLW- or DGT-) and I'll fetch the live status for you.",
+    scheme:"Based on your profile, you may be eligible for: BPL Ration Card · OBC Post-Matric Scholarship · Old Age Pension. Shall I check your full eligibility?",
+    fallback:"I can help you apply for certificates, check scheme eligibility, track applications, or find services. What would you like?"
+  },
+  gu:{
+    caste:"જ્ઞાતિ પ્રમાણ પત્ર માટે, મારે તમારું નામ, જ્ઞાતિ (SC/ST/OBC/NT) અને આધાર નંબર જોઈએ. શું હું અરજી શરૂ કરું?",
+    pension:"વૃદ્ધ પેન્શન (IGNOAPS) માટે: ઉંમર 60+, આવક ₹2 લાખ/વર્ષ. તમારો પરિવાર પાત્ર જણાય છે! શું હું અરજી કરવામાં મદદ કરું?",
+    status:"કૃપા કરીને ટ્રેકિંગ નંબર (FLW- અથવા DGT-) આપો, હું સ્ટેટસ જોઈ આપીશ.",
+    scheme:"તમારા પ્રોફાઇલ અનુસાર: BPL રેશન કાર્ડ · OBC શિષ્યવૃત્તિ · વૃદ્ધ પેન્શન — પાત્રતા છે. સંપૂર્ણ ચકાસણી કરું?",
+    fallback:"હું પ્રમાણ પત્ર, સ્કીમ, સ્ટેટસ, અથવા સેવા વિષે મદદ કરી શકું. શું જોઈએ?"
+  }
+};
+function setLang(l){lang=l;document.getElementById('langEn').className='cb-lang'+(l==='en'?' active':'');document.getElementById('langGu').className='cb-lang'+(l==='gu'?' active':'');}
+document.getElementById('cbToggle').addEventListener('click',function(){cbOpen=!cbOpen;document.getElementById('cbPanel').className='cb-panel'+(cbOpen?' open':'');this.setAttribute('aria-expanded',cbOpen);document.querySelector('.cb-badge').style.display=cbOpen?'none':'flex';});
+document.getElementById('cbClose').addEventListener('click',function(){cbOpen=false;document.getElementById('cbPanel').className='cb-panel';document.getElementById('cbToggle').setAttribute('aria-expanded',false);document.querySelector('.cb-badge').style.display='flex';});
+document.getElementById('cbSend').addEventListener('click',sendMsg);
+document.getElementById('cbInput').addEventListener('keydown',function(e){if(e.key==='Enter')sendMsg();});
+function sendMsg(){var i=document.getElementById('cbInput'),v=i.value.trim();if(!v)return;addMsg(v,'user');i.value='';setTimeout(function(){addMsg(getReply(v.toLowerCase()),'bot');},600);}
+function addMsg(t,type){var c=document.getElementById('cbMsgs'),d=document.createElement('div');d.className='cb-msg '+type;d.textContent=t;c.appendChild(d);c.scrollTop=c.scrollHeight;}
+function getReply(q){var m=R[lang];if(q.match(/caste|jati|sc|obc|st|nt|certificate|praman|jaati/))return m.caste;if(q.match(/pension|vriddh|old age|widow|santwana/))return m.pension;if(q.match(/status|track|flw|dgt|application/))return m.status;if(q.match(/scheme|yojana|eligible|benefit|scholarship/))return m.scheme;return m.fallback;}
+</script>
+</body>
+</html>

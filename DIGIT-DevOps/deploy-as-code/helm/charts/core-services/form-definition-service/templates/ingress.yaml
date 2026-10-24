@@ -1,0 +1,6 @@
+{{- /*
+  Ingress is disabled by default (FB-E5.2). Uses the common ingress helper so
+  Zuul path-preserving routing (/context → zuul:8080, no rewrite) matches
+  platform convention when explicitly enabled for non-deploy render checks.
+*/ -}}
+{{- template "common.ingress" . -}}

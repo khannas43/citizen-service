@@ -1,0 +1,15 @@
+.builder-access-denied {
+  max-width: 40rem;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+
+.builder-access-denied h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.35rem;
+}
+
+.builder-access-denied p {
+  margin: 0;
+  line-height: 1.5;
+}

@@ -1,0 +1,15 @@
+# FB-E1 — NON-PRODUCTION technical governance principal profile.
+#
+# Activate only for local E2 development:
+#   spring.profiles.active=local,governance-technical
+#
+# PROHIBITED in production / shared environments.
+# Prefer test @Bean injection for automated tests.
+# Does not validate JWT/Keycloak and is not an IAM role mapping.
+
+form-definition:
+  governance:
+    technical:
+      # Required when this profile is active — blank actor keeps fail-closed via missing property bean.
+      actor-id: ${GOVERNANCE_TECHNICAL_ACTOR_ID:}
+      capabilities: READ_FORM_DEFINITION_GOVERNANCE,APPROVE_FORM_DEFINITION,PUBLISH_FORM_DEFINITION

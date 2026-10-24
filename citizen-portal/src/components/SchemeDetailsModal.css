@@ -1,0 +1,253 @@
+.scheme-details-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.scheme-details-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: min(640px, 100%);
+  max-height: min(90vh, 900px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18);
+  border: 1px solid #e2e8f0;
+}
+
+.scheme-details-header {
+  padding: 1.25rem 1.35rem 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.scheme-details-header h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+.scheme-details-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.scheme-details-chips .chip {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.scheme-details-chips .status-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.scheme-details-body {
+  padding: 1rem 1.35rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.scheme-details-body h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.scheme-details-body section + section {
+  margin-top: 1.25rem;
+}
+
+.scheme-details-desc {
+  margin: 0;
+  color: #475569;
+  line-height: 1.55;
+}
+
+.benefit-summary {
+  margin: 0 0 0.5rem;
+  color: #475569;
+}
+
+.benefit-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.benefit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.benefit-table th,
+.benefit-table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.criteria-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.criteria-list li {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr 1.2fr;
+  gap: 0.5rem;
+  align-items: start;
+  padding: 0.5rem 0.65rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 0.88rem;
+}
+
+.crit-label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.crit-value {
+  color: #475569;
+}
+
+.crit-status {
+  font-weight: 700;
+  width: 1.25rem;
+  text-align: center;
+}
+
+.crit-status.met { color: #15803d; }
+.crit-status.not-met { color: #b91c1c; }
+.crit-status.needs { color: #b45309; }
+
+.scheme-details-footer {
+  padding: 0.75rem 1.35rem 1.25rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.scheme-details-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+.scheme-details-error {
+  text-align: center;
+  padding: 1rem;
+}
+
+.scheme-details-skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: scheme-sk 1.2s ease infinite;
+  border-radius: 8px;
+}
+
+.scheme-details-skeleton.title {
+  height: 1.5rem;
+  width: 70%;
+}
+
+.scheme-details-skeleton.block {
+  height: 8rem;
+}
+
+@keyframes scheme-sk {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.scheme-name-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline transparent;
+  text-underline-offset: 2px;
+}
+
+.scheme-name-link:hover {
+  text-decoration-color: #e4691f;
+  color: #c2410c;
+}
+
+.scheme-name-link:focus-visible {
+  outline: 2px solid #e4691f;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 540px) {
+  .scheme-details-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .scheme-details-modal {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .criteria-list li {
+    grid-template-columns: 1.5rem 1fr;
+  }
+
+  .crit-value {
+    grid-column: 2;
+  }
+}
+
+/* Guest page is wrapped in .dg-landing, whose `section { padding: 56px 0 }` leaks in here. */
+.scheme-details-modal .scheme-details-body section {
+  padding: 0;
+  margin: 0;
+  min-height: 0;
+}
+
+.scheme-details-modal .scheme-details-body section + section {
+  margin-top: 1.4rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid #eef2f6;
+}
+
+.scheme-details-body h3 {
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.scheme-details-body .benefit-summary {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.criteria-list li {
+  grid-template-columns: 1.4rem minmax(0, 1fr) minmax(0, 1.3fr);
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+}

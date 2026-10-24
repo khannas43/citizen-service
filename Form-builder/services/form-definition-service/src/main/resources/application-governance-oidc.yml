@@ -1,0 +1,17 @@
+# FB-E5.4.1 — Officer-governance OIDC / OAuth2 Resource Server profile.
+#
+# Activate with: spring.profiles.active=governance-oidc
+# Issuer is mandatory at runtime (FDS_OIDC_ISSUER_URI). Blank issuer fails startup.
+# Do not combine with governance-technical. PROHIBITED to use technical profile in production.
+#
+# No real issuer URLs, JWKS URLs, client secrets, or tokens belong in this file.
+
+form-definition:
+  security:
+    oidc:
+      issuer-uri: ${FDS_OIDC_ISSUER_URI:}
+      audience: ${FDS_OIDC_AUDIENCE:form-definition-service}
+      clock-skew-seconds: ${FDS_OIDC_CLOCK_SKEW_SECONDS:60}
+      # When true (default), JwtDecoder uses issuer discovery/JWKS. Tests set false and inject RSA decoder.
+      discovery-enabled: ${FDS_OIDC_DISCOVERY_ENABLED:true}
+    production: ${FDS_SECURITY_PRODUCTION:false}

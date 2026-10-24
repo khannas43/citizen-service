@@ -1,0 +1,233 @@
+.voice-eligibility.card {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.voice-eligibility-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #0f172a;
+}
+
+.voice-eligibility-toggle:hover {
+  background: #f8fafc;
+}
+
+.voice-eligibility-toggle:focus-visible {
+  outline: 2px solid #e4691f;
+  outline-offset: -2px;
+}
+
+.voice-eligibility-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: #fff1e6;
+  font-size: 1.05rem;
+}
+
+.voice-eligibility-heading {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.voice-eligibility-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.voice-eligibility-hint {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.voice-eligibility-chevron {
+  flex: none;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.voice-eligibility-body {
+  margin: 0;
+  padding: 1.1rem 1.25rem 1.35rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.voice-privacy-notice {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+  margin: 0;
+}
+
+.voice-privacy-notice p {
+  margin: 0 0 0.85rem;
+  font-size: 0.92rem;
+  color: #334155;
+}
+
+.voice-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 0 0 0.85rem;
+}
+
+.voice-mic-btn {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 2px solid #e4691f;
+  background: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.voice-mic-btn.active {
+  background: #ffe8e8;
+  border-color: #c0392b;
+}
+
+.voice-status {
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.voice-mute {
+  margin-left: auto;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #475569;
+}
+
+.voice-error {
+  color: #b42318;
+  font-size: 0.9rem;
+}
+
+.voice-assistant-msg {
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+
+.voice-transcript {
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  padding: 0.6rem 0.8rem;
+  background: #f8fafc;
+  border-left: 3px solid #e4691f;
+  border-radius: 4px;
+}
+
+.voice-slots {
+  margin-top: 0.9rem;
+}
+
+.voice-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.voice-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+}
+
+.voice-chip select,
+.voice-chip input {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 0.85rem;
+  font-weight: 400;
+  padding: 0.25rem 0.3rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.voice-run-check {
+  margin-top: 0.85rem;
+}
+
+.voice-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 2.25rem;
+  padding: 0 0.9rem;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+.voice-reset-btn:hover:not(:disabled) {
+  border-color: #e4691f;
+  color: #c2410c;
+  background: #fff7ed;
+}
+
+.voice-reset-btn:focus-visible {
+  outline: 2px solid #e4691f;
+  outline-offset: 2px;
+}
+
+.voice-reset-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.voice-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-warning, #d4a017);
+  border-radius: 8px;
+  background: rgba(212, 160, 23, 0.08);
+}
+
+.voice-confirm p {
+  margin: 0;
+  flex: 1 1 14rem;
+}

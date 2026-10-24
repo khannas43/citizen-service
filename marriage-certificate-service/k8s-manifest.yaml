@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marriage-certificate-service
+  namespace: egov
+  labels:
+    app: marriage-certificate-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: marriage-certificate-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: marriage-certificate-service
+    spec:
+      containers:
+        - name: marriage-certificate-service
+          image: marriage-certificate-service:arm64-local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: password
+          startupProbe:
+            httpGet:
+              path: /marriage-certificate-service/actuator/health/liveness
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /marriage-certificate-service/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 0
+            periodSeconds: 20
+            failureThreshold: 6
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /marriage-certificate-service/actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 6
+            timeoutSeconds: 5
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: marriage-certificate-service
+  namespace: egov
+spec:
+  selector:
+    app: marriage-certificate-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

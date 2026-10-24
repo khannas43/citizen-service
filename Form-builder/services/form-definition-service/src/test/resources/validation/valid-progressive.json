@@ -1,0 +1,62 @@
+{
+  "serviceId": "illustrative-progressive-service",
+  "version": 1,
+  "status": "draft",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "applicant_name": {
+        "type": "string",
+        "title": "Applicant name"
+      },
+      "form_section_intro": {},
+      "page_break_1": {}
+    },
+    "required": ["applicant_name"],
+    "additionalProperties": false
+  },
+  "uiSchema": {
+    "applicant_name": { "ui:widget": "text-short" },
+    "form_section_intro": { "ui:field": "section-header" },
+    "page_break_1": { "ui:field": "page-break" },
+    "ui:order": ["applicant_name", "form_section_intro", "page_break_1"]
+  },
+  "meta": {
+    "paletteProvenance": [
+      { "fieldId": "applicant_name", "widgetType": "text-short" },
+      { "fieldId": "form_section_intro", "widgetType": "section-header" },
+      { "fieldId": "page_break_1", "widgetType": "page-break" }
+    ],
+    "bilingual": {
+      "labels": {
+        "applicant_name": { "en": "Applicant name", "gu": "અરજદારનું નામ" },
+        "form_section_intro": { "en": "Applicant details", "gu": "અરજદારની વિગતો" },
+        "page_break_1": { "en": "Next page", "gu": "આગળનું પાનું" }
+      },
+      "help": {},
+      "errors": {}
+    },
+    "prefillBindings": [],
+    "integrationBindings": [],
+    "workflowBindings": [],
+    "progressiveSteps": [
+      {
+        "stepId": "step-1",
+        "labelEn": "Your details",
+        "labelGu": "તમારી વિગતો",
+        "fieldIds": ["applicant_name"]
+      },
+      {
+        "stepId": "step-2",
+        "labelEn": "Review",
+        "labelGu": "સમીક્ષા",
+        "fieldIds": ["form_section_intro", "page_break_1"]
+      }
+    ]
+  },
+  "audit": {
+    "createdBy": "svc-account",
+    "createdAt": "2026-01-01T00:00:00Z"
+  }
+}

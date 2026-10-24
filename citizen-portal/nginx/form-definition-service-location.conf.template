@@ -1,0 +1,48 @@
+# FB-E5.3A.1 — least-privilege Form Definition Service proxy (citizen).
+# Runtime: FORM_DEFINITION_SERVICE_UPSTREAM (default http://form-definition-service:8080)
+# Allows only GET published/latest. All other FDS paths/methods are rejected locally.
+# nginx forwards credentials when present but does not authenticate.
+# FDS remains authoritative for 401/403 on allowed routes. Fail-closed governance is FDS-owned.
+# This proxy is not a public governance exposure grant.
+
+# Exact allow — query string preserved by nginx when proxy_pass URI has no '?'.
+location = /form-definition-service/api/v1/form-definitions/published/latest {
+    if ($request_method != GET) {
+        return 405;
+    }
+
+    proxy_pass ${FORM_DEFINITION_SERVICE_UPSTREAM}/form-definition-service/api/v1/form-definitions/published/latest;
+    proxy_http_version 1.1;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host $host;
+
+    proxy_set_header Authorization $http_authorization;
+    proxy_set_header If-Match $http_if_match;
+
+    proxy_pass_header ETag;
+    proxy_hide_header Cache-Control;
+    add_header Cache-Control "no-store" always;
+
+    proxy_connect_timeout 10s;
+    proxy_send_timeout 60s;
+    proxy_read_timeout 60s;
+
+    access_log off;
+}
+
+# Deny everything else under the FDS prefix (actuator, drafts, governance, etc.).
+location = /form-definition-service {
+    add_header Cache-Control "no-store" always;
+    default_type application/json;
+    return 403 '{"code":"fds_proxy_forbidden"}';
+}
+
+location /form-definition-service/ {
+    add_header Cache-Control "no-store" always;
+    default_type application/json;
+    return 403 '{"code":"fds_proxy_forbidden"}';
+}

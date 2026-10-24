@@ -1,0 +1,29 @@
+global:
+  domain: localhost
+
+cluster-configs:
+  configmaps:
+    egov-config:
+      name: egov-config
+      namespace:
+        - egov
+      data:
+        db-url: "jdbc:postgresql://postgres.egov.svc.cluster.local:5432/egov_db"
+        kafka-brokers: "kafka.egov.svc.cluster.local:9092"
+        domain: "localhost"
+        egov-services-fqdn-name: "http://localhost/"
+        egov-state-level-tenant-id: "pg"
+        state-level-tenant-id: "pg"
+        mobile-validation-workaround: "true"
+        serializers-timezone-in-ist: "true"
+        timezone: "Asia/Kolkata"
+        spring-jpa-show-sql: "true"
+        logging-level-jdbc: "debug"
+        spring-datasource-tomcat-initialSize: "1"
+        spring-datasource-tomcat-max-active: "2"
+        server-tomcat-max-threads: "10"
+        server-tomcat-max-connections: "100"
+        tracer-errors-provideexceptionindetails: "true"
+
+egov-workflow-v2:
+  db-url: "jdbc:postgresql://postgres.egov.svc.cluster.local:5432/egov_db?currentSchema=egov_common_workflows"

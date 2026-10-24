@@ -1,0 +1,158 @@
+BEGIN;
+SET search_path TO family_registry;
+
+-- ── education_level ──
+WITH aged AS (
+  SELECT
+    id,
+    EXTRACT(YEAR FROM age(current_date, dob))::int AS age,
+    UPPER(TRIM(caste_category)) AS caste
+  FROM person
+)
+UPDATE person p
+SET education_level = CASE
+  WHEN a.age < 6 THEN 'NONE'
+  WHEN a.age BETWEEN 6 AND 10 THEN 'PRIMARY'
+  WHEN a.age BETWEEN 11 AND 14 THEN 'SECONDARY'
+  WHEN a.age BETWEEN 15 AND 17 THEN
+    (ARRAY['SECONDARY', 'MATRIC'])[1 + floor(random() * 2)::int]
+  WHEN a.age >= 18 AND a.caste IN ('SC', 'ST') THEN
+    (ARRAY[
+      'NONE','NONE',
+      'PRIMARY','PRIMARY','PRIMARY',
+      'SECONDARY','SECONDARY','SECONDARY','SECONDARY',
+      'MATRIC','MATRIC','MATRIC','MATRIC',
+      'HIGHER_SEC','HIGHER_SEC','HIGHER_SEC','HIGHER_SEC',
+      'GRADUATE','GRADUATE',
+      'POST_GRADUATE'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age >= 18 AND a.caste = 'NT' THEN
+    (ARRAY[
+      'PRIMARY','PRIMARY',
+      'SECONDARY','SECONDARY','SECONDARY','SECONDARY',
+      'MATRIC','MATRIC','MATRIC','MATRIC','MATRIC','MATRIC',
+      'HIGHER_SEC','HIGHER_SEC','HIGHER_SEC','HIGHER_SEC',
+      'GRADUATE','GRADUATE','GRADUATE',
+      'POST_GRADUATE'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age >= 18 AND a.caste = 'OBC' THEN
+    (ARRAY[
+      'SECONDARY','SECONDARY',
+      'MATRIC','MATRIC','MATRIC','MATRIC','MATRIC',
+      'HIGHER_SEC','HIGHER_SEC','HIGHER_SEC','HIGHER_SEC','HIGHER_SEC','HIGHER_SEC',
+      'GRADUATE','GRADUATE','GRADUATE','GRADUATE','GRADUATE',
+      'POST_GRADUATE','POST_GRADUATE'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age >= 18 THEN
+    (ARRAY[
+      'SECONDARY',
+      'MATRIC','MATRIC','MATRIC',
+      'HIGHER_SEC','HIGHER_SEC','HIGHER_SEC','HIGHER_SEC','HIGHER_SEC',
+      'GRADUATE','GRADUATE','GRADUATE','GRADUATE','GRADUATE','GRADUATE','GRADUATE',
+      'POST_GRADUATE','POST_GRADUATE','POST_GRADUATE','POST_GRADUATE'
+    ])[1 + floor(random() * 20)::int]
+  ELSE 'NONE'
+END
+FROM aged a
+WHERE p.id = a.id;
+
+-- ── marital_status ──
+WITH aged AS (
+  SELECT
+    id,
+    EXTRACT(YEAR FROM age(current_date, dob))::int AS age
+  FROM person
+)
+UPDATE person p
+SET marital_status = CASE
+  WHEN a.age < 18 THEN 'SINGLE'
+  WHEN a.age BETWEEN 18 AND 25 THEN
+    (ARRAY[
+      'SINGLE','SINGLE','SINGLE','SINGLE','SINGLE','SINGLE','SINGLE','SINGLE',
+      'SINGLE','SINGLE','SINGLE','SINGLE','SINGLE',
+      'MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED',
+      'DIVORCED','SEPARATED'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age BETWEEN 26 AND 40 THEN
+    (ARRAY[
+      'SINGLE','SINGLE',
+      'MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED',
+      'MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED',
+      'WIDOWED','WIDOWED',
+      'DIVORCED',
+      'SEPARATED'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age BETWEEN 41 AND 60 THEN
+    (ARRAY[
+      'SINGLE',
+      'MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED',
+      'MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED',
+      'WIDOWED','WIDOWED','WIDOWED','WIDOWED',
+      'DIVORCED','SEPARATED'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age > 60 THEN
+    (ARRAY[
+      'SINGLE','SINGLE',
+      'MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED','MARRIED',
+      'MARRIED','MARRIED',
+      'WIDOWED','WIDOWED','WIDOWED','WIDOWED','WIDOWED','WIDOWED','WIDOWED','WIDOWED',
+      'DIVORCED','SEPARATED'
+    ])[1 + floor(random() * 22)::int]
+  ELSE 'SINGLE'
+END
+FROM aged a
+WHERE p.id = a.id;
+
+-- ── employment_status ──
+WITH aged AS (
+  SELECT
+    id,
+    EXTRACT(YEAR FROM age(current_date, dob))::int AS age,
+    gender,
+    occupation
+  FROM person
+)
+UPDATE person p
+SET employment_status = CASE
+  WHEN a.age < 18 THEN 'STUDENT'
+  WHEN a.age BETWEEN 18 AND 25 THEN
+    (ARRAY[
+      'STUDENT','STUDENT','STUDENT','STUDENT','STUDENT','STUDENT','STUDENT','STUDENT','STUDENT',
+      'UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED',
+      'EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED',
+      'SELF_EMPLOYED','SELF_EMPLOYED'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age BETWEEN 26 AND 60 AND a.occupation IS NOT NULL AND TRIM(a.occupation) <> '' THEN
+    (ARRAY[
+      'EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED',
+      'SELF_EMPLOYED','SELF_EMPLOYED','SELF_EMPLOYED','SELF_EMPLOYED','SELF_EMPLOYED',
+      'SELF_EMPLOYED','SELF_EMPLOYED','SELF_EMPLOYED',
+      'UNEMPLOYED','UNEMPLOYED'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age BETWEEN 26 AND 60 AND (a.occupation IS NULL OR TRIM(a.occupation) = '') AND UPPER(a.gender) = 'F' THEN
+    (ARRAY[
+      'HOMEMAKER','HOMEMAKER','HOMEMAKER','HOMEMAKER','HOMEMAKER','HOMEMAKER','HOMEMAKER','HOMEMAKER','HOMEMAKER',
+      'UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED',
+      'EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED',
+      'SELF_EMPLOYED'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age BETWEEN 26 AND 60 THEN
+    (ARRAY[
+      'UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED','UNEMPLOYED',
+      'EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED','EMPLOYED',
+      'SELF_EMPLOYED','SELF_EMPLOYED','SELF_EMPLOYED','SELF_EMPLOYED','SELF_EMPLOYED'
+    ])[1 + floor(random() * 20)::int]
+  WHEN a.age > 60 THEN
+    (ARRAY[
+      'RETIRED','RETIRED','RETIRED','RETIRED','RETIRED','RETIRED','RETIRED','RETIRED','RETIRED','RETIRED',
+      'RETIRED','RETIRED','RETIRED',
+      'HOMEMAKER','HOMEMAKER','HOMEMAKER',
+      'EMPLOYED','EMPLOYED',
+      'SELF_EMPLOYED','SELF_EMPLOYED'
+    ])[1 + floor(random() * 20)::int]
+  ELSE 'UNEMPLOYED'
+END
+FROM aged a
+WHERE p.id = a.id;
+
+COMMIT;

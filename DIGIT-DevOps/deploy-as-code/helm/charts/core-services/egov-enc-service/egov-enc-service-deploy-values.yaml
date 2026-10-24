@@ -1,0 +1,59 @@
+labels:
+  app: "egov-enc-service"
+  group: "core"
+initContainers:
+  dbMigration:
+    enabled: false
+ingress:
+  enabled: false
+image:
+  repository: "egov-enc-service"
+  tag: "arm64-local"
+  pullPolicy: Never
+replicas: "1"
+healthChecks:
+  enabled: true
+  livenessProbePath: "/egov-enc-service/health/liveness"
+  readinessProbePath: "/egov-enc-service/health/readiness"
+env: |
+  - name: SERVER_PORT
+    value: "8080"
+  - name: JAVA_OPTS
+    value: "-Xmx256m -Xms256m"
+  - name: EGOV_MDMS_HOST
+    value: "http://egov-mdms-service.egov.svc.cluster.local:8080"
+  - name: STATE_LEVEL_TENANT_ID
+    valueFrom:
+      configMapKeyRef:
+        name: egov-config
+        key: state-level-tenant-id
+  - name: EGOV_STATE_LEVEL_TENANT_ID
+    valueFrom:
+      configMapKeyRef:
+        name: egov-config
+        key: egov-state-level-tenant-id
+  - name: SECURITY_BASIC_ENABLED
+    value: "false"
+  - name: MANAGEMENT_SECURITY_ENABLED
+    value: "false"
+  - name: SERVER_CONTEXT_PATH
+    value: /egov-enc-service
+  - name: MASTER_PASSWORD_PROVIDER
+    value: "software"
+  - name: MASTER_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: egov-enc-service
+        key: master.password
+  - name: MASTER_SALT
+    valueFrom:
+      secretKeyRef:
+        name: egov-enc-service
+        key: master.salt
+  - name: MASTER_INITIALVECTOR
+    valueFrom:
+      secretKeyRef:
+        name: egov-enc-service
+        key: master.initialvector
+  - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+    value: "org.postgresql.Driver"

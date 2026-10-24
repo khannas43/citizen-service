@@ -1,0 +1,103 @@
+{
+  "name": "pdf-service",
+  "version": "1.2.2",
+  "description": "Starter project for an ES6 RESTful Express API",
+  "main": "dist",
+  "scripts": {
+    "dev": "nodemon -w src --exec \"babel-node src\"",
+    "build": "babel src -s -D -d dist",
+    "start": "node --max-old-space-size=8192 dist",
+    "prestart": "npm run -s build",
+    "test": "eslint src"
+  },
+  "proxy": "https://egov-micro-dev.egovernments.org/",
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": 2020,
+      "sourceType": "module"
+    },
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "no-console": 0,
+      "no-unused-vars": 1
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/egovernments/core-services.git"
+  },
+  "author": "Jason Miller <jason@developit.ca>",
+  "license": "MIT",
+  "dependencies": {
+    "async": "3.2.3",
+    "axios": "^1.15.0",
+    "base64-stream": "1.0.0",
+    "body-parser": "^1.20.3",
+    "compression": "^1.8.1",
+    "cors": "^2.7.1",
+    "express": "^4.21.2",
+    "express-async-handler": "^1.1.4",
+    "form-data": "^2.5.4",
+    "@babel/runtime": "^7.23.2",
+    "jsonpath-plus": "^10.2.0",
+    "kafka-node": "^5.0.0",
+    "lodash.get": "^4.4.2",
+    "moment-timezone": "^0.5.28",
+    "morgan": "^1.8.0",
+    "node-cache": "5.1.2",
+    "pdf-merger-js": "3.2.1",
+    "pdfmake": "0.2.4",
+    "pg": "^8.7.1",
+    "qrcode": "^1.4.1",
+    "resource-router-middleware": "^0.6.0",
+    "uuid": "^9.0.1",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.0",
+    "@babel/core": "^7.23.2",
+    "@babel/plugin-transform-runtime": "^7.23.2",
+    "@babel/preset-env": "^7.23.2",
+    "eslint": "^8.57.0",
+    "mustache": "^3.0.1",
+    "nodemon": "^3.1.9",
+    "pdfmake": "^0.2.2"
+  },
+  "overrides": {
+    "follow-redirects": "^1.16.0",
+    "path-to-regexp": "^0.1.13",
+    "minimatch": "^3.1.4",
+    "qs": "^6.14.2",
+    "lodash": "^4.18.0",
+    "brace-expansion": "^1.1.13",
+    "minimist": "^1.2.6",
+    "json5": "^1.0.2",
+    "decode-uri-component": "^0.2.1",
+    "js-yaml": "^3.14.2",
+    "word-wrap": "^1.2.4",
+    "tough-cookie": "^4.1.3",
+    "braces": "^3.0.3",
+    "tar": "^7.5.11",
+    "tar-fs": "^2.1.4",
+    "semver": "^5.7.2",
+    "es5-ext": "^0.10.63",
+    "cookie": "^0.7.0",
+    "send": "^0.19.0",
+    "serve-static": "^1.16.0",
+    "underscore": "^1.13.8",
+    "on-headers": "^1.1.0",
+    "ajv": "^6.14.0",
+    "crypto-js": "^4.2.0",
+    "fsevents": "^1.2.11",
+    "ansi-regex": "^5.0.1",
+    "y18n": "^5.0.8",
+    "@babel/traverse": "^7.23.2"
+  },
+  "bugs": {
+    "url": "https://github.com/egovernments/core-services/issues"
+  },
+  "homepage": "https://github.com/egovernments/core-services/blob/master/README.md"
+}

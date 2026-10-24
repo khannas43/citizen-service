@@ -1,0 +1,304 @@
+/* =====================================================
+   DG 2.0 — Gujarat Government Design Tokens
+   ===================================================== */
+
+:root {
+  /* Gujarat Government Blue — primary brand */
+  --color-primary:        #1B3C74;
+  --color-primary-dark:   #112952;
+  --color-primary-light:  #2B5BA8;
+  --color-primary-pale:   #EDF2FB;
+
+  /* Saffron — accent / CTA */
+  --color-accent:         #E8650A;
+  --color-accent-light:   #FDF0E6;
+  --color-accent-hover:   #C4530A;
+
+  /* Surfaces */
+  --color-bg:             #F4F6FA;
+  --color-surface:        #FFFFFF;
+  --color-surface-subtle: #F9FAFB;
+  --color-border:         #DDE3EE;
+  --color-border-light:   #EEF1F7;
+
+  /* Text */
+  --color-text-primary:   #1A2340;
+  --color-text-secondary: #4A5568;
+  --color-text-muted:     #8A94A6;
+  --color-text-inverse:   #FFFFFF;
+
+  /* Status */
+  --color-success:        #1A7A4A;
+  --color-success-bg:     #E8F5EE;
+  --color-warning:        #B45309;
+  --color-warning-bg:     #FEF3C7;
+  --color-error:          #B91C1C;
+  --color-error-bg:       #FEE2E2;
+  --color-info:           #1B3C74;
+  --color-info-bg:        #EDF2FB;
+
+  /* Typography */
+  --font-primary: 'Noto Sans', 'Noto Sans Gujarati', sans-serif;
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+  --text-3xl:  1.875rem;
+
+  /* Spacing (8px grid) */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 3px rgba(27,60,116,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(27,60,116,0.10), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 24px rgba(27,60,116,0.12), 0 4px 8px rgba(0,0,0,0.04);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Legacy aliases */
+  --gov-blue: var(--color-primary);
+  --gov-blue-mid: var(--color-primary-light);
+  --gov-blue-light: var(--color-primary-pale);
+  --gov-orange: var(--color-accent);
+  --gov-orange-light: var(--color-accent-light);
+  --success: var(--color-success);
+  --success-bg: var(--color-success-bg);
+  --warning: var(--color-warning);
+  --warning-bg: var(--color-warning-bg);
+  --danger: var(--color-error);
+  --danger-bg: var(--color-error-bg);
+  --neutral: var(--color-text-secondary);
+  --neutral-bg: var(--color-border-light);
+  --surface: var(--color-surface);
+  --page-bg: var(--color-bg);
+  --border: var(--color-border);
+  --border-light: var(--color-border-light);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-hint: var(--color-text-muted);
+  --font-body: var(--font-primary);
+  --font-gu: 'Noto Sans Gujarati', 'Noto Sans', sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', monospace;
+  --text-hero: var(--text-3xl);
+  --weight-normal: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --shadow-card: var(--shadow-sm);
+  --shadow-hover: var(--shadow-md);
+  --shadow-modal: var(--shadow-lg);
+}
+
+/* Role badge colours (officer portal) */
+:root {
+  --role-data-entry-bg:   #EDF2FB;
+  --role-data-entry-fg:   #1B3C74;
+  --role-talati-bg:       #FDF0E6;
+  --role-talati-fg:       #C4530A;
+  --role-revenue-bg:      #E8F5EE;
+  --role-revenue-fg:      #1A7A4A;
+  --role-scheme-dept-bg:  #FEF3C7;
+  --role-scheme-dept-fg:  #B45309;
+  --role-dept-admin-bg:   var(--color-primary-pale);
+  --role-dept-admin-fg:   var(--color-primary);
+}
+
+@keyframes dg-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+@keyframes dg-flash-in {
+  0%   { background-color: var(--color-warning-bg); }
+  100% { background-color: transparent; }
+}
+
+@keyframes dg-slide-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes dg-slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes dg-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.dg-flash      { animation: dg-flash-in 2s ease-out; }
+.dg-slide-up   { animation: dg-slide-up 0.25s ease-out; }
+.dg-slide-right{ animation: dg-slide-in-right 0.3s ease-out; }
+.dg-fade-in    { animation: dg-fade-in 0.2s ease-out; }
+
+.dg-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
+}
+
+.dg-badge-flw { background: var(--color-success); color: var(--color-surface); }
+.dg-badge-dgt { background: var(--color-primary-light); color: var(--color-surface); }
+.dg-badge-identified { background: var(--color-warning-bg); color: var(--color-warning); }
+.dg-badge-confirmed { background: var(--color-primary-pale); color: var(--color-primary); }
+.dg-badge-active { background: var(--color-success-bg); color: var(--color-success); }
+.dg-badge-removed { background: var(--color-error-bg); color: var(--color-error); }
+
+.dg-role-data-entry  { background: var(--role-data-entry-bg);  color: var(--role-data-entry-fg); }
+.dg-role-talati      { background: var(--role-talati-bg);      color: var(--role-talati-fg); }
+.dg-role-revenue     { background: var(--role-revenue-bg);     color: var(--role-revenue-fg); }
+.dg-role-scheme-dept { background: var(--role-scheme-dept-bg); color: var(--role-scheme-dept-fg); }
+.dg-role-dept-admin  { background: var(--role-dept-admin-bg);  color: var(--role-dept-admin-fg); }
+
+.dg-sla-green {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.dg-sla-amber {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.dg-sla-red {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  animation: dg-pulse 1.5s ease-in-out infinite;
+}
+
+.dg-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.dg-card-stripe-pending    { border-left: 4px solid var(--color-accent); }
+.dg-card-stripe-approved   { border-left: 4px solid var(--color-success); }
+.dg-card-stripe-escalated  { border-left: 4px solid var(--color-error); }
+.dg-card-stripe-identified { border-left: 4px solid var(--color-warning); }
+.dg-card-stripe-confirmed  { border-left: 4px solid var(--color-primary-light); }
+
+.dg-gu {
+  font-family: var(--font-gu);
+  line-height: 1.65;
+}
+
+.dg-live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  animation: dg-pulse 1.5s ease-in-out infinite;
+  margin-right: var(--space-2);
+  vertical-align: middle;
+}
+
+/* Shared components */
+.btn-primary {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms, transform 100ms;
+}
+
+.btn-primary:hover { background: var(--color-accent-hover); }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.btn-secondary:hover { background: var(--color-primary-pale); }
+
+.page-title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  border-left: 4px solid var(--color-accent);
+  padding-left: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.section-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.status-approved,
+.badge-green { background: var(--color-success-bg); color: var(--color-success); }
+.status-pending,
+.badge-amber { background: var(--color-warning-bg); color: var(--color-warning); }
+.status-rejected,
+.badge-red { background: var(--color-error-bg); color: var(--color-error); }
+.badge-grey { background: var(--color-border-light); color: var(--color-text-secondary); }
+.badge-blue { background: var(--color-primary-pale); color: var(--color-primary); }
+.badge-orange { background: #fff7ed; color: #c2410c; }
+
+.badge-urgent-pulse {
+  animation: priority-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes priority-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; box-shadow: 0 0 0 2px var(--color-error); }
+}

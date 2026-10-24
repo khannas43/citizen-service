@@ -1,0 +1,52 @@
+initContainers:
+  dbMigration:
+    enabled: false
+  gitSync:
+    repo: "https://github.com/egovernments/configs"
+    branch: "master"
+    image:
+      repository: "registry.k8s.io/git-sync/git-sync"
+      tag: "v4.2.4"
+      pullPolicy: IfNotPresent
+    env: |
+        - name: "GITSYNC_REPO"
+          value: "{{ .Values.initContainers.gitSync.repo }}"
+        - name: "GITSYNC_REF"
+          value: "{{ .Values.initContainers.gitSync.branch }}"
+        - name: "GITSYNC_DEPTH"
+          value: "1"
+        - name: "GITSYNC_ONE_TIME"
+          value: "true"
+        - name: "GITSYNC_ROOT"
+          value: "/work-dir"
+        - name: "GITSYNC_LINK"
+          value: "configs"
+ingress:
+  enabled: false
+image:
+  repository: "egov-indexer"
+  tag: "arm64-local"
+  pullPolicy: Never
+healthChecks:
+  enabled: true
+  livenessProbePath: "/egov-indexer/health/liveness"
+  readinessProbePath: "/egov-indexer/health/readiness"
+egov-indexer-yaml-repo-path: "/work-dir/configs/egov-indexer"
+env: |
+  - name: EGOV_INDEXER_YML_REPO_PATH
+    value: {{ index .Values "egov-indexer-yaml-repo-path" | quote }}
+  - name: JAVA_OPTS
+    value: {{ index .Values "heap" | quote }}
+  - name: SERVER_PORT
+    value: "8080"
+  - name: SECURITY_BASIC_ENABLED
+    value: "false"
+  - name: MANAGEMENT_SECURITY_ENABLED
+    value: "false"
+  - name: STATE_LEVEL_TENANT_ID
+    valueFrom:
+      configMapKeyRef:
+        name: egov-config
+        key: state-level-tenant-id
+  - name: EGOV_INFRA_INDEXER_HOST
+    value: "http://localhost:9200"

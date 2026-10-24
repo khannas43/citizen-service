@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grievance-service
+  namespace: egov
+  labels:
+    app: grievance-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grievance-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: grievance-service
+    spec:
+      containers:
+        - name: grievance-service
+          image: grievance-service:arm64-local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8089
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: password
+          startupProbe:
+            httpGet:
+              path: /grievance-service/actuator/health/liveness
+              port: 8089
+            failureThreshold: 60
+            periodSeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /grievance-service/actuator/health/liveness
+              port: 8089
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /grievance-service/actuator/health/readiness
+              port: 8089
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "150m"
+            limits:
+              memory: "768Mi"
+              cpu: "400m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grievance-service
+  namespace: egov
+spec:
+  selector:
+    app: grievance-service
+  ports:
+    - name: http
+      port: 8089
+      targetPort: 8089

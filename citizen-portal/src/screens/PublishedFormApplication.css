@@ -1,0 +1,79 @@
+.pf-page {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 1rem;
+  min-width: 0;
+}
+
+.pf-header {
+  margin-bottom: 1rem;
+}
+
+.pf-title {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.pf-notice {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--color-primary, #1b3c74);
+  background: color-mix(in srgb, var(--color-primary, #1b3c74) 8%, white);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.pf-body {
+  min-width: 0;
+}
+
+.pf-state {
+  color: var(--color-text-muted, #5b6472);
+  font-size: 0.95rem;
+}
+
+.pf-alert {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid color-mix(in srgb, #b42318 35%, white);
+  background: color-mix(in srgb, #b42318 8%, white);
+  border-radius: 6px;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.pf-meta {
+  margin-bottom: 0.75rem;
+}
+
+.pf-submit-guidance,
+.pf-submit-success {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.pf-submit-success {
+  color: #1b7a3d;
+}
+
+.pf-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+}
+
+@media (max-width: 390px) {
+  .pf-page {
+    padding: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-page * {
+    transition: none !important;
+  }
+}

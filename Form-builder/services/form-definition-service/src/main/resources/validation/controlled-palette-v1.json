@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "widgets": [
+    {
+      "widgetType": "aadhaar",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "mobile-otp",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "email",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "full-name",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "dob",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "gender",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "caf-prefill",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": false,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "address-block",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "pincode",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "doc-upload",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "digilocker-fetch",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "photo-capture",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "dropdown-master",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "radio",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "multiselect",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "yesno",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "cascading-dropdown",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "text-short",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "text-long",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "number",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "currency-inr",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "percentage",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "widget"
+    },
+    {
+      "widgetType": "bank-account",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "family-repeater",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": false,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "eligibility-declaration",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": false,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "fee-field",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": false,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "signature-esign",
+      "category": "data",
+      "producesData": true,
+      "supportsRequired": true,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "section-header",
+      "category": "display",
+      "producesData": false,
+      "supportsRequired": false,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "info-panel",
+      "category": "display",
+      "producesData": false,
+      "supportsRequired": false,
+      "rjsfKind": "field"
+    },
+    {
+      "widgetType": "page-break",
+      "category": "layout",
+      "producesData": false,
+      "supportsRequired": false,
+      "rjsfKind": "field"
+    }
+  ]
+}

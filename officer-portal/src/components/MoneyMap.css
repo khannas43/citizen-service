@@ -1,0 +1,20 @@
+.money-map { height: 460px; border-radius: 12px; border: 1px solid var(--color-border, #dde3ee); background: #eef1f6; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06); }
+.mm-bubble-wrap { background: none; border: none; }
+.mm-bubble {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 50%; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  border: 2.5px solid #fff; box-shadow: 0 3px 10px rgba(15, 23, 42, 0.35);
+  line-height: 1.15; cursor: pointer; transition: transform 0.15s ease;
+}
+.mm-bubble:hover { transform: scale(1.08); }
+.mm-bubble b { font-size: 0.85rem; }
+.mm-bubble span { font-size: 0.62rem; opacity: 0.95; }
+.mm-bubble.mm-sel { outline: 3px solid #0f172a; outline-offset: 2px; }
+.mm-bubble.mm-top::after {
+  content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid currentColor; opacity: 0.5;
+  animation: mm-pulse 2s ease-out infinite; pointer-events: none;
+}
+@keyframes mm-pulse { from { transform: scale(0.9); opacity: 0.6; } to { transform: scale(1.35); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .mm-bubble.mm-top::after { animation: none; } }
+.mm-tip { font: inherit; border-radius: 8px; padding: 0.4rem 0.6rem; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2); }
+.mm-tiles { filter: grayscale(1) contrast(0.85) brightness(1.08); opacity: 0.75; }

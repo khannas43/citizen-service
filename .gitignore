@@ -1,0 +1,74 @@
+# Dependencies & virtualenvs
+node_modules/
+.venv/
+.venv-*/
+**/venv/
+**/__pycache__/
+*.pyc
+.Python
+
+# Build / dist / caches
+dist/
+dist-ssr/
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.turbo/
+.vite/
+.cache/
+*.tsbuildinfo
+coverage/
+storybook-static/
+target/
+*.class
+*.jar
+!**/gradle-wrapper.jar
+
+# Flutter / Android
+**/android/.gradle/
+**/android/local.properties
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+*.apk
+*.aab
+*.ipa
+
+# Env & local secrets (keep examples)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+!.env.*.example
+
+# IDE / OS
+.DS_Store
+**/.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.claude/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS Finder duplicates
+* 2.*
+* 3.*
+* 4.*
+
+# Nested git metadata (vendored trees tracked as normal files)
+**/.git.backup/
+**/.git/
+
+# Misc
+*.local
+.supabase/

@@ -1,0 +1,110 @@
+labels:
+  app: "egov-user"
+  group: "core"
+initContainers:
+  dbMigration:
+    enabled: false
+ingress:
+  enabled: false
+image:
+  repository: "egov-user"
+  tag: "arm64-local"
+  pullPolicy: Never
+replicas: "1"
+healthChecks:
+  enabled: true
+  livenessProbePath: "/user/health"
+  readinessProbePath: "/user/health"
+env: |
+  - name: SERVER_PORT
+    value: "8080"
+  - name: SPRING_REDIS_HOST
+    value: "redis-master"
+  - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+    valueFrom:
+      configMapKeyRef:
+        name: egov-config
+        key: kafka-brokers
+  - name: SPRING_REDIS_PORT
+    value: "6379"
+  - name: STATE_LEVEL_TENANT_ID
+    valueFrom:
+      configMapKeyRef:
+        name: egov-config
+        key: egov-state-level-tenant-id
+  - name: DECRYPTION_ABAC_ENABLED
+    value: "false"
+  - name: KAFKA_TOPIC_AUDIT
+    value: "enc-user-audit-data"
+  - name: SPRING_KAFKA_CONSUMER_GROUP_ID
+    value: "egov-user"
+  - name: SPRING_KAFKA_PRODUCER_KEY_SERIALIZER
+    value: org.apache.kafka.common.serialization.StringSerializer
+  - name: SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER
+    value: org.springframework.kafka.support.serializer.JsonSerializer
+  - name: OTP_VALIDATION_REGISTER_MANDATORY
+    value: "false"
+  - name: CITIZEN_LOGIN_PASSWORD_OTP_ENABLED
+    value: "true"
+  - name: CITIZEN_LOGIN_PASSWORD_OTP_FIXED_VALUE
+    value: "123456"
+  - name: CITIZEN_LOGIN_PASSWORD_OTP_FIXED_ENABLED
+    value: "true"
+  - name: ACCESS_TOKEN_VALIDITY_IN_MINUTES
+    value: "10080"
+  - name: REFRESH_TOKEN_VALIDITY_IN_MINUTES
+    value: "20160"
+  - name: JAVA_OPTS
+    value: "-Xmx192m -Xms192m"
+  - name: MDMS_HOST
+    value: "http://egov-mdms-service.egov.svc.cluster.local:8080"
+  - name: EGOV_MDMS_HOST
+    value: "http://egov-mdms-service.egov.svc.cluster.local:8080"
+  - name: SPRING_DATASOURCE_URL
+    valueFrom:
+      configMapKeyRef:
+        name: egov-config
+        key: db-url
+  - name: SPRING_DATASOURCE_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: db
+        key: username
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: db
+        key: password
+  - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+    value: "org.postgresql.Driver"
+  - name: EGOV_ENC_HOST
+    value: "http://egov-enc-service.egov.svc.cluster.local:8080"
+  - name: SECURITY_BASIC_ENABLED
+    value: "false"
+  - name: MANAGEMENT_SECURITY_ENABLED
+    value: "false"
+  - name: FLYWAY_ENABLED
+    value: "true"
+  - name: FLYWAY_URL
+    valueFrom:
+      configMapKeyRef:
+        name: egov-config
+        key: db-url
+  - name: FLYWAY_USER
+    valueFrom:
+      secretKeyRef:
+        name: db
+        key: username
+  - name: FLYWAY_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: db
+        key: password
+  - name: FLYWAY_LOCATIONS
+    value: "classpath:db/migration/ddl"
+  - name: FLYWAY_TABLE
+    value: "egov_user_schema_version"
+  - name: FLYWAY_BASELINE_ON_MIGRATE
+    value: "true"
+  - name: FLYWAY_OUT_OF_ORDER
+    value: "true"

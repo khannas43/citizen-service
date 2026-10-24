@@ -1,0 +1,71 @@
+.ops-health-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.ops-health-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.ops-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ops-up .ops-dot { background: #4caf50; }
+.ops-down .ops-dot { background: #e53935; }
+.ops-down { border-color: #ffcdd2; }
+
+.ops-fraud-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.ops-fraud-chip {
+  font-size: 0.78rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.ops-fraud-high { background: #ffebee; color: #c62828; }
+.ops-fraud-medium { background: #fff8e1; color: #f57f17; }
+.ops-fraud-low { background: #f3e5f5; color: #6a1b9a; }
+
+.ops-bars { max-width: 480px; }
+
+.ops-integrations-grid {
+  display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem;
+}
+.ops-integration-card {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 0.375rem);
+  background: var(--color-surface);
+}
+.ops-int-icon { font-size: 1.2rem; width: 1.6rem; text-align: center; flex-shrink: 0; }
+.ops-int-body { display: flex; flex-direction: column; flex: 1; }
+.ops-int-name { font-size: 0.85rem; font-weight: 600; color: var(--color-text); }
+.ops-int-detail { font-size: 0.75rem; color: var(--color-text-muted); }
+.ops-int-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+.ops-int-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.ops-int-connected .ops-int-dot { background: #16a34a; box-shadow: 0 0 4px #16a34a88; }
+.ops-int-degraded  .ops-int-dot { background: #d97706; box-shadow: 0 0 4px #d9770688; }
+.ops-int-sync { font-size: 0.7rem; color: var(--color-text-muted); }
