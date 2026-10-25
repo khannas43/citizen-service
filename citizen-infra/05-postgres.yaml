@@ -1,0 +1,52 @@
+# Postgres for Citizen Services (namespace citizen). Same image as DG2.0 (pgvector/pgvector:pg16, already in the local image store).
+# Needs the secret `db-admin` (username/password) and the PVC `postgres-data` (postgres-pvc.yaml) first.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: citizen
+  labels: {app: postgres, group: db}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: postgres}
+  template:
+    metadata:
+      labels: {app: postgres, group: db}
+    spec:
+      containers:
+        - name: postgres
+          image: pgvector/pgvector:pg16
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom: {secretKeyRef: {name: db-admin, key: username}}
+            - name: POSTGRES_PASSWORD
+              valueFrom: {secretKeyRef: {name: db-admin, key: password}}
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          readinessProbe:
+            exec: {command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\""]}
+            periodSeconds: 5
+          resources:
+            requests: {cpu: 100m, memory: 512Mi}
+            limits: {memory: 1Gi}
+          volumeMounts:
+            - {name: data, mountPath: /var/lib/postgresql/data}
+      volumes:
+        - name: data
+          persistentVolumeClaim: {claimName: postgres-data}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: citizen
+  labels: {app: postgres}
+spec:
+  selector: {app: postgres}
+  ports:
+    - {port: 5432, targetPort: 5432}

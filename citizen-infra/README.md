@@ -14,8 +14,8 @@ All scripts source `scripts/lib/guard.sh`, which refuses `egov`.
      (Postgres superuser, for restore and migrations only)
    - `kubectl -n citizen create secret generic db --from-literal=username=citizenuser --from-literal=password="$(openssl rand -base64 24)"`
      (what the services use; an ordinary role, created in step 4)
-3. `kubectl apply -f postgres-pvc.yaml`, then install Postgres with `postgres-persistence-values.yaml`
-   using the same chart DG2.0 used, into namespace `citizen`, with the `db-admin` credentials as the bootstrap user.
+3. `kubectl apply -f postgres-pvc.yaml -f citizen-infra/05-postgres.yaml` (plain Deployment + Service named `postgres`, same image as DG2.0;
+   `postgres.citizen.svc.cluster.local` is the host the services expect).
 4. Create `citizen_db`; restore a read-only DG2.0 dump into it as the superuser
    (`pg_dump --no-owner --no-acl` from egov). Then run `db/platform/001..003` (see `db/platform/README.md`;
    003 creates `citizenuser`). Then `CREATE DATABASE keycloak_db OWNER citizenuser;`
