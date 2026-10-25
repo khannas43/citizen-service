@@ -72,3 +72,6 @@ yarn-error.log*
 # Misc
 *.local
 .supabase/
+
+# bulky all-India LGD downloads; commit the per-state CSVs made by scripts/lgd_to_csv.py instead
+state-packs/*/lgd/*.xlsx

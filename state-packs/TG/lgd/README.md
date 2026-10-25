@@ -20,3 +20,10 @@ Then:
 
 The India Data portal copy of LGD (https://ckandev.indiadataportal.com/dataset/lgd-codes) is dated 2023, so prefer a fresh
 LGD download: Telangana's districts and mandals have changed since.
+
+## What is in this folder now
+The LGD "all India" spreadsheets (`*.xlsx`, not committed) were cut down to Telangana (LGD state code 36) with
+`scripts/lgd_to_csv.py`: 33 districts, 621 sub-districts (mandals), 11,450 villages. The loader reads the CSVs first and also
+accepts the `.xlsx` files directly (slow for the 500 MB village sheet). To refresh, download again from LGD and run, for each file:
+
+    python3 scripts/lgd_to_csv.py state-packs/TG/lgd/villages.xlsx state-packs/TG/lgd/villages.csv --state 36
