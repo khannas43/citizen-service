@@ -28,7 +28,7 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms" \
   -d '{
     "realm": "citizen",
     "enabled": true,
-    "displayName": "Gujarat Government - EGOV",
+    "displayName": "Citizen Services",
     "registrationAllowed": false,
     "loginWithEmailAllowed": false,
     "duplicateEmailsAllowed": true,

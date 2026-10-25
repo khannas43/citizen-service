@@ -1,7 +1,7 @@
 {
   "id": "a88b43ad-2d7c-4f67-bd82-cfa5e67ccd5a",
   "realm": "citizen",
-  "displayName": "Gujarat Government - EGOV",
+  "displayName": "Citizen Services",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
