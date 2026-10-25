@@ -104,7 +104,7 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms/cit
   }' | grep -qE '^(201|409)$' || echo "(client may already exist)"
 
 
-STATE_CODE="${STATE_CODE:-GJ}"
+STATE_CODE="${STATE_CODE:-TG}"
 echo "Registering state_code user attribute and 'state' token claim..."
 python3 - "$KEYCLOAK_URL" "$ADMIN_TOKEN" <<'PY'
 import json, sys, urllib.request

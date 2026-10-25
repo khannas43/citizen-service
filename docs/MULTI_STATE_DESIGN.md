@@ -78,3 +78,12 @@ Telangana scheme catalogue not started: needs the list of schemes to include.
 Update: Telangana geography loaded from LGD (33 districts, 621 mandals, 11,450 villages) and a 43-entry scheme list from
 govtschemes.in (a third-party aggregator; every entry is `verified=false` until checked against the department source).
 Unit identity is now the LGD code (45 villages share a name with another village in the same mandal).
+
+## 10. Decision: Option C (Telangana-first, no Gujarat)
+- Gujarat is not part of this platform. No `GJ` state row, no GJ geography pack, no linkage to DG2.0 data.
+- Default state is `TG`. All seeded users (`citizen-realm.json`, `setup-keycloak.sh`) carry `state_code=TG`.
+- `citizen_db` is created from the DG2.0 **schema only** (`pg_dump --schema-only`), no rows. Telangana gets its own
+  citizens, geography (LGD pack), schemes (verified list) and synthetic demo data.
+- Step 3 (migrating existing free-text district/taluka to `admin_unit_id`) is dropped: there are no legacy rows.
+  New code uses `admin_unit` from the start.
+- Next states (e.g. TN) are added with their own pack and their own users (`STATE_CODE=TN`).

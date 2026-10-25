@@ -1,7 +1,7 @@
 -- 001_platform.sql  (run as the database owner / superuser, once per database; idempotent)
 -- Creates the state-neutral `platform` schema used by every service.
 -- Existing behaviour is unchanged: when a connection does not say which state it serves,
--- platform.current_state() returns the default state (GJ, the DG2.0 sample data).
+-- platform.current_state() returns the default state (TG, Telangana).
 
 CREATE SCHEMA IF NOT EXISTS platform;
 
@@ -66,8 +66,7 @@ CREATE TABLE IF NOT EXISTS platform.managed_schema (
 
 INSERT INTO platform.state (code, name_en, name_local, languages, default_lang, digit_tenant_id, admin_level_labels, is_default)
 VALUES
- ('GJ','Gujarat',   '{"gu":"ગુજરાત"}',    '{en,gu}', 'gu', 'pg', '{"1":"District","2":"Taluka","3":"Village"}', true),
- ('TG','Telangana', '{"te":"తెలంగాణ"}',  '{en,te}', 'te', 'tg', '{"1":"District","2":"Mandal","3":"Village"}', false),
+ ('TG','Telangana', '{"te":"తెలంగాణ"}',  '{en,te}', 'te', 'tg', '{"1":"District","2":"Mandal","3":"Village"}', true),
  ('TN','Tamil Nadu','{"ta":"தமிழ்நாடு"}', '{en,ta}', 'ta', 'tn', '{"1":"District","2":"Taluk","3":"Village"}',  false)
 ON CONFLICT (code) DO NOTHING;
 

@@ -1,7 +1,7 @@
 -- 002_state_scoping.sql  (run as superuser after 001; idempotent)
 -- Gives every business table a state_code column and row-level security, so one database can hold
 -- several states and each session sees only the state it serves (app.state_code).
--- Existing rows are tagged with the default state (GJ). Hibernate tables created later are scoped
+-- Existing rows are tagged with the default state (TG). Hibernate tables created later are scoped
 -- automatically by the event trigger at the bottom.
 
 INSERT INTO platform.managed_schema (schema_name) VALUES

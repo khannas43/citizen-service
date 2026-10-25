@@ -5,7 +5,7 @@ All scripts source `scripts/lib/guard.sh`, which refuses `egov`.
 
 ## Before you start
 1. `kubectl top nodes; kubectl get pods -n egov` and compare with the quota in `00-namespace-quota.yaml`.
-2. Snapshot DG2.0 first (read-only): `pg_dump` of each DB, `export-keycloak-realm.sh` equivalent, image digests.
+2. Snapshot DG2.0 first (read-only): `pg_dump` of each DB (the Citizen DB restore uses `--schema-only`: no Gujarat rows), `export-keycloak-realm.sh` equivalent, image digests.
 
 ## Order
 1. `kubectl apply -f citizen-infra/00-namespace-quota.yaml`

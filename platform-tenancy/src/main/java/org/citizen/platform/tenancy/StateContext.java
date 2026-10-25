@@ -2,7 +2,7 @@ package org.citizen.platform.tenancy;
 
 import java.util.regex.Pattern;
 
-/** The state (tenant) the current request serves, e.g. "GJ", "TG", "TN". Empty means "the default state". */
+/** The state (tenant) the current request serves, e.g. "TG", "TN". Empty means "the default state". */
 public final class StateContext {
 
     private static final Pattern VALID = Pattern.compile("[A-Z]{2}");

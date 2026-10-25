@@ -9,7 +9,6 @@ See the header of `scripts/load_state_pack.py` for the file layout.
 
 | Pack | Status |
 | --- | --- |
-| `GJ` | Districts (32) and talukas (216) from the DG2.0 demo seed. Not LGD-verified, no LGD codes. |
 | `TG` | LGD geography: 33 districts, 621 mandals, 11,450 villages (with Telugu village names). 43 schemes from govtschemes.in, all marked `verified=false`: still to be checked against Telangana department notifications. |
 | `_fixtures/tg-sample` | Invented names in LGD export format, used to test the loader. Never load it into a real database. |
 

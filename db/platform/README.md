@@ -12,7 +12,7 @@ Run 002 again whenever you restore data or add a service schema (add the schema 
 `platform.managed_schema` first). Tables created later by Hibernate are scoped automatically.
 
 ## How it works
-- `platform.current_state()` returns the session's `app.state_code`, or the default state (GJ) when unset.
+- `platform.current_state()` returns the session's `app.state_code`, or the default state (TG) when unset.
   Code that does not know about states therefore behaves exactly as before.
 - Every table in a managed schema gets `state_code char(2) NOT NULL DEFAULT platform.current_state()`, an index,
   and a forced row-level-security policy `state_code = platform.current_state()` (reads and writes).
