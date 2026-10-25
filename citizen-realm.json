@@ -481,7 +481,22 @@
         "configure": true,
         "manage": true
       },
-      "protocolMappers": []
+      "protocolMappers": [
+        {
+          "name": "state",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "state_code",
+            "claim.name": "state",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.claim": "true"
+          }
+        }
+      ]
     },
     {
       "id": "4884b1a6-0356-47c8-a1f5-8ed57eef1f08",
@@ -630,7 +645,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     },
     {
       "id": "7817b01b-fb92-4113-b6bc-629db405f659",
@@ -661,7 +681,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     },
     {
       "id": "8b6e3698-70c4-4f4a-9980-1532c48c06ca",
@@ -692,7 +717,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     },
     {
       "id": "1d1688d5-4ac0-4305-a8d3-be209ef8f692",
@@ -723,7 +753,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     },
     {
       "id": "9c34084e-8ad5-4dc3-ada6-5a388508a074",
@@ -754,7 +789,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     },
     {
       "id": "2352ab7f-a446-43e1-8b1b-eb7118ba8f71",
@@ -785,7 +825,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     },
     {
       "id": "af85533b-c6aa-4913-9ecd-36b4c0c9b164",
@@ -816,7 +861,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     },
     {
       "id": "bf274881-23b3-4c41-a77e-7e80078cddd4",
@@ -847,7 +897,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     },
     {
       "id": "d939f36e-5772-44a0-b78a-a9679d926970",
@@ -878,7 +933,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     },
     {
       "id": "4e64a699-191b-4883-afc9-9b89373caa09",
@@ -909,7 +969,12 @@
           "value": "officer123",
           "temporary": false
         }
-      ]
+      ],
+      "attributes": {
+        "state_code": [
+          "GJ"
+        ]
+      }
     }
   ],
   "requiredActions": [
@@ -1001,5 +1066,18 @@
       "priority": 1000,
       "config": {}
     }
-  ]
+  ],
+  "components": {
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "providerId": "declarative-user-profile",
+        "subComponents": {},
+        "config": {
+          "kc.user.profile.config": [
+            "{\"attributes\": [{\"name\": \"username\", \"displayName\": \"${username}\", \"validations\": {\"length\": {\"min\": 3, \"max\": 255}, \"username-prohibited-characters\": {}, \"up-username-not-idn-homograph\": {}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}, \"multivalued\": false}, {\"name\": \"email\", \"displayName\": \"${email}\", \"validations\": {\"email\": {}, \"length\": {\"max\": 255}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}, \"multivalued\": false}, {\"name\": \"firstName\", \"displayName\": \"${firstName}\", \"validations\": {\"length\": {\"max\": 255}, \"person-name-prohibited-characters\": {}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}, \"multivalued\": false}, {\"name\": \"lastName\", \"displayName\": \"${lastName}\", \"validations\": {\"length\": {\"max\": 255}, \"person-name-prohibited-characters\": {}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}, \"multivalued\": false}, {\"name\": \"state_code\", \"displayName\": \"State\", \"validations\": {\"length\": {\"min\": 2, \"max\": 2}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}]}"
+          ]
+        }
+      }
+    ]
+  }
 }

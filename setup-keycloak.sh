@@ -103,6 +103,36 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms/cit
     "webOrigins": ["http://localhost:5173"]
   }' | grep -qE '^(201|409)$' || echo "(client may already exist)"
 
+
+STATE_CODE="${STATE_CODE:-GJ}"
+echo "Registering state_code user attribute and 'state' token claim..."
+python3 - "$KEYCLOAK_URL" "$ADMIN_TOKEN" <<'PY'
+import json, sys, urllib.request
+url, token = sys.argv[1], sys.argv[2]
+def call(method, path, body=None):
+    req = urllib.request.Request(f'{url}/admin/realms/citizen{path}', method=method,
+        data=None if body is None else json.dumps(body).encode(),
+        headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'})
+    try:
+        with urllib.request.urlopen(req) as r:
+            raw = r.read(); return json.loads(raw) if raw else None
+    except urllib.error.HTTPError as e:
+        if e.code == 409: return None
+        raise
+prof = call('GET', '/users/profile')
+if not any(a['name'] == 'state_code' for a in prof['attributes']):
+    prof['attributes'].append({'name': 'state_code', 'displayName': 'State',
+        'validations': {'length': {'min': 2, 'max': 2}},
+        'permissions': {'view': ['admin', 'user'], 'edit': ['admin']}, 'multivalued': False})
+    call('PUT', '/users/profile', prof)
+client = call('GET', '/clients?clientId=officer-portal')[0]['id']
+call('POST', f'/clients/{client}/protocol-mappers/models', {'name': 'state', 'protocol': 'openid-connect',
+    'protocolMapper': 'oidc-usermodel-attribute-mapper', 'config': {'user.attribute': 'state_code',
+    'claim.name': 'state', 'jsonType.label': 'String', 'id.token.claim': 'true',
+    'access.token.claim': 'true', 'userinfo.claim': 'true'}})
+print('  done')
+PY
+
 echo "Creating realm roles..."
 for ROLE in DATA_ENTRY_OFFICER TALATI REVENUE_OFFICER SCHEME_DEPT DEPT_ADMIN IT_ADMIN SENIOR_MGMT; do
   curl -s -o /dev/null -X POST "${KEYCLOAK_URL}/admin/realms/citizen/roles" \
@@ -135,6 +165,7 @@ create_user() {
       \"email\": \"${EMAIL}\",
       \"emailVerified\": true,
       \"firstName\": \"${DISPLAY}\",
+      \"attributes\": {\"state_code\": [\"${STATE_CODE}\"]},
       \"requiredActions\": [],
       \"credentials\": [{\"type\":\"password\",\"value\":\"officer123\",\"temporary\":false}]
     }")
