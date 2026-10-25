@@ -87,3 +87,9 @@ Unit identity is now the LGD code (45 villages share a name with another village
 - Step 3 (migrating existing free-text district/taluka to `admin_unit_id`) is dropped: there are no legacy rows.
   New code uses `admin_unit` from the start.
 - Next states (e.g. TN) are added with their own pack and their own users (`STATE_CODE=TN`).
+
+## 11. Telangana demo data (family registry)
+`seed_data/telangana/generate_families_tg.py` writes 1,000 invented families (5 hero + 995 random) into `family_registry`.
+Districts, mandals and villages come from the LGD files in `state-packs/TG/lgd/`; names follow Telangana communities.
+Caste codes stay SC/ST/OBC/NT/GENERAL (OBC = BC). Run after `db/platform/001..003`. Other service seeds
+(schemes, applications, grievances, payments) still carry Gujarat content and are rebuilt one service at a time.
