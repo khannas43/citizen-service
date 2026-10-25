@@ -1,0 +1,12 @@
+# Placeholder so the officer portal's nginx can resolve `form-definition-service` (it has no pods yet).
+# Calls to it fail with 503 for the form-governance screens only. Delete this when the real service is deployed.
+apiVersion: v1
+kind: Service
+metadata:
+  name: form-definition-service
+  namespace: citizen
+  labels: {app: form-definition-service, role: placeholder}
+spec:
+  selector: {app: form-definition-service-not-deployed}
+  ports:
+    - {port: 8080, targetPort: 8080}
