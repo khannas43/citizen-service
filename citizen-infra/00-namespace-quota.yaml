@@ -16,7 +16,7 @@ spec:
   hard:
     requests.cpu: "3"
     requests.memory: 4Gi
-    limits.memory: 6Gi
+    limits.memory: 10Gi
     persistentvolumeclaims: "6"
     services.nodeports: "12"
 ---

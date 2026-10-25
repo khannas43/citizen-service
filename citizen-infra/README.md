@@ -29,4 +29,4 @@ DG2.0 (`egov`) uses about 8.7 GB of the node's ~12 GB; the AI service alone is 3
 Lean first deployment (about 3.3 GB): postgres, keycloak, auth, family-registry, family-member, scheme-engine,
 scheme-application, grievance, notifications, chatbot, and the three portals.
 Leave out for now: kafka, redis, superset, expenditure-integrity, pension, marriage and caste certificate services.
-Quota in `00-namespace-quota.yaml`: 3 CPU, 4 GiB requests, 6 GiB limits.
+Quota in `00-namespace-quota.yaml`: 3 CPU, 4 GiB requests, 10 GiB limits.
