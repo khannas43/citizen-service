@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { BilingualContent } from '@dg20/form-contract'
+import type { BilingualContent } from '@citizen/form-contract'
 
 import type { IdentityTokenizationAdapter, MobileOtpAdapter } from '../src/runtime/service-ports.js'
 import { parseDg20Extensions, resolveOtpChannels } from '../src/runtime/x-dg20.js'

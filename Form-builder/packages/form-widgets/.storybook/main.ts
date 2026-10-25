@@ -35,7 +35,7 @@ const config: StorybookConfig = {
 
     config.resolve.alias = {
       ...aliasMap,
-      '@dg20/form-renderer': path.resolve(dirname, '../../form-renderer/src'),
+      '@citizen/form-renderer': path.resolve(dirname, '../../form-renderer/src'),
     }
     return config
   },

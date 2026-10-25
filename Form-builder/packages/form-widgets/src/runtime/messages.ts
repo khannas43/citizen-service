@@ -1,4 +1,4 @@
-import type { LocalizedValue } from '@dg20/form-contract'
+import type { LocalizedValue } from '@citizen/form-contract'
 
 import type { WidgetLocale } from './localized-text.js'
 

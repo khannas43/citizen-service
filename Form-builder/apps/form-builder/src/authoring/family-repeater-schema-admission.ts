@@ -3,14 +3,14 @@
  * Never repairs; never invokes accessors; never embeds hostile values in messages.
  */
 
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 import {
   dg20Fields,
   dg20Widgets,
   FAMILY_REPEATER_GLOBAL_MAX_ROWS,
   getPaletteWidget,
   isApprovedWidgetType,
-} from '@dg20/form-widgets'
+} from '@citizen/form-widgets'
 
 import { isAdmittedCitizenSchema, isCitizenWidgetType } from './citizen-schema-admission.js'
 import { isFamilyMemberWidgetType, type FamilyMemberWidgetType } from './family-member-types.js'

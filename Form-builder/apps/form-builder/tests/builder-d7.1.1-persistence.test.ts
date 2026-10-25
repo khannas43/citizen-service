@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import { createAuthoringSession } from '../src/authoring/index.js'
 import { ILLUSTRATIVE_DRAFT_DEFINITION } from '../src/definition/illustrative-draft-definition.js'

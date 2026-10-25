@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { axe } from 'vitest-axe'
 
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import {
   authoringReducer,

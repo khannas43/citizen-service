@@ -8,27 +8,27 @@
 
 ```bash
 # 1. Verify all pods running — output should be empty (no non-Running pods)
-kubectl get pods -n egov | grep -v Running | grep -v Completed
+kubectl get pods -n citizen | grep -v Running | grep -v Completed
 
 # 2. Reset demo state
-cd /Users/sameerkhanna/Documents/Projects/DG2.0
+cd /Users/sameerkhanna/Documents/Projects/Citizen-Services
 ./demo_reset.sh
 
 # 3. Seed red-badge SLA task (run exactly 1 hour before demo)
-PGPOD=$(kubectl get pods -n egov -l app=postgres -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -n egov $PGPOD -- psql -U egovuser -d egov_db -c \
+PGPOD=$(kubectl get pods -n citizen -l app=postgres -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n citizen $PGPOD -- psql -U citizenuser -d citizen_db -c \
   "UPDATE caste_cert.caste_application
    SET created_at = NOW() - INTERVAL '23 hours'
    WHERE applicant_name = 'Priya Patel'
    AND status = 'TALATI_VERIFICATION';"
 
 # 4. Verify portals respond
-curl -s -o /dev/null -w "%{http_code}" http://192.168.1.10:30074
-curl -s -o /dev/null -w "%{http_code}" http://192.168.1.10:30073
+curl -s -o /dev/null -w "%{http_code}" http://192.168.1.10:31174
+curl -s -o /dev/null -w "%{http_code}" http://192.168.1.10:31173
 # Both must return 200
 
 # 5. Verify AI service healthy
-curl -s http://192.168.1.10:30089/health | python3 -m json.tool
+curl -s http://192.168.1.10:31189/health | python3 -m json.tool
 # Must show: "status":"ok", "ollama":"reachable", both models "loaded"
 
 # 6. Connect phone (if using scrcpy)
@@ -36,7 +36,7 @@ adb devices
 scrcpy --window-title "Priya's Phone — Digital Gujarat" --max-fps 30 --window-width 400 &
 
 # 7. Open officer portal in Chrome, do NOT log in yet
-open http://192.168.1.10:30073
+open http://192.168.1.10:31173
 
 # 8. Keep this terminal open for Scene 17 birthday trigger
 ```
@@ -51,11 +51,11 @@ open http://192.168.1.10:30073
 
 | Who | URL | Login |
 |---|---|---|
-| Priya (citizen) | :30074 | XXXX-XXXX-1001 · OTP 123456 |
-| Talati | :30073 | talati / officer123 |
-| Mamlatdar | :30073 | mamlatdar / officer123 |
-| Dept Admin | :30073 | dept_admin / officer123 |
-| IT Secretary | :30073 | it.admin / officer123 |
+| Priya (citizen) | :31174 | XXXX-XXXX-1001 · OTP 123456 |
+| Talati | :31173 | talati / officer123 |
+| Mamlatdar | :31173 | mamlatdar / officer123 |
+| Dept Admin | :31173 | dept_admin / officer123 |
+| IT Secretary | :31173 | it.admin / officer123 |
 
 ---
 
@@ -63,7 +63,7 @@ open http://192.168.1.10:30073
 
 ### Scene 1 · Priya logs in (1:30)
 
-**URL:** `http://192.168.1.10:30074`
+**URL:** `http://192.168.1.10:31174`
 
 **Actions:**
 1. Open citizen portal
@@ -152,7 +152,7 @@ open http://192.168.1.10:30073
 ### Scene 7 · Officer logs in — Task Queue with SLA (1:30)
 
 **Actions:**
-1. Switch to officer portal — `http://192.168.1.10:30073`
+1. Switch to officer portal — `http://192.168.1.10:31173`
 2. Login as `talati / officer123`
 3. Home screen loads — show 4 KPI cards (Pending, SLA Breached, Approved Today, AI At Risk)
 4. Click "📋 Task Queue" from Quick Actions
@@ -303,7 +303,7 @@ open http://192.168.1.10:30073
 **Actions (from terminal):**
 ```bash
 curl -s -X POST \
-  "http://192.168.1.10:$(kubectl get svc scheme-engine-service -n egov \
+  "http://192.168.1.10:$(kubectl get svc scheme-engine-service -n citizen \
   -o jsonpath='{.spec.ports[0].nodePort}')/scheme-engine-service/v1/admin/trigger-birthday-check?date=$(date +%Y-%m-%d)"
 ```
 1. Run the command
@@ -351,33 +351,33 @@ curl -s -X POST \
 
 ```bash
 # Pod not Running
-kubectl rollout restart deployment/<service-name> -n egov
-kubectl rollout status deployment/<service-name> -n egov --timeout=120s
+kubectl rollout restart deployment/<service-name> -n citizen
+kubectl rollout status deployment/<service-name> -n citizen --timeout=120s
 
 # Postgres data lost (pod restart)
-PGPOD=$(kubectl get pods -n egov -l app=postgres -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -i -n egov $PGPOD -- psql -U egovuser -d egov_db < seed_data/seed_families.sql
-kubectl exec -i -n egov $PGPOD -- psql -U egovuser -d egov_db < seed_data/seed_demo_schemes.sql
-kubectl exec -i -n egov $PGPOD -- psql -U egovuser -d egov_db < seed_data/demo_hero_patch.sql
-kubectl exec -i -n egov $PGPOD -- psql -U egovuser -d egov_db < seed_data/demo_beneficiaries.sql
+PGPOD=$(kubectl get pods -n citizen -l app=postgres -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -i -n citizen $PGPOD -- psql -U citizenuser -d citizen_db < seed_data/seed_families.sql
+kubectl exec -i -n citizen $PGPOD -- psql -U citizenuser -d citizen_db < seed_data/seed_demo_schemes.sql
+kubectl exec -i -n citizen $PGPOD -- psql -U citizenuser -d citizen_db < seed_data/demo_hero_patch.sql
+kubectl exec -i -n citizen $PGPOD -- psql -U citizenuser -d citizen_db < seed_data/demo_beneficiaries.sql
 ./demo_reset.sh
 
 # AI service down
-kubectl rollout restart deployment/ai-intelligence-service -n egov
+kubectl rollout restart deployment/ai-intelligence-service -n citizen
 # Wait 90s (model load time), then verify:
-curl -s http://192.168.1.10:30089/health
+curl -s http://192.168.1.10:31189/health
 
 # Notification bell not firing within 30s
-kubectl logs -n egov deployment/notifications-service --tail=20
+kubectl logs -n citizen deployment/notifications-service --tail=20
 
 # SLA badge not showing red
-PGPOD=$(kubectl get pods -n egov -l app=postgres -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -n egov $PGPOD -- psql -U egovuser -d egov_db -c \
+PGPOD=$(kubectl get pods -n citizen -l app=postgres -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n citizen $PGPOD -- psql -U citizenuser -d citizen_db -c \
   "UPDATE caste_cert.caste_application SET created_at = NOW() - INTERVAL '23 hours'
    WHERE applicant_name = 'Priya Patel';"
 
 # Keycloak login fails after pod restart
-kubectl rollout restart deployment/keycloak -n egov
+kubectl rollout restart deployment/keycloak -n citizen
 # Wait 60s — realm auto-imports from ConfigMap
 
 # Port-forwards died (if using local mode)

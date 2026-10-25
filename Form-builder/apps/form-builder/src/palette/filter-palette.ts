@@ -1,5 +1,5 @@
-import type { PaletteGroupDefinition, PaletteWidgetDefinition } from '@dg20/form-widgets'
-import { PALETTE_GROUPS, listWidgetsByGroup } from '@dg20/form-widgets'
+import type { PaletteGroupDefinition, PaletteWidgetDefinition } from '@citizen/form-widgets'
+import { PALETTE_GROUPS, listWidgetsByGroup } from '@citizen/form-widgets'
 
 export interface PaletteSearchGroup {
   readonly group: PaletteGroupDefinition

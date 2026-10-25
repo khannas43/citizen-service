@@ -123,9 +123,9 @@ Record in any order. Each session is **self-contained**.
 
 | Surface | URL |
 | --- | --- |
-| Citizen | `http://localhost:30074/` |
-| Officer | `http://localhost:30073/` |
-| Family | `http://localhost:30075/` |
+| Citizen | `http://localhost:31174/` |
+| Officer | `http://localhost:31173/` |
+| Family | `http://localhost:31175/` |
 
 If capturing on LAN, substitute the machine IP; **do not** show the address bar in the finished film (editor crops 64 px from top **or** capture with address bar hidden).
 
@@ -308,7 +308,7 @@ Each sheet: **used duration** is what the editor keeps. **Record** at least the 
 | **File** | `DG20_G2_family_portal_tree.mov` |
 | **Used** | 7s |
 | **Record** | 30s |
-| **Portal** | Family portal `:30075` |
+| **Portal** | Family portal `:31175` |
 | **Action** | Open **Patel / Bavla** tree. Pan React Flow canvas. Show deceased overlay if present. Eligibility cards on the side. |
 | **Must see** | Interactive tree, not a static org chart screenshot from PowerPoint |
 | **Edit** | Second half of **L7**. LT-G across G1–G2. |

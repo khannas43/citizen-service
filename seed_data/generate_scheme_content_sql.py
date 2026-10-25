@@ -49,14 +49,14 @@ def fetch_active_schemes() -> list[dict]:
         "FROM scheme_engine.scheme WHERE is_active = true ORDER BY name"
     )
     cmd = [
-        "kubectl", "-n", "egov", "exec", "deploy/postgres", "--",
-        "psql", "-U", "egovuser", "-d", "egov_db", "-t", "-A", "-F|", "-c", query,
+        "kubectl", "-n", "citizen", "exec", "deploy/postgres", "--",
+        "psql", "-U", "citizenuser", "-d", "citizen_db", "-t", "-A", "-F|", "-c", query,
     ]
     try:
         raw = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
     except subprocess.CalledProcessError as e:
         print(e.output, file=sys.stderr)
-        raise SystemExit("Could not load schemes from Postgres (is kubectl/egov up?)")
+        raise SystemExit("Could not load schemes from Postgres (is kubectl/citizen up?)")
     schemes = []
     for line in raw.splitlines():
         if not line.strip():

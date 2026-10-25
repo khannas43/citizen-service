@@ -1,6 +1,6 @@
 # Working rules for every Expenditure Integrity task (read this first)
 
-Repo `/Users/sameerkhanna/Documents/Projects/DG2.0` (Digital Gujarat DG 2.0). Module `expenditure-integrity-service` (Spring Boot 3.3, Java 17, port 8092, schema `expenditure_integrity`) and the officer portal `officer-portal` (React/Vite, vitest). Read `docs/handover/HANDOVER_expenditure_integrity.md` and `docs/EXPENDITURE_INTEGRITY_ASSUMPTIONS.md` before you start. Match the style of the code around you (comment density, naming, idiom).
+Repo `/Users/sameerkhanna/Documents/Projects/Citizen-Services` (Digital Gujarat DG 2.0). Module `expenditure-integrity-service` (Spring Boot 3.3, Java 17, port 8092, schema `expenditure_integrity`) and the officer portal `officer-portal` (React/Vite, vitest). Read `docs/handover/HANDOVER_expenditure_integrity.md` and `docs/EXPENDITURE_INTEGRITY_ASSUMPTIONS.md` before you start. Match the style of the code around you (comment density, naming, idiom).
 
 ## Hard rules
 - **Do not commit or push.** Leave changes in the working tree.

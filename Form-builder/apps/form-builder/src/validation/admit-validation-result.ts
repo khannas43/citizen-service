@@ -1,4 +1,4 @@
-import type { ValidationIssue, ValidationResult, ValidationSeverity } from '@dg20/form-contract'
+import type { ValidationIssue, ValidationResult, ValidationSeverity } from '@citizen/form-contract'
 
 export const MAX_VALIDATION_ISSUES = 200
 

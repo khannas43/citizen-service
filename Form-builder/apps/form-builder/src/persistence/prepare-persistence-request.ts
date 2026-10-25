@@ -1,4 +1,4 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import { cloneJsonSafeObject } from '../authoring/index.js'
 import { admitClonedDraftFormDefinition } from './admit-persistence-response.js'

@@ -4,8 +4,8 @@ import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
 import { FormRenderer } from '../src/FormRenderer.js'
 import { createSamplePublishedDefinition } from './fixtures.js'
 
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
 import '../src/styles/renderer.css'
 
 describe('FB-B3 FormRenderer DOM id isolation', () => {

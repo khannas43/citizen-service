@@ -3,8 +3,8 @@
  * Never mutates inputs. Stale baselines yield `stale_editor_draft`.
  */
 
-import type { FormDefinition, JsonObject } from '@dg20/form-contract'
-import { FAMILY_REPEATER_GLOBAL_MAX_ROWS, getPaletteWidget } from '@dg20/form-widgets'
+import type { FormDefinition, JsonObject } from '@citizen/form-contract'
+import { FAMILY_REPEATER_GLOBAL_MAX_ROWS, getPaletteWidget } from '@citizen/form-widgets'
 
 import { parseOptionalNonnegativeSafeIntegerString } from './age-integer.js'
 import { cloneJsonSafeObject } from './clone.js'

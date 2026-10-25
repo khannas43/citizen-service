@@ -7,7 +7,7 @@
 | Name        | Illustrative single-page technical acceptance fixture                                                               |
 | `serviceId` | Per-test synthetic IDs, e.g. `c5-acc-draft-roundtrip`, `c5-acc-published-only`, etc.                                |
 | Fixture     | `services/form-definition-service/src/test/resources/validation/valid-single-page.json`                             |
-| Location    | `services/form-definition-service/src/test/java/org/magicsword/formdefinition/FormDefinitionUnitCAcceptanceIT.java` |
+| Location    | `services/form-definition-service/src/test/java/org/citizen/formdefinition/FormDefinitionUnitCAcceptanceIT.java` |
 | Kind        | **Illustrative technical fixture** (not authoritative)                                                              |
 | Runtime     | Testcontainers PostgreSQL 16-alpine + full Spring MVC context + `FixedClock`                                        |
 

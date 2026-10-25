@@ -1,10 +1,12 @@
 #!/bin/bash
+# shellcheck source=/dev/null
+source "$(dirname "$0")/scripts/lib/guard.sh"
 # seed_demo_task_queue.sh — creates demo workflow tasks for officer portal Task Queue.
 # Run after service restarts or Postgres recovery when task lists are empty.
 set -e
 
 PROXY="http://127.0.0.1"
-EXEC=(kubectl exec -n egov deployment/officer-portal -- sh -c)
+EXEC=(kubectl exec -n citizen deployment/officer-portal -- sh -c)
 
 post_json() {
   local path="$1"
@@ -46,8 +48,8 @@ post_json "/scheme-application-service/v1/applications" \
 echo "    Created scheme application"
 
 echo "==> Setting Priya caste cert SLA badge (23h old)..."
-POSTGRES_POD=$(kubectl get pods -n egov -l app=postgres -o jsonpath='{.items[0].metadata.name}')
-kubectl exec "$POSTGRES_POD" -n egov -- psql -U egovuser -d egov_db -c "
+POSTGRES_POD=$(kubectl get pods -n citizen -l app=postgres -o jsonpath='{.items[0].metadata.name}')
+kubectl exec "$POSTGRES_POD" -n citizen -- psql -U citizenuser -d citizen_db -c "
   UPDATE caste_cert.act_ru_task
   SET create_time_ = NOW() - INTERVAL '23 hours'
   WHERE name_ = 'Talati Verification'

@@ -1143,7 +1143,7 @@ class _ContactScreen extends StatelessWidget {
      'Go to My Family in the navigation menu. From there you can view all registered family members and submit a change request. Changes are verified by the Talati office within 3–5 working days.'),
     ('What if my application is rejected?',
      'You have the right to appeal within 30 days of rejection. Go to My Applications, open the rejected application, and tap "Raise Grievance". The grievance will be reviewed by a senior officer.'),
-    ('Is my data safe on Digital Gujarat?',
+    ('Is my data safe on Citizen Services?',
      'Yes. All data is stored on government-secured infrastructure under the DPDP Act 2023. You can view what data is held about you, manage consent, and download a full copy at any time from My Data & Consents.'),
   ];
 

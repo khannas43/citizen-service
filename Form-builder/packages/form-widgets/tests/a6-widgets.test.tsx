@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { BilingualContent } from '@dg20/form-contract'
+import type { BilingualContent } from '@citizen/form-contract'
 
 import type { MasterDataAdapter, MasterDataOption } from '../src/runtime/service-ports.js'
 import { resolveMasterListId, validateMasterDataOptions } from '../src/runtime/master-data.js'

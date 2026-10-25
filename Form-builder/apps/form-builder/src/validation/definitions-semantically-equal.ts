@@ -1,4 +1,4 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 const MAX_EQUALITY_DEPTH = 64
 const MAX_EQUALITY_NODES = 50_000

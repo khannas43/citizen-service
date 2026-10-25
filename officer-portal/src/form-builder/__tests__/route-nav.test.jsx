@@ -2,10 +2,10 @@ import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@dg20/form-builder-app/embed', () => ({
+vi.mock('@citizen/form-builder-app/embed', () => ({
   BuilderShell: () => <div data-testid="mock-builder-shell">BuilderShell</div>,
 }))
-vi.mock('@dg20/form-builder-app/styles/embed.css', () => ({}))
+vi.mock('@citizen/form-builder-app/styles/embed.css', () => ({}))
 vi.mock('../../screens/FormDefinitionGovernance', () => ({
   default: () => <div data-testid="governance-screen">Governance</div>,
 }))

@@ -55,13 +55,13 @@ This document consolidates functionality across portals, microservices, Form Bui
                 │                                      │
 ┌───────────────▼──────────────┐        ┌──────────────▼───────────────────┐
 │ DIGIT core                   │        │ Platform data & messaging          │
-│ workflow-v2 │ mdms │ user    │        │ PostgreSQL 16 (egov_db + schemas)  │
+│ workflow-v2 │ mdms │ user    │        │ PostgreSQL 16 (citizen_db + schemas)  │
 │ persister │ indexer │ enc    │        │ Kafka │ Redis │ Keycloak (egov)    │
 └──────────────────────────────┘        │ Superset (analytics)               │
                                         └────────────────────────────────────┘
 ```
 
-**Runtime environment (reference demo):** Rancher Desktop (K3s), namespace `egov`, Apple Silicon arm64 images, NodePorts for portals (officer `30073`, citizen `30074`, family `30075`).
+**Runtime environment (reference demo):** Rancher Desktop (K3s), namespace `egov`, Apple Silicon arm64 images, NodePorts for portals (officer `31173`, citizen `31174`, family `31175`).
 
 ---
 
@@ -170,7 +170,7 @@ This document consolidates functionality across portals, microservices, Form Bui
 | Data export | Citizen data-export path |
 | Family IDs enumeration | Used by scheme-engine identification scan |
 
-**Schema:** `family_registry` in `egov_db`.
+**Schema:** `family_registry` in `citizen_db`.
 
 ### 5.3 Certificate & application services (workflow)
 
@@ -298,7 +298,7 @@ Full DIGIT source tree also includes filestore, localization, notifications, pay
 
 ## 7. Data architecture
 
-**Database:** PostgreSQL 16 · database `egov_db`
+**Database:** PostgreSQL 16 · database `citizen_db`
 
 | Schema | Owner service | Contents (representative) |
 | --- | --- | --- |

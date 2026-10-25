@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { axe } from 'vitest-axe'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { FormDefinition, ValidationResult } from '@dg20/form-contract'
+import type { FormDefinition, ValidationResult } from '@citizen/form-contract'
 
 import { BuilderShell } from '../src/shell/BuilderShell.js'
 import type { FormDefinitionValidationAdapter } from '../src/validation/index.js'

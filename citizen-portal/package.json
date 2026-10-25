@@ -15,9 +15,9 @@
     "e4:test": "vitest run src/published-form src/acceptance/e4-unit-e-acceptance.test.jsx"
   },
   "dependencies": {
-    "@dg20/form-contract": "file:vendor/dg20/dg20-form-contract-0.1.0.tgz",
-    "@dg20/form-renderer": "file:vendor/dg20/dg20-form-renderer-0.1.0.tgz",
-    "@dg20/form-widgets": "file:vendor/dg20/dg20-form-widgets-0.2.0.tgz",
+    "@citizen/form-contract": "file:vendor/dg20/dg20-form-contract-0.1.0.tgz",
+    "@citizen/form-renderer": "file:vendor/dg20/dg20-form-renderer-0.1.0.tgz",
+    "@citizen/form-widgets": "file:vendor/dg20/dg20-form-widgets-0.2.0.tgz",
     "i18next": "^26.3.1",
     "leaflet": "^1.9.4",
     "react": "^19.2.6",

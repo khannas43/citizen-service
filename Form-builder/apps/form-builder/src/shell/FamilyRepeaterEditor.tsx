@@ -1,5 +1,5 @@
 import { useId, useMemo, useState } from 'react'
-import { getPaletteWidget } from '@dg20/form-widgets'
+import { getPaletteWidget } from '@citizen/form-widgets'
 
 import {
   FAMILY_MEMBER_WIDGET_TYPES,

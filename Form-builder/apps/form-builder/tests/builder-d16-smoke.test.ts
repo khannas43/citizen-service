@@ -15,7 +15,7 @@ import {
   isAddableWidgetType,
   isConfiguredAddableWidgetType,
 } from '../src/authoring/templates.js'
-import { PALETTE_WIDGET_COUNT } from '@dg20/form-widgets'
+import { PALETTE_WIDGET_COUNT } from '@citizen/form-widgets'
 import { familyMemberDefinitionPath } from '../src/authoring/family-repeater-paths.js'
 
 describe('FB-D16 smoke', () => {

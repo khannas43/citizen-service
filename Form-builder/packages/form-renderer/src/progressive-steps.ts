@@ -1,4 +1,4 @@
-import type { ProgressiveStep } from '@dg20/form-contract'
+import type { ProgressiveStep } from '@citizen/form-contract'
 import type { ErrorSchema, RJSFSchema, UiSchema } from '@rjsf/utils'
 
 /**

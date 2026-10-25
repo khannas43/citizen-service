@@ -416,7 +416,7 @@ export type BuilderMessageKey =
   | 'editorErrorWorkflowDuplicatePair'
 
 const EN: Record<BuilderMessageKey, string> = {
-  appTitle: 'DG 2.0 Form Builder',
+  appTitle: 'Citizen Services Form Builder',
   localPreviewBadge: 'Local technical preview',
   notSavedNote:
     'Local and stored draft status is shown above. Technical submit requires a saved, validated draft and host actor context.',
@@ -915,7 +915,7 @@ const EN: Record<BuilderMessageKey, string> = {
 }
 
 const GU: Record<BuilderMessageKey, string> = {
-  appTitle: 'DG 2.0 ફોર્મ બિલ્ડર',
+  appTitle: 'Citizen Services ફોર્મ બિલ્ડર',
   localPreviewBadge: 'સ્થાનિક તકનીકી પૂર્વાવલોકન',
   notSavedNote:
     'સ્થાનિક અને સંગ્રહિત ડ્રાફ્ટ સ્થિતિ ઉપર દર્શાવેલ છે. તકનીકી સબમિટ માટે સાચવેલ માન્ય ડ્રાફ્ટ અને હોસ્ટ અભિનેતા સંદર્ભ જરૂરી છે.',

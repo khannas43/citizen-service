@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { BilingualContent } from '@dg20/form-contract'
+import type { BilingualContent } from '@citizen/form-contract'
 
 import {
   assessBankAccountIncomingValue,

@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react'
 
-import type { BilingualContent, PrefillBinding } from '@dg20/form-contract'
+import type { BilingualContent, PrefillBinding } from '@citizen/form-contract'
 
 import type { FieldIdResolver } from './field-id.js'
 import type { WidgetLocale } from './localized-text.js'

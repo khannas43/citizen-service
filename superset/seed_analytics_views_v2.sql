@@ -1,5 +1,5 @@
--- DG 2.0 analytics views v2 — cross-domain grievance correlation
--- Run as: psql -U egovuser -d egov_db -f seed_analytics_views_v2.sql
+-- Citizen Services analytics views v2 — cross-domain grievance correlation
+-- Run as: psql -U citizenuser -d citizen_db -f seed_analytics_views_v2.sql
 -- Joins grievance.grievance to family_registry via aadhaar_ref (grievances carry no
 -- district/taluka of their own), then correlates against beneficiary volume per district
 -- so districts with disproportionate grievance load stand out, not just raw counts.
@@ -34,4 +34,4 @@ SELECT
 FROM grievance_by_district g
 FULL OUTER JOIN beneficiary_by_district b ON b.district = g.district;
 
-GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO egovuser;
+GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO citizenuser;

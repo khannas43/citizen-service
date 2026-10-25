@@ -74,7 +74,7 @@ function Header({ onArchClick, onWorkflowClick }) {
   return (
     <header className="top-header">
       <div className="header-brand">
-        <img src="/logodig.png" alt="Digital Gujarat" className="header-logo" />
+        <img src="/logodig.png" alt="Citizen Services" className="header-logo" />
         <span className="header-portal-label">Officer Services</span>
       </div>
       <div className="header-actions">

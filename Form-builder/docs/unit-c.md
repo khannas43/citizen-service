@@ -380,7 +380,7 @@ Family-repeater structural rules enforced (`maxItems` 1..20, etc.).
 `services/form-definition-service/` is a standalone **Maven / Spring Boot 3.3.4**
 service (Java 17). It is **not** part of npm workspaces.
 
-Package namespace: `org.magicsword.formdefinition`
+Package namespace: `org.citizen.formdefinition`
 
 ### Delivered
 

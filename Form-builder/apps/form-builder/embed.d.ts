@@ -1,5 +1,5 @@
 /**
- * Public TypeScript surface for `@dg20/form-builder-app/embed` (FB-E5.4.3A).
+ * Public TypeScript surface for `@citizen/form-builder-app/embed` (FB-E5.4.3A).
  * Hand-maintained to keep the host API narrow — does not expose acceptance adapters.
  */
 import type { ComponentType } from 'react'

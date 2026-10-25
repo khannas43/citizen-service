@@ -9,7 +9,7 @@ from superset.app import create_app
 EGOV_URI = (
     f"postgresql+psycopg2://{os.environ.get('EGOV_DB_USER', os.environ['DB_USER'])}:"
     f"{os.environ.get('EGOV_DB_PASS', os.environ['DB_PASS'])}"
-    f"@postgres.egov.svc.cluster.local:5432/egov_db"
+    f"@postgres.citizen.svc.cluster.local:5432/citizen_db"
 )
 
 VIEWS = [
@@ -355,7 +355,7 @@ def ensure_embedded_dashboard(session, Dashboard, slug, allow_domains=None):
     if allow_domains is None:
         origins = os.environ.get(
             "OFFICER_PORTAL_ORIGINS",
-            "http://localhost:30073,http://127.0.0.1:30073",
+            "http://localhost:31173,http://127.0.0.1:31173",
         )
         allow_domains = origins
 

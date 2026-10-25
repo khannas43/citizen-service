@@ -5,7 +5,7 @@
  * Not exported from any public package surface.
  */
 
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import {
   addFamilyMember,

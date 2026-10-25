@@ -1,9 +1,9 @@
--- Seed 4 demo citizen profiles into egov_db for the DG 2.0 mobile app
+-- Seed 4 demo citizen profiles into citizen_db for the Citizen Services mobile app
 -- Matches actual schema: family_registry.{family, person, family_member}
 --
 -- Run via kubectl:
---   kubectl exec -n egov <postgres-pod> -- \
---     psql -U egovuser -d egov_db < seed_demo_profiles.sql
+--   kubectl exec -n citizen <postgres-pod> -- \
+--     psql -U citizenuser -d citizen_db < seed_demo_profiles.sql
 --
 -- Aadhaar refs: 900000010001 – 900000010004
 

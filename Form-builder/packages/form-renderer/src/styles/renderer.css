@@ -2,9 +2,9 @@
  * Renderer-owned chrome styles.
  *
  * Hosts should also load widget tokens/styles (do not duplicate them here):
- *   @dg20/form-widgets/styles/tokens.css
- *   @dg20/form-widgets/styles/widgets.css
- *   @dg20/form-renderer/styles/renderer.css
+ *   @citizen/form-widgets/styles/tokens.css
+ *   @citizen/form-widgets/styles/widgets.css
+ *   @citizen/form-renderer/styles/renderer.css
  */
 
 .dg20-form-renderer {

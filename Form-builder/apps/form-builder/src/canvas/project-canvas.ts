@@ -1,6 +1,6 @@
-import type { FormDefinition } from '@dg20/form-contract'
-import type { PaletteWidgetDefinition, WidgetCategory } from '@dg20/form-widgets'
-import { getPaletteGroup, getPaletteWidget } from '@dg20/form-widgets'
+import type { FormDefinition } from '@citizen/form-contract'
+import type { PaletteWidgetDefinition, WidgetCategory } from '@citizen/form-widgets'
+import { getPaletteGroup, getPaletteWidget } from '@citizen/form-widgets'
 
 export type CanvasProjectionFailureReason =
   | 'missing_properties'

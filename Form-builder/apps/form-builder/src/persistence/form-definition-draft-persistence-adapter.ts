@@ -1,4 +1,4 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 /** Exact draft coordinates for Unit C GET/PUT query parameters (FB-D7). */
 export interface DraftCoordinates {

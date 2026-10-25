@@ -8,7 +8,7 @@ import './ChatWidget.css'
 const MAX_RECORD_MS = 60000
 
 const WELCOME_INTRO = {
-  en: 'Welcome to Digital Gujarat! I can help you:',
+  en: 'Welcome to Citizen Services! I can help you:',
   gu: 'ડિજિટલ ગુજરાતમાં સ્વાગત! હું મદદ કરી શકું:',
 }
 
@@ -122,7 +122,7 @@ const NAV_LABELS = {
 function detectNavigateIntent(replyText) {
   const trimmed = replyText.trim()
   // Generic welcome / menu replies should not offer navigation buttons
-  if (/^welcome to digital gujarat/i.test(trimmed)) return null
+  if (/^welcome to citizen services/i.test(trimmed)) return null
   if (/^ડિજિટલ ગુજરાતમાં સ્વાગત/i.test(trimmed)) return null
   const lower = replyText.toLowerCase()
   for (const [keyword, route] of NAVIGATE_INTENTS) {
@@ -323,7 +323,7 @@ export default function ChatWidget() {
         <div className="chat-panel dg-slide-right">
           <div className="chat-panel-header">
             <span className="chat-panel-title">
-              {lang === 'gu' ? '🤖 ડિજિટલ ગુજરાત સહાયક' : '🤖 Digital Gujarat Assistant'}
+              {lang === 'gu' ? '🤖 ડિજિટલ ગુજરાત સહાયક' : '🤖 Citizen Services Assistant'}
             </span>
             <div className="chat-header-actions">
               <button

@@ -2,7 +2,7 @@ import type { Preview } from '@storybook/react'
 import React from 'react'
 
 import { WidgetRuntimeProvider } from '../src/runtime/widget-context'
-import type { BilingualContent } from '@dg20/form-contract'
+import type { BilingualContent } from '@citizen/form-contract'
 
 import '../src/styles/tokens.css'
 import '../src/styles/widgets.css'

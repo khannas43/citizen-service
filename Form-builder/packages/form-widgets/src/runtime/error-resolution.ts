@@ -1,4 +1,4 @@
-import type { BilingualContent } from '@dg20/form-contract'
+import type { BilingualContent } from '@citizen/form-contract'
 
 import { resolveLocalizedText, type WidgetLocale } from './localized-text.js'
 

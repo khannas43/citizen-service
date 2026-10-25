@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# shellcheck source=/dev/null
+source "$(dirname "$0")/scripts/lib/guard.sh"
 set -euo pipefail
 
 KEYCLOAK_URL="${KEYCLOAK_URL:-http://localhost:8090}"
@@ -10,21 +12,21 @@ TOKEN_RESPONSE=$(curl -s -X POST "${KEYCLOAK_URL}/realms/master/protocol/openid-
 
 if ! echo "$TOKEN_RESPONSE" | python3 -c "import sys,json; json.load(sys.stdin)['access_token']" >/dev/null 2>&1; then
   echo "Failed to get admin token. Is Keycloak running?"
-  echo "  1. kubectl port-forward svc/keycloak 8090:8080 -n egov"
+  echo "  1. kubectl port-forward svc/keycloak 8090:8080 -n citizen"
   echo "  2. Wait ~60s after pod start, then retry"
-  echo "  3. If still failing: kubectl rollout restart deployment/keycloak -n egov"
+  echo "  3. If still failing: kubectl rollout restart deployment/keycloak -n citizen"
   echo "Response: ${TOKEN_RESPONSE:-<empty — port-forward likely not running>}"
   exit 1
 fi
 
 ADMIN_TOKEN=$(echo "$TOKEN_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
 
-echo "Creating realm egov..."
+echo "Creating realm citizen..."
 curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms" \
   -H "Authorization: Bearer ${ADMIN_TOKEN}" \
   -H 'Content-Type: application/json' \
   -d '{
-    "realm": "egov",
+    "realm": "citizen",
     "enabled": true,
     "displayName": "Gujarat Government - EGOV",
     "registrationAllowed": false,
@@ -39,14 +41,14 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms" \
     "ssoSessionMaxLifespan": 86400
   }' | grep -qE '^(201|409)$' || echo "(realm may already exist)"
 
-echo "Setting 24h token / SSO lifespans on egov (demo)..."
+echo "Setting 24h token / SSO lifespans on citizen (demo)..."
 export KEYCLOAK_URL ADMIN_TOKEN
 python3 - <<'PY'
 import json, os, urllib.request
 url = os.environ['KEYCLOAK_URL']
 token = os.environ['ADMIN_TOKEN']
 req = urllib.request.Request(
-    f'{url}/admin/realms/egov',
+    f'{url}/admin/realms/citizen',
     headers={'Authorization': f'Bearer {token}'},
 )
 with urllib.request.urlopen(req) as resp:
@@ -57,7 +59,7 @@ realm['ssoSessionIdleTimeout'] = 86400
 realm['ssoSessionMaxLifespan'] = 86400
 body = json.dumps(realm).encode()
 put = urllib.request.Request(
-    f'{url}/admin/realms/egov',
+    f'{url}/admin/realms/citizen',
     data=body,
     method='PUT',
     headers={
@@ -71,7 +73,7 @@ PY
 
 echo "Disabling all required actions (Keycloak 24 defaults block direct-grant login)..."
 export KEYCLOAK_URL ADMIN_TOKEN
-curl -s "${KEYCLOAK_URL}/admin/realms/egov/authentication/required-actions" \
+curl -s "${KEYCLOAK_URL}/admin/realms/citizen/authentication/required-actions" \
   -H "Authorization: Bearer ${ADMIN_TOKEN}" \
 | python3 -c "
 import json, os, subprocess, sys
@@ -82,13 +84,13 @@ for a in actions:
     alias = a['alias']
     body = json.dumps({'alias': alias, 'enabled': False, 'defaultAction': False, 'priority': a.get('priority', 0)})
     subprocess.run(['curl', '-s', '-o', '/dev/null', '-X', 'PUT',
-        f'{url}/admin/realms/egov/authentication/required-actions/{alias}',
+        f'{url}/admin/realms/citizen/authentication/required-actions/{alias}',
         '-H', f'Authorization: Bearer {token}', '-H', 'Content-Type: application/json', '-d', body], check=False)
     print(f'  disabled {alias}')
 "
 
 echo "Creating client officer-portal..."
-curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms/egov/clients" \
+curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms/citizen/clients" \
   -H "Authorization: Bearer ${ADMIN_TOKEN}" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -103,7 +105,7 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms/ego
 
 echo "Creating realm roles..."
 for ROLE in DATA_ENTRY_OFFICER TALATI REVENUE_OFFICER SCHEME_DEPT DEPT_ADMIN IT_ADMIN SENIOR_MGMT; do
-  curl -s -o /dev/null -X POST "${KEYCLOAK_URL}/admin/realms/egov/roles" \
+  curl -s -o /dev/null -X POST "${KEYCLOAK_URL}/admin/realms/citizen/roles" \
     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
     -H 'Content-Type: application/json' \
     -d "{\"name\": \"${ROLE}\", \"description\": \"${ROLE} role\"}" || true
@@ -116,15 +118,15 @@ create_user() {
   EMAIL="${USERNAME}@demo.gov.in"
 
   # Remove existing user so credentials/required-actions are clean
-  EXISTING_ID=$(curl -s "${KEYCLOAK_URL}/admin/realms/egov/users?username=${USERNAME}&exact=true" \
+  EXISTING_ID=$(curl -s "${KEYCLOAK_URL}/admin/realms/citizen/users?username=${USERNAME}&exact=true" \
     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
     | python3 -c "import sys,json; u=json.load(sys.stdin); print(u[0]['id'] if u else '')" 2>/dev/null || true)
   if [[ -n "${EXISTING_ID}" ]]; then
-    curl -s -o /dev/null -X DELETE "${KEYCLOAK_URL}/admin/realms/egov/users/${EXISTING_ID}" \
+    curl -s -o /dev/null -X DELETE "${KEYCLOAK_URL}/admin/realms/citizen/users/${EXISTING_ID}" \
       -H "Authorization: Bearer ${ADMIN_TOKEN}"
   fi
 
-  HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms/egov/users" \
+  HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${KEYCLOAK_URL}/admin/realms/citizen/users" \
     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
     -H 'Content-Type: application/json' \
     -d "{
@@ -140,17 +142,17 @@ create_user() {
     echo "Warning: create user ${USERNAME} returned HTTP ${HTTP}"
   fi
 
-  USER_ID=$(curl -s "${KEYCLOAK_URL}/admin/realms/egov/users?username=${USERNAME}&exact=true" \
+  USER_ID=$(curl -s "${KEYCLOAK_URL}/admin/realms/citizen/users?username=${USERNAME}&exact=true" \
     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
     | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['id'])")
 
-  ROLE_ID=$(curl -s "${KEYCLOAK_URL}/admin/realms/egov/roles/${ROLE}" \
+  ROLE_ID=$(curl -s "${KEYCLOAK_URL}/admin/realms/citizen/roles/${ROLE}" \
     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
     -H 'Content-Type: application/json' \
     | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
 
   curl -s -o /dev/null -X POST \
-    "${KEYCLOAK_URL}/admin/realms/egov/users/${USER_ID}/role-mappings/realm" \
+    "${KEYCLOAK_URL}/admin/realms/citizen/users/${USER_ID}/role-mappings/realm" \
     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
     -H 'Content-Type: application/json' \
     -d "[{\"id\":\"${ROLE_ID}\",\"name\":\"${ROLE}\"}]"
@@ -175,7 +177,7 @@ echo "Keycloak setup complete."
 
 echo "Verifying talati login..."
 VERIFY=$(curl -s -X POST \
-  "${KEYCLOAK_URL}/realms/egov/protocol/openid-connect/token" \
+  "${KEYCLOAK_URL}/realms/citizen/protocol/openid-connect/token" \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=password&client_id=officer-portal&username=talati&password=officer123')
 if echo "$VERIFY" | python3 -c "import sys,json; json.load(sys.stdin)['access_token']" >/dev/null 2>&1; then

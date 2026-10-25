@@ -2,7 +2,7 @@ import { render } from '@testing-library/react'
 import { axe } from 'vitest-axe'
 import { describe, expect, it } from 'vitest'
 
-import type { BilingualContent, PrefillBinding } from '@dg20/form-contract'
+import type { BilingualContent, PrefillBinding } from '@citizen/form-contract'
 
 import type {
   BankAccountVerificationAdapter,

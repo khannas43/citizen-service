@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: caste-certificate-service
-  namespace: egov
+  namespace: citizen
   labels:
     app: caste-certificate-service
 spec:
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: caste-certificate-service
-          image: caste-certificate-service:arm64-local
+          image: cs-caste-certificate-service:dev
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
@@ -66,7 +66,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: caste-certificate-service
-  namespace: egov
+  namespace: citizen
 spec:
   selector:
     app: caste-certificate-service

@@ -1,4 +1,4 @@
-import type { JsonObject } from '@dg20/form-contract'
+import type { JsonObject } from '@citizen/form-contract'
 import type { RJSFSchema } from '@rjsf/utils'
 
 import {

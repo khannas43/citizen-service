@@ -1,4 +1,4 @@
-import type { BilingualContent, LocalizedValue } from '@dg20/form-contract'
+import type { BilingualContent, LocalizedValue } from '@citizen/form-contract'
 
 /** Supported runtime locales for widget chrome and field copy. */
 export type WidgetLocale = 'en' | 'gu'

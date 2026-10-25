@@ -15,7 +15,7 @@
     "e4:test": "vitest run src/form-definition-governance src/acceptance/e4-unit-e-acceptance.test.jsx"
   },
   "dependencies": {
-    "@dg20/form-builder-app": "file:vendor/dg20/dg20-form-builder-app-0.1.0.tgz",
+    "@citizen/form-builder-app": "file:vendor/dg20/dg20-form-builder-app-0.1.0.tgz",
     "@superset-ui/embedded-sdk": "^0.4.0",
     "d3-geo": "^3.1.1",
     "leaflet": "^1.9.4",

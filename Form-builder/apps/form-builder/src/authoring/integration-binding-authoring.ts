@@ -3,7 +3,7 @@
  * Mutates only meta.integrationBindings — never prefill/workflow or other sections.
  */
 
-import type { FormDefinition, IntegrationBinding, IntegrationDirection } from '@dg20/form-contract'
+import type { FormDefinition, IntegrationBinding, IntegrationDirection } from '@citizen/form-contract'
 
 import {
   bindableFieldOrderIndex,

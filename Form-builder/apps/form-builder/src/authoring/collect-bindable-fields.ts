@@ -3,8 +3,8 @@
  * Roots follow ui:order; nested family members follow immediately after their parent.
  */
 
-import type { FormDefinition } from '@dg20/form-contract'
-import { getPaletteWidget } from '@dg20/form-widgets'
+import type { FormDefinition } from '@citizen/form-contract'
+import { getPaletteWidget } from '@citizen/form-widgets'
 
 import { collectFamilyRepeaterNestedPaths } from './family-repeater-schema-admission.js'
 import { assertDefinitionIntegrity, readUiOrder } from './integrity.js'

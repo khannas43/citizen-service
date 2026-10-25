@@ -347,7 +347,7 @@ export default function MyCertificates() {
                               </style></head><body>
                               <div class="body">
                                 <div class="header"><div class="seal">🏛</div>
-                                  <div class="gov">Government of Gujarat — Digital Gujarat Portal</div>
+                                  <div class="gov">Government of Gujarat — Citizen Services Portal</div>
                                   <h1>${cert.type}</h1></div>
                                 <div class="certno">${cert.certNumber}</div>
                                 <div class="row"><span class="lbl">Issued By</span><span class="val">${cert.issuedBy}</span></div>

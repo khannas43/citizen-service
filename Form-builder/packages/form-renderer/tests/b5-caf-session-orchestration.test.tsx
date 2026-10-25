@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { axe } from 'vitest-axe'
 
-import type { CafPrefillAdapter, CafPrefillRequest } from '@dg20/form-widgets'
+import type { CafPrefillAdapter, CafPrefillRequest } from '@citizen/form-widgets'
 
 import { FormRenderer } from '../src/FormRenderer.js'
 import type {
@@ -18,8 +18,8 @@ import {
   createSamplePublishedDefinition,
 } from './fixtures.js'
 
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
 import '../src/styles/renderer.css'
 
 function createCafAdapter(

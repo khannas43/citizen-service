@@ -1,4 +1,4 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import { cloneJsonSafe } from './clone.js'
 import { assertDefinitionIntegrity } from './integrity.js'

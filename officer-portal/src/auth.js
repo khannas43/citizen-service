@@ -1,5 +1,5 @@
 export const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL ?? 'http://localhost:8090'
-export const TOKEN_URL = `${KEYCLOAK_URL}/realms/egov/protocol/openid-connect/token`
+export const TOKEN_URL = `${KEYCLOAK_URL}/realms/citizen/protocol/openid-connect/token`
 
 export const OFFICER_ROLES = [
   'DATA_ENTRY_OFFICER',
@@ -62,12 +62,12 @@ export function extractOfficerRole(payload) {
   return matched ?? 'UNKNOWN'
 }
 
-/** Citizen landing page — env override or same host on NodePort 30074. */
+/** Citizen landing page — env override or same host on NodePort 31174. */
 export function getCitizenLandingUrl() {
   const env = import.meta.env.VITE_CITIZEN_PORTAL_URL
   if (env) return env.replace(/\/$/, '') + '/'
   const { protocol, hostname } = window.location
-  return `${protocol}//${hostname}:30074/`
+  return `${protocol}//${hostname}:31174/`
 }
 
 export function logoutOfficer() {

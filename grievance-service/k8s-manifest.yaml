@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grievance-service
-  namespace: egov
+  namespace: citizen
   labels:
     app: grievance-service
 spec:
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: grievance-service
-          image: grievance-service:arm64-local
+          image: cs-grievance-service:dev
           imagePullPolicy: Never
           ports:
             - containerPort: 8089
@@ -67,7 +67,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grievance-service
-  namespace: egov
+  namespace: citizen
 spec:
   selector:
     app: grievance-service

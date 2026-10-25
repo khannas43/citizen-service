@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build + npm-pack @dg20/form-builder-app embed artifact (FB-E5.4.3A).
+ * Build + npm-pack @citizen/form-builder-app embed artifact (FB-E5.4.3A).
  * Staging uses a clean package.json (peer React only) because the embed bundle
  * already inlines workspace Form packages.
  */
@@ -23,7 +23,7 @@ function run(command, args, cwd) {
 }
 
 await mkdir(outDir, { recursive: true })
-run('npm', ['run', 'build:embed', '-w', '@dg20/form-builder-app'], root)
+run('npm', ['run', 'build:embed', '-w', '@citizen/form-builder-app'], root)
 
 await rm(stageDir, { recursive: true, force: true })
 await mkdir(path.join(stageDir, 'dist/embed'), { recursive: true })

@@ -22,7 +22,7 @@ log = logging.getLogger("stt_worker")
 TOKEN = os.environ.get("STT_WORKER_TOKEN", "")
 MAX_AUDIO_BYTES = 5 * 1024 * 1024
 
-app = FastAPI(title="DG 2.0 speech worker")
+app = FastAPI(title="Citizen Services speech worker")
 
 
 @app.on_event("startup")

@@ -1,7 +1,7 @@
 # Published Form Application (FB-E3)
 
 Citizen Portal package-level integration for the latest **published** Form
-Definition via `@dg20/form-renderer`.
+Definition via `@citizen/form-renderer`.
 
 ## Route
 
@@ -27,9 +27,9 @@ Local npm-pack tarballs (not a parent workspace, not published):
 
 | Package | Path |
 | --- | --- |
-| `@dg20/form-contract` | `vendor/dg20/dg20-form-contract-0.1.0.tgz` |
-| `@dg20/form-widgets` | `vendor/dg20/dg20-form-widgets-0.2.0.tgz` |
-| `@dg20/form-renderer` | `vendor/dg20/dg20-form-renderer-0.1.0.tgz` |
+| `@citizen/form-contract` | `vendor/dg20/dg20-form-contract-0.1.0.tgz` |
+| `@citizen/form-widgets` | `vendor/dg20/dg20-form-widgets-0.2.0.tgz` |
+| `@citizen/form-renderer` | `vendor/dg20/dg20-form-renderer-0.1.0.tgz` |
 
 ### Refresh procedure
 

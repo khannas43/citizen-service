@@ -1,4 +1,4 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 /** Immutable Builder authoring session state (FB-D1). */
 export interface BuilderAuthoringState {

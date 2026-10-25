@@ -1,0 +1,33 @@
+# OPTIONAL. Stops pods in `citizen` from reaching anything in `egov` except the AI service (8089).
+# Needs a network-policy controller (k3s embeds one). Test before relying on it.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: citizen-egress-no-egov
+  namespace: citizen
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - podSelector: {}
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - {protocol: UDP, port: 53}
+        - {protocol: TCP, port: 53}
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: egov
+          podSelector:
+            matchLabels:
+              app: ai-intelligence-service
+      ports:
+        - {protocol: TCP, port: 8089}
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except: [10.42.0.0/16, 10.43.0.0/16]

@@ -17,11 +17,11 @@ Published Form Definitions are **immutable** and stored as portable JSON.
 
 | Package / deployable                           | Role                                        | Status                                                             |
 | ---------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------ |
-| `@dg20/form-contract`                          | Canonical `FormDefinition` TypeScript types | **FB-0 done**                                                      |
-| `@dg20/form-widgets`                           | Palette registry + RJSF widget library      | **Unit A complete (FB-A12.1)** (30/30)                             |
-| `@dg20/form-renderer`                          | Unit B — RJSF renderer of a Form Definition | **Unit B package acceptance complete (FB-B6.1)**                   |
+| `@citizen/form-contract`                          | Canonical `FormDefinition` TypeScript types | **FB-0 done**                                                      |
+| `@citizen/form-widgets`                           | Palette registry + RJSF widget library      | **Unit A complete (FB-A12.1)** (30/30)                             |
+| `@citizen/form-renderer`                          | Unit B — RJSF renderer of a Form Definition | **Unit B package acceptance complete (FB-B6.1)**                   |
 | `services/form-definition-service` (Maven)     | Unit C + E1 governance boundary             | **FB-C5 + FB-E1 governance foundation** (**not** an npm workspace) |
-| `@dg20/form-builder-app` (`apps/form-builder`) | Unit D — palette-constrained Builder SPA    | **Unit D package-level COMPLETE (FB-D22)**                         |
+| `@citizen/form-builder-app` (`apps/form-builder`) | Unit D — palette-constrained Builder SPA    | **Unit D package-level COMPLETE (FB-D22)**                         |
 
 See [`docs/architecture.md`](./docs/architecture.md),
 [`docs/renderer.md`](./docs/renderer.md),
@@ -108,7 +108,7 @@ npm test && npm run build
 
 **FB-E5.4.3A — Officer-hosted Form Builder foundation**
 
-Stable `@dg20/form-builder-app/embed` package entry + CSS for host SPAs.
+Stable `@citizen/form-builder-app/embed` package entry + CSS for host SPAs.
 Officer-portal mounts Builder at `/form-builder` with request-time
 `accessTokenProvider` (no `lifecycleActorId`). Builder-role UX gate only;
 FDS remains authoritative. **Nginx still blocks Builder FDS routes until

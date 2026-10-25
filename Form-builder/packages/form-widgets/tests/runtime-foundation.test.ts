@@ -13,7 +13,7 @@ import {
   parseIsoDate,
   subtractYearsForCutoff,
 } from '../src/runtime/civil-date.js'
-import type { BilingualContent } from '@dg20/form-contract'
+import type { BilingualContent } from '@citizen/form-contract'
 
 describe('field ID resolution', () => {
   it('preserves underscore-containing RJSF names exactly', () => {

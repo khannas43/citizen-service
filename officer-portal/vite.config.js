@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
       dedupe: ['react', 'react-dom'],
     },
     optimizeDeps: {
-      include: ['@dg20/form-builder-app/embed'],
+      include: ['@citizen/form-builder-app/embed'],
     },
     server: {
       proxy: {

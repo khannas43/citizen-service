@@ -9,8 +9,8 @@ Stable package entry for officer (and future) hosts:
 
 | Export                                    | Purpose                                                            |
 | ----------------------------------------- | ------------------------------------------------------------------ |
-| `@dg20/form-builder-app/embed`            | `BuilderShell` + `AccessTokenProvider` / `BuilderShellProps` types |
-| `@dg20/form-builder-app/styles/embed.css` | Bundled Builder + widget + renderer CSS (no document chrome)       |
+| `@citizen/form-builder-app/embed`            | `BuilderShell` + `AccessTokenProvider` / `BuilderShellProps` types |
+| `@citizen/form-builder-app/styles/embed.css` | Bundled Builder + widget + renderer CSS (no document chrome)       |
 
 Packaging:
 

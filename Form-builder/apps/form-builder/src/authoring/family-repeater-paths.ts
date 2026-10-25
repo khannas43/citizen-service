@@ -3,7 +3,7 @@
  * Uses B3 FieldPathEscaper-compatible client helpers — never re-escape resolved paths.
  */
 
-import { appendArrayTemplate, appendProperty, escapeFieldPathSegment } from '@dg20/form-widgets'
+import { appendArrayTemplate, appendProperty, escapeFieldPathSegment } from '@citizen/form-widgets'
 
 import { widgetTypeToIdStem } from './field-ids.js'
 

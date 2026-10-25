@@ -2,8 +2,8 @@
  * FB-D17 — page-break as progressive-step boundary action (pure coverage, §12).
  */
 import { describe, expect, it } from 'vitest'
-import type { FormDefinition } from '@dg20/form-contract'
-import { PALETTE_WIDGET_COUNT } from '@dg20/form-widgets'
+import type { FormDefinition } from '@citizen/form-contract'
+import { PALETTE_WIDGET_COUNT } from '@citizen/form-widgets'
 
 import {
   ADDABLE_COUNT,

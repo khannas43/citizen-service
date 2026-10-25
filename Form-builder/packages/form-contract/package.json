@@ -1,5 +1,5 @@
 {
-  "name": "@dg20/form-contract",
+  "name": "@citizen/form-contract",
   "private": true,
   "version": "0.1.0",
   "description": "Canonical FormDefinition TypeScript contract for DG 2.0 Form Builder",

@@ -18,7 +18,7 @@ import {
   type ReactElement,
 } from 'react'
 
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 import {
   dg20Fields,
   dg20Widgets,
@@ -26,7 +26,7 @@ import {
   type FieldIdResolver,
   type WidgetMessageOverrides,
   type WidgetServicePorts,
-} from '@dg20/form-widgets'
+} from '@citizen/form-widgets'
 
 import { admitFormDefinition } from './definition-admission.js'
 import {

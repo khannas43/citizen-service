@@ -7,14 +7,14 @@ import { provideOfficerBuilderAccessToken } from '../provide-officer-builder-acc
 
 const builderShellMock = vi.fn()
 
-vi.mock('@dg20/form-builder-app/embed', () => ({
+vi.mock('@citizen/form-builder-app/embed', () => ({
   BuilderShell: (props) => {
     builderShellMock(props)
     return <div data-testid="mock-builder-shell">BuilderShell</div>
   },
 }))
 
-vi.mock('@dg20/form-builder-app/styles/embed.css', () => ({}))
+vi.mock('@citizen/form-builder-app/styles/embed.css', () => ({}))
 
 function b64url(value) {
   return btoa(JSON.stringify(value)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')

@@ -1,5 +1,5 @@
 import { useEffect, useId } from 'react'
-import type { IntegrationDirection } from '@dg20/form-contract'
+import type { IntegrationDirection } from '@citizen/form-contract'
 
 import type { BuilderLocale, BuilderMessageKey } from '../locale/builder-messages.js'
 import { builderMessage } from '../locale/builder-messages.js'

@@ -10,17 +10,17 @@ Cluster: Rancher Desktop (K3s) on Apple Silicon, namespace `egov`.
 
 | Service | Image | Status |
 |---|---|---|
-| `postgres` | `postgres:16` (single instance, `egov_db` database) | ✅ Running |
+| `postgres` | `postgres:16` (single instance, `citizen_db` database) | ✅ Running |
 | `kafka` | **`apache/kafka:latest`** (NOT Bitnami — see §4) | ✅ Running |
 | `redis-master` | `bitnamilegacy/redis` | ✅ Running |
-| `egov-mdms-service` | built from source, `egovio/egov-mdms-service:arm64-local` | ✅ Running, healthy |
-| `egov-persister` | built from source, `egovio/egov-persister:arm64-local` | ✅ Running, healthy |
-| `egov-indexer` | built from source, `egovio/egov-indexer:arm64-local` | ✅ Running, healthy |
-| `egov-user` | built from source, `egovio/egov-user:arm64-local` | ✅ Running, healthy |
-| `egov-workflow-v2` | built from source, `egovio/egov-workflow-v2:arm64-local` | ✅ Running, healthy |
-| `egov-enc-service` | built from source, `egovio/egov-enc-service:arm64-local` | ✅ Running, healthy — **added mid-Phase-0**, not in the original spec, but load-bearing for citizen PII encryption/decryption |
+| `egov-mdms-service` | built from source, `egovio/cs-egov-mdms-service:dev` | ✅ Running, healthy |
+| `egov-persister` | built from source, `egovio/cs-egov-persister:dev` | ✅ Running, healthy |
+| `egov-indexer` | built from source, `egovio/cs-egov-indexer:dev` | ✅ Running, healthy |
+| `egov-user` | built from source, `egovio/cs-egov-user:dev` | ✅ Running, healthy |
+| `egov-workflow-v2` | built from source, `egovio/cs-egov-workflow-v2:dev` | ✅ Running, healthy |
+| `egov-enc-service` | built from source, `egovio/cs-egov-enc-service:dev` | ✅ Running, healthy — **added mid-Phase-0**, not in the original spec, but load-bearing for citizen PII encryption/decryption |
 
-Repos cloned at `/Users/sameerkhanna/Documents/Projects/DG2.0/`:
+Repos cloned at `/Users/sameerkhanna/Documents/Projects/Citizen-Services/`:
 - `Digit-Core/` — DIGIT service source
 - `DIGIT-DevOps/` — Helm charts, at `DIGIT-DevOps/deploy-as-code/helm/`
 
@@ -53,7 +53,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafka
-  namespace: egov
+  namespace: citizen
   labels:
     app: kafka-apache
 spec:
@@ -82,7 +82,7 @@ spec:
             - name: KAFKA_LISTENERS
               value: "PLAINTEXT://:9092,CONTROLLER://:9093"
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: "PLAINTEXT://kafka.egov.svc.cluster.local:9092"
+              value: "PLAINTEXT://kafka.citizen.svc.cluster.local:9092"
             - name: KAFKA_CONTROLLER_LISTENER_NAMES
               value: "CONTROLLER"
             - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
@@ -109,7 +109,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka
-  namespace: egov
+  namespace: citizen
 spec:
   selector: { app: kafka-apache }
   ports:
@@ -117,7 +117,7 @@ spec:
     - { name: controller, port: 9093, targetPort: 9093 }
 ```
 
-Admin CLI lives inside the container at `/opt/kafka/bin/` (e.g. `kubectl exec -it deployment/kafka -n egov -- /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list`).
+Admin CLI lives inside the container at `/opt/kafka/bin/` (e.g. `kubectl exec -it deployment/kafka -n citizen -- /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list`).
 
 ### Bitnami's other charts (Postgres alt, Redis) need the registry redirect
 Bitnami gated most free images behind a paywall in Aug 2025. Any *other* Bitnami chart you deploy needs:
@@ -189,7 +189,7 @@ If you insert a test citizen directly via SQL (bypassing the real create-user fl
 8. Write a `{service}-deploy-values.yaml` override (full self-contained file, not a partial patch — include `labels`, `image`, `healthChecks`, full `env` block)
 9. `helm dependency build` if the chart errors about the `common` library chart
 10. `helm install` (not `upgrade --install` for a truly fresh release — `upgrade` reuses prior release values you may not want)
-11. If `helm install`/`upgrade` complains about adopting pre-existing K8s objects without Helm ownership metadata: `kubectl delete deployment/service {name} -n egov` first, then reinstall clean.
+11. If `helm install`/`upgrade` complains about adopting pre-existing K8s objects without Helm ownership metadata: `kubectl delete deployment/service {name} -n citizen` first, then reinstall clean.
 
 ---
 
@@ -197,13 +197,13 @@ If you insert a test citizen directly via SQL (bypassing the real create-user fl
 
 ```bash
 # debug pod for curl-based API testing (recreate if its sleep timer expires)
-kubectl run debug-curl -n egov --image=curlimages/curl --restart=Never -- sleep 14400
+kubectl run debug-curl -n citizen --image=curlimages/curl --restart=Never -- sleep 14400
 
 # tail logs filtered of the constant Jaeger/health-check noise
-kubectl logs <pod> -n egov --since=5m | grep -v "jaeger-collector\|UnknownHostException\|at okhttp3\|HttpExporter\|TracerFilter"
+kubectl logs <pod> -n citizen --since=5m | grep -v "jaeger-collector\|UnknownHostException\|at okhttp3\|HttpExporter\|TracerFilter"
 
 # check actual Kafka consumer group lag (the real ground truth, more reliable than app logs)
-kubectl exec -it deployment/kafka -n egov -- /opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group <group-name>
+kubectl exec -it deployment/kafka -n citizen -- /opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group <group-name>
 
 # decompile a class from inside a built jar when you need the real source/bytecode
 mkdir -p /tmp/extract && cd /tmp/extract

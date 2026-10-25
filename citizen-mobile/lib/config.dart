@@ -1,10 +1,10 @@
-// Android emulator: 10.0.2.2 → host machine localhost (K8s NodePort :30074).
-// Physical device on same WiFi: --dart-define=API_BASE=http://<your-mac-ip>:30074
+// Android emulator: 10.0.2.2 → host machine localhost (K8s NodePort :31174).
+// Physical device on same WiFi: --dart-define=API_BASE=http://<your-mac-ip>:31174
 const String kApiBase = String.fromEnvironment(
   'API_BASE',
-  defaultValue: 'http://10.0.2.2:30074',
+  defaultValue: 'http://10.0.2.2:31174',
 );
-// Same host as kApiBase (citizen-portal nginx) so the emulator only needs :30074.
+// Same host as kApiBase (citizen-portal nginx) so the emulator only needs :31174.
 const String kAiBase = String.fromEnvironment(
   'AI_BASE',
   defaultValue: '$kApiBase/ai-intelligence-service',

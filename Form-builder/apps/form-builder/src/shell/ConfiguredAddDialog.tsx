@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef } from 'react'
-import { getPaletteWidget } from '@dg20/form-widgets'
+import { getPaletteWidget } from '@citizen/form-widgets'
 
 import type {
   ConfiguredAddFocusControl,

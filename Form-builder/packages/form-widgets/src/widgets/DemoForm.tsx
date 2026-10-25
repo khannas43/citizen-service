@@ -3,7 +3,7 @@ import validator from '@rjsf/validator-ajv8'
 import type { ErrorSchema, RJSFSchema, UiSchema } from '@rjsf/utils'
 import { useEffect, useState, type ReactElement } from 'react'
 
-import type { BilingualContent, PrefillBinding } from '@dg20/form-contract'
+import type { BilingualContent, PrefillBinding } from '@citizen/form-contract'
 
 import type { FieldIdResolver } from '../runtime/field-id.js'
 import type { WidgetMessageOverrides } from '../runtime/messages.js'

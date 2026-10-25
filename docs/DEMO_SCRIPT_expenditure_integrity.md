@@ -4,8 +4,8 @@ Audience: department heads and finance. Message: **"We find money that should no
 Everything runs on the presenter's laptop with synthetic data. Say so once, early.
 
 ## Before you start (5 minutes, do it the day before and again an hour before)
-1. Rancher Desktop is running; `kubectl -n egov get pods` shows everything Running. Wait a minute after any restart: the local port-forwards flap.
-2. Open `http://localhost:30073` and sign in as **dept.admin**. Keep a second window signed in as **senior.mgmt** and a third as **scheme.dept**. Passwords: `docs/PROJECT_PLAN.md`.
+1. Rancher Desktop is running; `kubectl -n citizen get pods` shows everything Running. Wait a minute after any restart: the local port-forwards flap.
+2. Open `http://localhost:31173` and sign in as **dept.admin**. Keep a second window signed in as **senior.mgmt** and a third as **scheme.dept**. Passwords: `docs/PROJECT_PLAN.md`.
 3. Check the numbers on **Money Overview** match this script: open alerts **447** (184 beneficiary, 263 payroll), flagged **₹5,20,000**, confirmed and recovered **₹9,65,000**, stopped before payment **₹68,000**, verified closed **124**, waiting to be verified **19**, flagged again **13.6%**, days to correct **6.6**. If open alerts are not 447, someone ran detection: see "Put it back" at the end.
 4. Do **not** press **Run detection** during the demo. It adds about 20 new alerts to the data and changes every figure.
 5. Have the file `docs/demo/demo_payment_file.csv` ready on the desktop.
@@ -44,7 +44,7 @@ Detect (rules) → Understand (timeline, person view) → Prevent (pre-payment g
 **Say:** "The inbox ranks by expected recovery: the amount at stake times how often that check has proved right. Hover over the ₹ figure for the reason. A star means we are using the overall hit rate because that check has few rulings yet."
 
 ## 5. Fair to the person affected: notice and appeal (2 min) — as dept.admin
-**Page:** open the closed case **Bhavnaben Nayka** (Rule 805) with this address: `http://localhost:30073/expenditure-integrity?domain=beneficiary&case=f261e97f-1749-5c0c-9f55-a7dec5af144a`
+**Page:** open the closed case **Bhavnaben Nayka** (Rule 805) with this address: `http://localhost:31173/expenditure-integrity?domain=beneficiary&case=f261e97f-1749-5c0c-9f55-a7dec5af144a`
 **Show:** the **Draft notice** section. The letter is a fixed template filled from the case: the person, the scheme, the reason the officer wrote, a date to respond by (15 days) and an appeal paragraph. Click **Gujarati**. Edit a word to show the officer can adjust it. Point to **Copy** and **Print**.
 **Say:** "Nothing is sent from the system. The officer reviews the letter and sends it. The Gujarati template is a draft that still needs a language review before real use."
 **Then:** point to **Reopen on appeal** (department admin only, with a required reason): "If the person appeals, the case goes back under review, the history stays, and a new decision can overturn the old one. The overview counts overturned decisions, so the safeguards are measured."
@@ -75,9 +75,9 @@ Detect (rules) → Understand (timeline, person view) → Prevent (pre-payment g
 
 ## 9. Optional: a second officer approves a big recovery (2 min, rehearse first)
 Recoveries of ₹1,00,000 or more need a second person. The demo cases are ₹10,000, so lower the limit for the demo:
-`kubectl -n egov set env deploy/expenditure-integrity-service OFFICER_INTEGRITY_RECOVERY_APPROVAL_THRESHOLD=5000` (wait for the pod to restart, about 30 seconds).
+`kubectl -n citizen set env deploy/expenditure-integrity-service OFFICER_INTEGRITY_RECOVERY_APPROVAL_THRESHOLD=5000` (wait for the pod to restart, about 30 seconds).
 Record a recovery as **dept.admin**: it shows *Waiting for approval*. Try **Approve** as the same user: refused. Sign in as **dept.admin2** and click **Approve recovery**.
-**Put it back straight after:** `kubectl -n egov set env deploy/expenditure-integrity-service OFFICER_INTEGRITY_RECOVERY_APPROVAL_THRESHOLD-`
+**Put it back straight after:** `kubectl -n citizen set env deploy/expenditure-integrity-service OFFICER_INTEGRITY_RECOVERY_APPROVAL_THRESHOLD-`
 
 ## 10. Close (1 min)
 "Detect, understand, prevent, decide, fix, and prove it. The same ideas apply to any scheme or payroll. This pilot used two use cases; the rules and the screens are reusable."
@@ -103,7 +103,7 @@ Record a recovery as **dept.admin**: it shows *Waiting for approval*. Try **Appr
 
 ## Put it back after the demo (so the next run starts from the same numbers)
 Run in a terminal. Open alerts should be 447 afterwards, and the payment file and the case you worked go back to how they started. If you clicked Mark as issued or Reopen case in segment 5, reset Bhavnaben Nayka's case (`f261e97f-1749-5c0c-9f55-a7dec5af144a`) to CLOSED with its original verification, and delete its `case_notice` row and the audit rows from today.
-1. **Payment file from segment 6:** `kubectl -n egov exec deploy/postgres -- psql -U egovuser -d egov_db -c "delete from expenditure_integrity.payment_batch_line where batch_id in (select id from expenditure_integrity.payment_batch where name not like 'Demo payment file%'); delete from expenditure_integrity.payment_batch where name not like 'Demo payment file%';"`
+1. **Payment file from segment 6:** `kubectl -n citizen exec deploy/postgres -- psql -U citizenuser -d citizen_db -c "delete from expenditure_integrity.payment_batch_line where batch_id in (select id from expenditure_integrity.payment_batch where name not like 'Demo payment file%'); delete from expenditure_integrity.payment_batch where name not like 'Demo payment file%';"`
 2. **Case you decided and recorded in segment 3:** it was an open alert. Reset its case and alert: set the case to `OPEN` with no classification or decision, the alert to `OPEN`, and delete the action and audit rows created today for that case. (Keep the case id you used; two minutes with `psql`.) If you used the *verify only* alternative, set the case back to `ACTION_RECORDED` and clear `verified_at`, `verified_by` and `verification_note`.
 3. **If someone ran detection:** delete the alerts and cases with `detected_at` after the demo started and status `OPEN` (the earlier runs added about 22: 13 shared-bank and 9 eligibility alerts).
 4. **Check:** Money Overview shows 447 open alerts, ₹68,000 stopped, 124 verified, 19 waiting.

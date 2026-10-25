@@ -34,9 +34,9 @@ export default defineConfig(({ mode }) => {
         '@rjsf/core',
         '@rjsf/utils',
         '@rjsf/validator-ajv8',
-        '@dg20/form-renderer',
-        '@dg20/form-widgets',
-        '@dg20/form-contract',
+        '@citizen/form-renderer',
+        '@citizen/form-widgets',
+        '@citizen/form-contract',
       ],
     },
     server: {
@@ -56,9 +56,9 @@ export default defineConfig(({ mode }) => {
       server: {
         deps: {
           inline: [
-            '@dg20/form-renderer',
-            '@dg20/form-widgets',
-            '@dg20/form-contract',
+            '@citizen/form-renderer',
+            '@citizen/form-widgets',
+            '@citizen/form-contract',
             '@rjsf/validator-ajv8',
             '@rjsf/core',
             '@rjsf/utils',

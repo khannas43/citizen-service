@@ -1,5 +1,5 @@
-import type { FormDefinition, FormStatus } from '@dg20/form-contract'
-import { isFormStatus } from '@dg20/form-contract'
+import type { FormDefinition, FormStatus } from '@citizen/form-contract'
+import { isFormStatus } from '@citizen/form-contract'
 
 import type {
   FormDefinitionAdmissionReason,

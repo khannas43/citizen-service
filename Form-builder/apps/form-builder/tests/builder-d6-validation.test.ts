@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import type { ValidationResult } from '@dg20/form-contract'
+import type { ValidationResult } from '@citizen/form-contract'
 
 import {
   admitValidationResult,

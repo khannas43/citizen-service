@@ -3,7 +3,7 @@
  * Never silently trims, deduplicates, or invents defaults.
  */
 
-import { DOCUMENT_UPLOAD_GLOBAL_MAX_BYTES } from '@dg20/form-widgets'
+import { DOCUMENT_UPLOAD_GLOBAL_MAX_BYTES } from '@citizen/form-widgets'
 
 import { isExactMasterListId } from './master-list-schema-admission.js'
 

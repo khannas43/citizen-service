@@ -1,4 +1,4 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import { AuthoringError } from './types.js'
 import { readUiOrder } from './integrity.js'

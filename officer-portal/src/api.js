@@ -26,7 +26,7 @@ export const NOTIFICATIONS_API =
 function resolveAiBase() {
   const fromEnv = (import.meta.env.VITE_AI_BASE ?? '').trim()
   if (fromEnv) return fromEnv.replace(/\/$/, '')
-  if (import.meta.env.DEV) return 'http://localhost:30089'
+  if (import.meta.env.DEV) return 'http://localhost:31189'
   return '/ai-intelligence-service'
 }
 

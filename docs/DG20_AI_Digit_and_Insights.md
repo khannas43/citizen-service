@@ -45,7 +45,7 @@ A prototype plan proposed **100% client-side JavaScript** for AI-1 (Levenshtein 
 | **Ollama API** | `http://localhost:11434` — OpenAI-compatible `/v1/chat/completions` |
 | **Ollama embeddings** | Gemma 4 does **not** expose embeddings via Ollama on this install — use **sentence-transformers** in Python for vectors |
 | **K3s / Rancher** | Running; namespace `egov`; Postgres pod `postgres:16` |
-| **pgvector** | Not installed yet — **approved to add** to `egov_db` |
+| **pgvector** | Not installed yet — **approved to add** to `citizen_db` |
 | **Workflow history** | None sufficient for SLA training — **approved to generate synthetic training data** |
 | **Team** | Solo — Sameer Khanna + Cursor implementation |
 
@@ -151,12 +151,12 @@ These six DIGIT services run in namespace `egov` as platform infrastructure:
 
 | DIGIT service | Image | Role |
 |---------------|-------|------|
-| **egov-mdms-service** | `egovio/egov-mdms-service:arm64-local` | Master data — tenant `pg` |
-| **egov-persister** | `egovio/egov-persister:arm64-local` | Kafka consumer → Postgres persistence |
-| **egov-indexer** | `egovio/egov-indexer:arm64-local` | Search/indexing pipeline |
-| **egov-user** | `egovio/egov-user:arm64-local` | DIGIT citizen user records |
-| **egov-workflow-v2** | `egovio/egov-workflow-v2:arm64-local` | DIGIT workflow engine (`DGT-` tasks) |
-| **egov-enc-service** | `egovio/egov-enc-service:arm64-local` | PII encryption/decryption |
+| **egov-mdms-service** | `egovio/cs-egov-mdms-service:dev` | Master data — tenant `pg` |
+| **egov-persister** | `egovio/cs-egov-persister:dev` | Kafka consumer → Postgres persistence |
+| **egov-indexer** | `egovio/cs-egov-indexer:dev` | Search/indexing pipeline |
+| **egov-user** | `egovio/cs-egov-user:dev` | DIGIT citizen user records |
+| **egov-workflow-v2** | `egovio/cs-egov-workflow-v2:dev` | DIGIT workflow engine (`DGT-` tasks) |
+| **egov-enc-service** | `egovio/cs-egov-enc-service:dev` | PII encryption/decryption |
 
 **Source:** `Digit-Core/` (arm64 native builds).  
 **Database:** DIGIT tables in `public` schema (`EG_WF_*`, `EG_USER`, etc.).
@@ -175,7 +175,7 @@ These six DIGIT services run in namespace `egov` as platform infrastructure:
 **Marriage service workflow URL:**
 
 ```
-http://egov-workflow-v2.egov.svc.cluster.local:8080/egov-workflow-v2
+http://egov-workflow-v2.citizen.svc.cluster.local:8080/egov-workflow-v2
 ```
 
 ---
@@ -332,8 +332,8 @@ flows         (schemes, status, services)
 
 **Files to modify:**
 
-- `chatbot-service/src/main/java/org/magicsword/chatbot/IntentDetector.java` (or new `NlpIntentService.java`)
-- `chatbot-service/src/main/java/org/magicsword/chatbot/service/ChatbotService.java`
+- `chatbot-service/src/main/java/org/citizen/chatbot/IntentDetector.java` (or new `NlpIntentService.java`)
+- `chatbot-service/src/main/java/org/citizen/chatbot/service/ChatbotService.java`
 - `chatbot-service/src/main/resources/application.properties` — Gamma 4 config
 
 ---
@@ -384,7 +384,7 @@ flows         (schemes, status, services)
 
 | Requirement | Notes |
 |-------------|-------|
-| `chatbot-service` rebuild + redeploy | Existing K8s manifest on port 30088 |
+| `chatbot-service` rebuild + redeploy | Existing K8s manifest on port 31188 |
 | Citizen portal | No change if API contract unchanged |
 | Config | `GAMMA4_BASE_URL`, `GAMMA4_API_KEY`, `GAMMA4_MODEL`, `NLP_ENABLED=true` |
 
@@ -776,13 +776,13 @@ The existing `postgres:16` image has **no pgvector**.
 
 ```bash
 # 1. Backup
-kubectl exec -n egov deploy/postgres -- pg_dump -U egovuser egov_db > egov_db_backup_$(date +%Y%m%d).sql
+kubectl exec -n citizen deploy/postgres -- pg_dump -U citizenuser citizen_db > egov_db_backup_$(date +%Y%m%d).sql
 
 # 2. Update postgres Deployment image → pgvector/pgvector:pg16
 # 3. Restore if fresh volume, or CREATE EXTENSION on existing data volume
 
-psql -U egovuser -d egov_db -c "CREATE EXTENSION IF NOT EXISTS vector;"
-psql -U egovuser -d egov_db -c "CREATE SCHEMA IF NOT EXISTS ai;"
+psql -U citizenuser -d citizen_db -c "CREATE EXTENSION IF NOT EXISTS vector;"
+psql -U citizenuser -d citizen_db -c "CREATE SCHEMA IF NOT EXISTS ai;"
 ```
 
 One-time migration. Clean and supported.
@@ -839,7 +839,7 @@ Ollama runs on Mac at `localhost:11434`. Inside K3s pods, `localhost` = the pod,
 **Phase 0 gate — must pass before prompt pipeline:**
 
 ```bash
-kubectl exec -it -n egov deploy/citizen-portal -- wget -qO- http://host.docker.internal:11434/api/tags
+kubectl exec -it -n citizen deploy/citizen-portal -- wget -qO- http://host.docker.internal:11434/api/tags
 # or curl from a debug pod
 ```
 
@@ -863,7 +863,7 @@ Do **not** use Gemma for everything. LLM calls add 2–5s latency.
 
 ```
 citizen-portal (React) ──┐
-                          ├──► ai-intelligence-service (FastAPI :30089)
+                          ├──► ai-intelligence-service (FastAPI :31189)
 officer-portal (React) ──┘         │
                                    ├── sentence-transformers (bundled in image)
                                    ├── pgvector queries → postgres :5432
@@ -927,10 +927,10 @@ ai-intelligence-service/
 
 ### 12.1 New service overview
 
-**Location:** `/Users/sameerkhanna/Documents/Projects/DG2.0/ai-intelligence-service/`  
+**Location:** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/ai-intelligence-service/`  
 **Runtime:** Python 3.11 + FastAPI  
 **Deploy:** Docker `arm64-local` → K8s Deployment in namespace `egov`  
-**NodePort:** `30089`
+**NodePort:** `31189`
 
 See **§11** for locked directory layout and decisions.
 
@@ -953,7 +953,7 @@ See **§11** for locked directory layout and decisions.
 
 **Do not** use `apt-get install` inside the pod.
 
-1. `pg_dump` full `egov_db` backup to host  
+1. `pg_dump` full `citizen_db` backup to host  
 2. Update postgres Deployment: `image: pgvector/pgvector:pg16`  
 3. Apply manifest; verify pod healthy  
 4. `CREATE EXTENSION vector;` + `CREATE SCHEMA ai;`  
@@ -983,7 +983,7 @@ CREATE TABLE ai.sla_training_runs (
 
 ```bash
 # Must succeed before any Gemma prompt work
-kubectl run ollama-test --rm -it --image=curlimages/curl -n egov -- \
+kubectl run ollama-test --rm -it --image=curlimages/curl -n citizen -- \
   curl -s http://host.docker.internal:11434/api/tags
 ```
 
@@ -999,7 +999,7 @@ LLM_MODEL=gemma4:e4b
 - Dockerfile: pre-download sentence-transformers model + `COPY models_trained/*.pkl`  
 - `requirements.txt`: fastapi, uvicorn, sentence-transformers, lightgbm, shap, asyncpg, pgvector, httpx  
 - Health: `GET /health` — DB ok; Ollama optional ping  
-- Deploy: `imagePullPolicy: Never`, arm64, NodePort 30089  
+- Deploy: `imagePullPolicy: Never`, arm64, NodePort 31189  
 
 #### Step 0.4 — Nginx proxy (citizen + officer portals)
 
@@ -1007,7 +1007,7 @@ Add to portal `nginx.conf`:
 
 ```nginx
 location /ai-intelligence-service/ {
-  proxy_pass http://ai-intelligence-service.egov.svc.cluster.local:8089/;
+  proxy_pass http://ai-intelligence-service.citizen.svc.cluster.local:8089/;
 }
 ```
 
@@ -1100,12 +1100,12 @@ Response: { "results": [{ "serviceKey", "title", "score", "whyMatched", "route" 
 
 | Variable | Example |
 |----------|---------|
-| `DATABASE_URL` | `postgresql://egovuser:***@postgres.egov.svc.cluster.local:5432/egov_db` |
+| `DATABASE_URL` | `postgresql://citizenuser:***@postgres.citizen.svc.cluster.local:5432/citizen_db` |
 | `OLLAMA_BASE_URL` | `http://host.docker.internal:11434` |
 | `LLM_MODEL` | `gemma4:e4b` |
 | `EMBEDDING_MODEL` | `paraphrase-multilingual-MiniLM-L12-v2` |
-| `SCHEME_ENGINE_URL` | `http://scheme-engine-service.egov.svc.cluster.local:8086` |
-| `FAMILY_REGISTRY_URL` | `http://family-registry-service.egov.svc.cluster.local:8085` |
+| `SCHEME_ENGINE_URL` | `http://scheme-engine-service.citizen.svc.cluster.local:8086` |
+| `FAMILY_REGISTRY_URL` | `http://family-registry-service.citizen.svc.cluster.local:8085` |
 
 ---
 

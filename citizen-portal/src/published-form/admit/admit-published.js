@@ -1,4 +1,4 @@
-import { admitFormDefinition } from '@dg20/form-renderer'
+import { admitFormDefinition } from '@citizen/form-renderer'
 import { admitServiceId, admitVersionNumber } from './admit-service-id.js'
 import { cloneJsonSafe } from './clone-json-safe.js'
 

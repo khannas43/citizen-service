@@ -4,7 +4,7 @@ import { getDefaultRegistry } from '@rjsf/core'
 import validator from '@rjsf/validator-ajv8'
 import { useEffect, useState, type ReactElement } from 'react'
 
-import type { BilingualContent, PrefillBinding } from '@dg20/form-contract'
+import type { BilingualContent, PrefillBinding } from '@citizen/form-contract'
 
 import type { WidgetServicePorts } from '../src/runtime/service-ports.js'
 import type { FieldIdResolver } from '../src/runtime/field-id.js'

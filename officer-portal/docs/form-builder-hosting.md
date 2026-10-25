@@ -1,6 +1,6 @@
 # Officer-hosted Form Builder (FB-E5.4.3A)
 
-Mounts the DG2.0 Form Builder package at authenticated route **`/form-builder`**.
+Mounts the Citizen Services Form Builder package at authenticated route **`/form-builder`**.
 
 ## Ownership
 
@@ -32,7 +32,7 @@ Builder roles do **not** imply governance navigation.
 
 | Package | Path |
 | --- | --- |
-| `@dg20/form-builder-app` | `vendor/dg20/dg20-form-builder-app-0.1.0.tgz` |
+| `@citizen/form-builder-app` | `vendor/dg20/dg20-form-builder-app-0.1.0.tgz` |
 
 Refresh from Form-builder:
 
@@ -49,8 +49,8 @@ npm install --legacy-peer-deps
 Imports:
 
 ```js
-import { BuilderShell } from '@dg20/form-builder-app/embed'
-import '@dg20/form-builder-app/styles/embed.css'
+import { BuilderShell } from '@citizen/form-builder-app/embed'
+import '@citizen/form-builder-app/styles/embed.css'
 ```
 
 ## Explicit limitations

@@ -13,11 +13,11 @@ function defaultSupersetUrl() {
   // Local demos always use the port-forward; baked LAN IPs go stale when Wi‑Fi changes.
   const pageHost = window.location.hostname
   if (pageHost === 'localhost' || pageHost === '127.0.0.1') {
-    return `${window.location.protocol}//127.0.0.1:30076`
+    return `${window.location.protocol}//127.0.0.1:31176`
   }
   const fromEnv = (import.meta.env.VITE_SUPERSET_URL ?? '').replace(/\/$/, '')
   if (fromEnv) return fromEnv
-  return `${window.location.protocol}//${pageHost}:30076`
+  return `${window.location.protocol}//${pageHost}:31176`
 }
 
 const SUPERSET_URL = defaultSupersetUrl()
@@ -94,7 +94,7 @@ export default function Reports() {
       <div className="rpt-bar">
         <div className="rpt-bar-left">
           <div className="rpt-title">Analytics & Reports</div>
-          <div className="rpt-sub">DG 2.0 Platform · Live data</div>
+          <div className="rpt-sub">Citizen Services Platform · Live data</div>
           <DistrictScopeBanner noun="reports" />
         </div>
         <div className="rpt-tabs">

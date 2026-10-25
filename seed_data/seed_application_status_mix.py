@@ -12,11 +12,11 @@ import time
 import urllib.error
 import urllib.request
 
-BASE = "http://localhost:30073"
+BASE = "http://localhost:31173"
 PSQL = [
-    "kubectl", "exec", "-n", "egov",
+    "kubectl", "exec", "-n", "citizen",
     "deployment/postgres", "--",
-    "psql", "-U", "egovuser", "-d", "egov_db", "-At", "-c",
+    "psql", "-U", "citizenuser", "-d", "citizen_db", "-At", "-c",
 ]
 
 

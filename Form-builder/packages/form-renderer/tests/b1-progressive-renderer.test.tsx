@@ -4,7 +4,7 @@ import { useState, type ReactElement } from 'react'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { axe } from 'vitest-axe'
 
-import type { CafPrefillAdapter, WidgetServicePorts } from '@dg20/form-widgets'
+import type { CafPrefillAdapter, WidgetServicePorts } from '@citizen/form-widgets'
 
 import { FormRenderer } from '../src/FormRenderer.js'
 import type { FormRendererStepChangeData } from '../src/renderer-types.js'
@@ -13,8 +13,8 @@ import {
   createSamplePublishedDefinition,
 } from './fixtures.js'
 
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
 import '../src/styles/renderer.css'
 
 function stepHeading(): HTMLElement {

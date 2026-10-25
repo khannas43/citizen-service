@@ -4,9 +4,9 @@ import { createRoot } from 'react-dom/client'
 import { BuilderShell } from './shell/BuilderShell.js'
 import { admitHostLifecycleActorId } from './lifecycle/index.js'
 
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
-import '@dg20/form-renderer/styles/renderer.css'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
+import '@citizen/form-renderer/styles/renderer.css'
 import './styles/builder-document.css'
 import './styles/builder.css'
 

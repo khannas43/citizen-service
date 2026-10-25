@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { useState, type ReactElement } from 'react'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
-import type { CafPrefillAdapter, WidgetServicePorts } from '@dg20/form-widgets'
+import type { CafPrefillAdapter, WidgetServicePorts } from '@citizen/form-widgets'
 
 import { admitFormDefinition } from '../src/definition-admission.js'
 import { FormRenderer } from '../src/FormRenderer.js'
@@ -14,8 +14,8 @@ import {
 } from '../src/validator-2020.js'
 import { createSamplePublishedDefinition } from './fixtures.js'
 
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
 import '../src/styles/renderer.css'
 
 function sharedIdSchemas(versionRules: {

@@ -18,7 +18,7 @@ import '../utils/app_ref_utils.dart';
 import 'dg_text_field.dart';
 
 const _welcomeIntro = {
-  'en': 'Welcome to Digital Gujarat! I can help you:',
+  'en': 'Welcome to Citizen Services! I can help you:',
   'gu': 'ડિજિટલ ગુજરાતમાં સ્વાગત! હું મદદ કરી શકું:',
 };
 

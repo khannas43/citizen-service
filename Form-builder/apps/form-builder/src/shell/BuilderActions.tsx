@@ -1,4 +1,4 @@
-import type { ValidationIssue, ValidationResult } from '@dg20/form-contract'
+import type { ValidationIssue, ValidationResult } from '@citizen/form-contract'
 import type { RefObject } from 'react'
 
 import type { BuilderLocale } from '../locale/builder-messages.js'

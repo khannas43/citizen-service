@@ -82,7 +82,7 @@ export default function Layout() {
     <div className="citizen-app">
       <header className="top-header">
         <div className="header-brand">
-          <img src="/logodig.png" alt="Digital Gujarat" className="header-logo" />
+          <img src="/logodig.png" alt="Citizen Services" className="header-logo" />
           <span className="header-citizen-services">Citizen Services</span>
         </div>
         <div className="header-actions">

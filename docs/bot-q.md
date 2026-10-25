@@ -1,6 +1,6 @@
 # Citizen chatbot — questions to ask (voice or text)
 
-Use these on the citizen portal chatbot (`:30074`), typed or spoken. English and Gujarati both work.
+Use these on the citizen portal chatbot (`:31174`), typed or spoken. English and Gujarati both work.
 
 Login as **Priya Patel** (`XXXX-XXXX-1001` / OTP `123456`) for the best demo answers.
 

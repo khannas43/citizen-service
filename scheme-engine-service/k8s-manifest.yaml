@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: scheme-engine-service
-  namespace: egov
+  namespace: citizen
   labels:
     app: scheme-engine-service
 spec:
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: scheme-engine-service
-          image: scheme-engine-service:arm64-local
+          image: cs-scheme-engine-service:dev
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
@@ -41,7 +41,7 @@ spec:
                   key: key
                   optional: true
             - name: OFFICER_JWKS_URI
-              value: "http://keycloak.egov.svc.cluster.local:8080/realms/egov/protocol/openid-connect/certs"
+              value: "http://keycloak.citizen.svc.cluster.local:8080/realms/citizen/protocol/openid-connect/certs"
           startupProbe:
             httpGet:
               path: /scheme-engine-service/actuator/health/liveness
@@ -75,7 +75,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: scheme-engine-service
-  namespace: egov
+  namespace: citizen
 spec:
   selector:
     app: scheme-engine-service

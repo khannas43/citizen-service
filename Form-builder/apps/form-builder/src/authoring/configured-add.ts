@@ -26,7 +26,7 @@ import {
 } from './family-member-types.js'
 import type { ConfiguredAddTemplateInput, ConfiguredAddableWidgetType } from './templates.js'
 import { parseOptionalNonnegativeSafeIntegerString } from './age-integer.js'
-import { FAMILY_REPEATER_GLOBAL_MAX_ROWS } from '@dg20/form-widgets'
+import { FAMILY_REPEATER_GLOBAL_MAX_ROWS } from '@citizen/form-widgets'
 
 export type ConfiguredAddFocusControl =
   | 'masterListId'

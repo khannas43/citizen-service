@@ -8,7 +8,7 @@ const KEYCLOAK_URL =
   import.meta.env.VITE_KEYCLOAK_URL ||
   (import.meta.env.DEV ? 'http://localhost:8090' : '')
 
-export const OFFICER_TOKEN_URL = `${KEYCLOAK_URL}/realms/egov/protocol/openid-connect/token`
+export const OFFICER_TOKEN_URL = `${KEYCLOAK_URL}/realms/citizen/protocol/openid-connect/token`
 
 export async function verifyCitizenToken(token) {
   const res = await fetch(`${AUTH_API}/v1/verify`, {

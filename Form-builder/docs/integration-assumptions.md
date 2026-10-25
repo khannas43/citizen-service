@@ -1,6 +1,6 @@
 # Integration assumptions (FB-A12)
 
-This document records what `@dg20/form-widgets` **does and does not** assume about
+This document records what `@citizen/form-widgets` **does and does not** assume about
 host services. Exact adapter ownership remains unresolved at the monorepo level.
 
 ## Ports only
@@ -278,7 +278,7 @@ adapters and fixtures only.
 
 ## Progressive autosave (FB-B2)
 
-`@dg20/form-renderer` defines `ProgressiveAutosaveAdapter` as a **Renderer-level**
+`@citizen/form-renderer` defines `ProgressiveAutosaveAdapter` as a **Renderer-level**
 host port (not part of `WidgetServicePorts`). The host owns application/session
 identity, authentication, HTTP, persistence, encryption, audit logging, server
 timestamps, and idempotency/rate limits. The renderer:
@@ -338,7 +338,7 @@ Income Certificate fixture and synthetic in-memory adapters only. See
 
 - No authoritative DST/catalogue FormDefinition was found in the DG2.0 monorepo
 - The fixture is **not** an approved production DG form and is **not** part of
-  the `@dg20/form-renderer` public exports
+  the `@citizen/form-renderer` public exports
 - Representative `required` fields are technical acceptance constraints, not
   approved service policy
 - CAF object schemas require nonblank `value` + `CAF|OVERRIDE` `source`
@@ -408,7 +408,7 @@ Unit D is **explicitly authorized** under a **2026-07-24 sequencing exception**
 while §5 live acceptance, authentication/authorization, DST approval
 integration, and deployment/Kubernetes remain open. See [`unit-d.md`](./unit-d.md).
 
-FB-D0 delivers `@dg20/form-builder-app` — a visible **read-only** three-pane
+FB-D0 delivers `@citizen/form-builder-app` — a visible **read-only** three-pane
 Builder shell with an embedded Unit B FormRenderer preview. It does **not**
 author definitions, call Unit C APIs, persist to browser storage, or claim
 production readiness. FB-D1 will introduce the authoring state model and

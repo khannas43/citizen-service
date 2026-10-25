@@ -19,7 +19,7 @@ class BootErrorBoundary extends Component {
     if (this.state.error) {
       return (
         <div className="app-boot">
-          <p>The citizen portal failed to load. Try http://127.0.0.1:30074/ or refresh.</p>
+          <p>The citizen portal failed to load. Try http://127.0.0.1:31174/ or refresh.</p>
         </div>
       )
     }

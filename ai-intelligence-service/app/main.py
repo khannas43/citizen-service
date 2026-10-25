@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
     await close_pool()
 
 
-app = FastAPI(title="DG 2.0 AI Intelligence Service", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Citizen Services AI Intelligence Service", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

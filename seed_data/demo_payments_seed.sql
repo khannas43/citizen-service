@@ -1,5 +1,5 @@
 -- Payments & Benefits seed — pre-seeds disbursement history for Priya's family
--- Run against egov_db after demo_beneficiaries.sql
+-- Run against citizen_db after demo_beneficiaries.sql
 -- Schema: scheme_engine
 
 SET search_path TO scheme_engine;

@@ -55,7 +55,7 @@ export default function LandingChromeHeader({
       <header className="dg-header">
         <div className="wrap header-inner">
           <div className="header-left">
-            <Link to="/" className="emblem-wrap" aria-label="Digital Gujarat home">
+            <Link to="/" className="emblem-wrap" aria-label="Citizen Services home">
               <img src="/emblem-of-india.png" alt={t.emblemAlt} className="india-emblem" />
               <img src="/logodig.png" alt={t.logoAlt} className="header-logo" />
             </Link>

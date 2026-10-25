@@ -1,9 +1,9 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 import type {
   FieldIdResolver,
   WidgetMessageOverrides,
   WidgetServicePorts,
-} from '@dg20/form-widgets'
+} from '@citizen/form-widgets'
 
 import type {
   ProgressiveAutosaveAdapter,

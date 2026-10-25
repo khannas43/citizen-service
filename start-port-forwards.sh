@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+# shellcheck source=/dev/null
+source "$(dirname "$0")/scripts/lib/guard.sh"
 # Start kubectl port-forwards for local portal development.
 # Run once, keep this terminal open (or run in background with nohup).
 set -euo pipefail
 
-NS="${NAMESPACE:-egov}"
+NS="${NAMESPACE:-citizen}"
 
 FORWARDS=(
   "caste-certificate-service:8080:8080"

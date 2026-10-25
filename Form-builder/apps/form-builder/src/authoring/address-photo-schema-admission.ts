@@ -8,7 +8,7 @@ import {
   PHOTO_CAPTURE_MAX_BYTES,
   PHOTO_CAPTURE_MAX_DIMENSION,
   PHOTO_CAPTURE_MIN_DIMENSION,
-} from '@dg20/form-widgets'
+} from '@citizen/form-widgets'
 
 import { isExactMasterListId } from './master-list-schema-admission.js'
 import type { XDg20AdmissionResult } from './master-list-schema-admission.js'

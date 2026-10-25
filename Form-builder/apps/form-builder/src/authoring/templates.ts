@@ -1,4 +1,4 @@
-import type { JsonObject } from '@dg20/form-contract'
+import type { JsonObject } from '@citizen/form-contract'
 import {
   getPaletteWidget,
   PALETTE_WIDGET_COUNT,
@@ -6,7 +6,7 @@ import {
   PHOTO_CAPTURE_MAX_BYTES,
   PHOTO_CAPTURE_MAX_DIMENSION,
   PHOTO_CAPTURE_MIN_DIMENSION,
-} from '@dg20/form-widgets'
+} from '@citizen/form-widgets'
 
 import { FEE_AMOUNT_MINOR_MAX } from './fee-esign-schema-admission.js'
 

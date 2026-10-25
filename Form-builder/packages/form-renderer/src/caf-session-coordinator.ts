@@ -2,7 +2,7 @@ import type {
   CafPrefillAdapter,
   CafPrefillRequest,
   CafPrefillResolveResult,
-} from '@dg20/form-widgets'
+} from '@citizen/form-widgets'
 
 import { createAutosaveSnapshot } from './progressive-autosave.js'
 

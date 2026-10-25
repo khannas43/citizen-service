@@ -109,7 +109,7 @@ export default function Login() {
 
       <div className="login-wrap">
         <p style={{ marginBottom: 12 }}>
-          <Link to="/" className="link-btn">← Back to Digital Gujarat home</Link>
+          <Link to="/" className="link-btn">← Back to Citizen Services home</Link>
         </p>
         <div className="card login-card">
           {screen === 'aadhaar' ? (

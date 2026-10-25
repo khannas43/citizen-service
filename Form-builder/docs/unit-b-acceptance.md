@@ -9,13 +9,13 @@
 | `version`   | `1`                                                                      |
 | `status`    | `published`                                                              |
 | Location    | `packages/form-renderer/acceptance/representative-income-certificate.ts` |
-| Public API  | **Not exported** from `@dg20/form-renderer`                              |
+| Public API  | **Not exported** from `@citizen/form-renderer`                              |
 | Kind        | **Representative** (not authoritative)                                   |
 | Runtime     | **Deeply frozen** JSON-safe singleton (`deepFreezeJsonSafe`)             |
 
 ## Authoritative vs representative
 
-**Representative.** A read-only search of `/Users/sameerkhanna/Documents/Projects/DG2.0`
+**Representative.** A read-only search of `/Users/sameerkhanna/Documents/Projects/Citizen-Services`
 found **no** authoritative, versioned DG Service Catalogue / DST-approved
 `FormDefinition` with traceable production provenance suitable for §5 live
 acceptance.
@@ -24,7 +24,7 @@ Existing `income-certificate-sample` test fixtures elsewhere are **not** treated
 as authoritative.
 
 This fixture is **not** an approved production DG form. Package-level technical
-acceptance of `@dg20/form-renderer` is complete only after **FB-B6.1**. Design-spec
+acceptance of `@citizen/form-renderer` is complete only after **FB-B6.1**. Design-spec
 **§5 live real-service acceptance remains pending**.
 
 ### Provenance

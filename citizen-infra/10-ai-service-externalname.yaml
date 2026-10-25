@@ -1,0 +1,11 @@
+# Reuse the DG2.0 AI service read-only. The nginx configs and services call
+# ai-intelligence-service.citizen.svc.cluster.local:8089; this alias forwards it to DG2.0's pod.
+# Do NOT apply ai-intelligence-service/k8s.yaml in the citizen namespace until you change that service.
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-intelligence-service
+  namespace: citizen
+spec:
+  type: ExternalName
+  externalName: ai-intelligence-service.egov.svc.cluster.local

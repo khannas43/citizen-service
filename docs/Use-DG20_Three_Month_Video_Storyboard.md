@@ -60,7 +60,7 @@ This is the **creative lock** (3:00). For the video maker — shot files, VO cue
 | **Picture** | Gujarat map / emblem dissolves into citizen landing. Hard-cut: English landing → Gujarati toggle. |
 | **On-screen** | `DIGITAL GUJARAT 2.0` · `A working evaluation build` |
 | **Voice-over** | *Six crore citizens. Hundreds of schemes. Two government workflow engines. The evaluation question is simple: can the State find the family — before the family has to find the State?* |
-| **Capture** | Citizen `http://localhost:30074/` |
+| **Capture** | Citizen `http://localhost:31174/` |
 
 ---
 
@@ -73,7 +73,7 @@ This is the **creative lock** (3:00). For the video maker — shot files, VO cue
 | **Picture** | **Clip 6s.** Citizen tab → Aadhaar `XXXX-XXXX-1001` → OTP → Home: **Priya Patel**, Bavla, family summary. |
 | **On-screen** | `Aadhaar + OTP` · `No new registration` |
 | **Voice-over** | *Priya Patel is an ASHA worker in Bavla. She does not register. She authenticates. The family registry already holds her record. Digital Gujarat 2.0 lets her use it.* |
-| **Capture** | `:30074` landing |
+| **Capture** | `:31174` landing |
 
 ### Beat 2 · Same citizen on the phone (0:20 – 0:26)
 
@@ -122,7 +122,7 @@ This is the **creative lock** (3:00). For the video maker — shot files, VO cue
 | **Picture** | **Clip 7s.** Citizen My Family list → **cut** to Family Portal tree (Patel household, deceased overlay, eligibility cards). |
 | **On-screen** | `Family is the unit of welfare` |
 | **Voice-over** | *Digital Gujarat 2.0 does not treat the applicant as a lone file. The household is the record of truth — members, income, relationships, life events.* |
-| **Capture** | `:30074/my-family` · family portal `:30075` |
+| **Capture** | `:31174/my-family` · family portal `:31175` |
 
 ### Beat 7 · Consent you can revoke (1:14 – 1:26)
 
@@ -144,7 +144,7 @@ This is the **creative lock** (3:00). For the video maker — shot files, VO cue
 | **Picture** | **Clip 10s.** Login `talati` → `/tasks`. Green `FLW-` caste task **and** blue `DGT-` marriage task. SLA badge on Priya’s caste file. Approve. 2s architecture panel: Flowable vs DIGIT counts. |
 | **On-screen** | `Flowable + DIGIT workflow · one queue` |
 | **Voice-over** | *The Talati does not run two products. Caste certificates move on Flowable. Marriage certificates move on DIGIT’s workflow engine. She sees one queue, one SLA, one decision.* |
-| **Capture** | `:30073/tasks` · Arch panel |
+| **Capture** | `:31173/tasks` · Arch panel |
 
 ### Beat 9 · Assist the officer (1:44 – 2:00)
 
@@ -166,7 +166,7 @@ This is the **creative lock** (3:00). For the video maker — shot files, VO cue
 | **Picture** | **Clip 8s.** `dept_admin` → `/schemes` → Run Identification Scan → counts. Beneficiaries: reason chips → Confirm. Super: `Recorded from the live cluster`. |
 | **On-screen** | `Population identification` |
 | **Voice-over** | *A department defines a scheme. The engine runs it against the family registry. Qualifying citizens are identified with reasons in the open — not inside an opaque model.* |
-| **Capture** | `:30073/schemes` · `/beneficiaries` |
+| **Capture** | `:31173/schemes` · `/beneficiaries` |
 
 ### Beat 11 · Coverage, fairness, fraud (2:16 – 2:32)
 
@@ -188,7 +188,7 @@ This is the **creative lock** (3:00). For the video maker — shot files, VO cue
 | **Picture** | **Clip 14s, do not rush.** `/form-builder`: locked palette → field on canvas → **live citizen preview**. Cut to `/form-definitions`: Approve → Publish. Smash-cut to citizen **published form** `/apply/:serviceId` — **same fields, same order**. Hold 1.5s on the citizen form after VO line ends. |
 | **On-screen** | `Controlled government palette` · `One Form Definition` · `Publish to the citizen` |
 | **Voice-over** | *Departments do not wait for a vendor to draw the next form. They compose from a locked government palette. What the officer designs is what the citizen sees. Draft. Submit. Approve. Publish. The service is live on the same platform the evaluator is watching.* |
-| **Capture** | `:30073/form-builder` · `/form-definitions` · citizen published apply |
+| **Capture** | `:31173/form-builder` · `/form-definitions` · citizen published apply |
 
 **Director’s note:** If time is slipping, **shorten Act IV montage**, never this beat.
 
@@ -282,7 +282,7 @@ Not five services on a portal. A platform: two engines, one family record, expla
 ## Pre-record (T−60)
 
 ```bash
-kubectl get pods -n egov | grep -v Running | grep -v Completed
+kubectl get pods -n citizen | grep -v Running | grep -v Completed
 ./demo_reset.sh
 # Priya caste task SLA amber/red (DEMO_SCRIPT.md)
 # Schemes seeded; identification scan succeeds
@@ -291,10 +291,10 @@ kubectl get pods -n egov | grep -v Running | grep -v Completed
 
 | Role | URL | Login |
 | --- | --- | --- |
-| Priya (web) | `:30074` | `XXXX-XXXX-1001` · OTP `123456` |
-| Talati | `:30073` | `talati` / `officer123` |
-| Dept Admin | `:30073` | `dept_admin` / `officer123` |
-| Family tree | `:30075` | staff search Patel / Bavla |
+| Priya (web) | `:31174` | `XXXX-XXXX-1001` · OTP `123456` |
+| Talati | `:31173` | `talati` / `officer123` |
+| Dept Admin | `:31173` | `dept_admin` / `officer123` |
+| Family tree | `:31175` | staff search Patel / Bavla |
 | Flutter | local run | Priya **pre-selected** |
 
 ---

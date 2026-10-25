@@ -1,5 +1,5 @@
-import type { JsonObject } from '@dg20/form-contract'
-import { createAutosaveSnapshot } from '@dg20/form-renderer'
+import type { JsonObject } from '@citizen/form-contract'
+import { createAutosaveSnapshot } from '@citizen/form-renderer'
 
 import { AuthoringError } from './types.js'
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 
-import type { PrefillBinding } from '@dg20/form-contract'
+import type { PrefillBinding } from '@citizen/form-contract'
 
 import {
   acceptCafPrefillResult,

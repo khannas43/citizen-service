@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: notifications-service
-  namespace: egov
+  namespace: citizen
   labels:
     app: notifications-service
 spec:
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: notifications-service
-          image: notifications-service:arm64-local
+          image: cs-notifications-service:dev
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
@@ -62,7 +62,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: notifications-service
-  namespace: egov
+  namespace: citizen
 spec:
   selector:
     app: notifications-service

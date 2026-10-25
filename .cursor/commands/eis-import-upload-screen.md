@@ -1,6 +1,6 @@
 # Build an upload screen for the seven Expenditure Integrity CSV imports
 
-Repo: `/Users/sameerkhanna/Documents/Projects/DG2.0` (Digital Gujarat DG 2.0). This is a **portal-only** task in `officer-portal` (React/Vite, vitest + testing-library). The backend already exists and must not change. Do not commit or push. Never touch `videos/` or any `.pptx`.
+Repo: `/Users/sameerkhanna/Documents/Projects/Citizen-Services` (Digital Gujarat DG 2.0). This is a **portal-only** task in `officer-portal` (React/Vite, vitest + testing-library). The backend already exists and must not change. Do not commit or push. Never touch `videos/` or any `.pptx`.
 
 ## Goal
 

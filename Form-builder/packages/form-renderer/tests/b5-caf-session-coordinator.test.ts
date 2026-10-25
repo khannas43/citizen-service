@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import type { CafPrefillAdapter } from '@dg20/form-widgets'
+import type { CafPrefillAdapter } from '@citizen/form-widgets'
 
 import {
   admitCafPrefillAdapterResult,

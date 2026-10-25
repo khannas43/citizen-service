@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import type { CafPrefillAdapter, WidgetServicePorts } from '@dg20/form-widgets'
+import type { CafPrefillAdapter, WidgetServicePorts } from '@citizen/form-widgets'
 
 import {
   createCafSessionCoordinator,

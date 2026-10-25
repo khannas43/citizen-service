@@ -1,4 +1,4 @@
--- DG 2.0 analytics views for Apache Superset (read-only reporting layer)
+-- Citizen Services analytics views for Apache Superset (read-only reporting layer)
 CREATE SCHEMA IF NOT EXISTS analytics;
 
 CREATE OR REPLACE VIEW analytics.beneficiary_by_status AS
@@ -99,5 +99,5 @@ SELECT 'Total Identified', pending_confirmation::numeric FROM analytics.platform
 UNION ALL
 SELECT 'Total Active', active_beneficiaries::numeric FROM analytics.platform_snapshot;
 
-GRANT USAGE ON SCHEMA analytics TO egovuser;
-GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO egovuser;
+GRANT USAGE ON SCHEMA analytics TO citizenuser;
+GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO citizenuser;

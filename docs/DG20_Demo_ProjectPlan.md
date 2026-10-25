@@ -50,8 +50,8 @@
 | — | Scheme Simulator: Budget Forecasting single row | ✅ Done | ✅ Passed | sim-budget-grid repeat(4,1fr); all 4 fields in one row |
 | — | Family Registry: complete redesign | ✅ Done | ✅ Passed | Empty state; min-3-char search; AbortController + cancel button; 🔄 refresh; sort toolbar; caste/district filters; pagination with page-size selector; advanced filters panel (17 fields); tested 2026-06-28 |
 | — | Family Registry: family tree visual overhaul | ✅ Done | ✅ Passed | White cards; role-coloured accent stripe; avatar circle per role; HEAD gold ring + crown; SPOUSE bridge; Income Overview tab; Scheme Eligibility tab; tested 2026-06-28 |
-| — | Officer portal image fix | ✅ Done | ✅ Passed | Was serving citizen-portal content on port 30073; fixed by building with absolute path; verified title = "Officer Portal" in running pod |
-| — | Apache Superset integration + Reports module | ✅ Done | ✅ Passed | Superset 3.1.3 on NodePort 30076; 2 executive dashboards (`gujarat-welfare-pulse`, `scheme-performance`); analytics SQL views seeded; `@superset-ui/embedded-sdk` with guest tokens via `build_with_superset.sh`; tab switcher in officer portal; filter sidebar hidden — 2026-07-02 |
+| — | Officer portal image fix | ✅ Done | ✅ Passed | Was serving citizen-portal content on port 31173; fixed by building with absolute path; verified title = "Officer Portal" in running pod |
+| — | Apache Superset integration + Reports module | ✅ Done | ✅ Passed | Superset 3.1.3 on NodePort 31176; 2 executive dashboards (`gujarat-welfare-pulse`, `scheme-performance`); analytics SQL views seeded; `@superset-ui/embedded-sdk` with guest tokens via `build_with_superset.sh`; tab switcher in officer portal; filter sidebar hidden — 2026-07-02 |
 | — | Citizen portal Gujarati i18n expansion | ✅ Done | ✅ Passed | 530 keys EN/GU; Payments, Certificates, Notifications, Contact Centre, Consents, Home (My Applications), CAF, Apply, complaints, nav — 2026-06-29 |
 | — | Common Application Form (CAF) | ✅ Done | ✅ Passed | 5-step wizard; `/apply/caf`; duplicate check; document config; linked from Home — 2026-06-29 |
 | — | Officer portal: Task Queue table redesign | ✅ Done | ✅ Passed | Card list → sortable table (all columns); pagination; search + filters in single row — 2026-07-02 |
@@ -98,7 +98,7 @@ This plan picks up from where the current PROJECT_PLAN.md ends — Phases 0–6c
 | Service / Feature | Status | Notes |
 |---|---|---|
 | K3s cluster on Rancher Desktop | ✅ Done | arm64, namespace `egov` |
-| PostgreSQL 16 | ✅ Done | `egov_db`, all schemas |
+| PostgreSQL 16 | ✅ Done | `citizen_db`, all schemas |
 | Kafka (KRaft, apache/kafka:latest) | ✅ Done | Not Bitnami |
 | Valkey / Redis | ✅ Done | Cache |
 | DIGIT core (mdms, persister, indexer, user, workflow-v2, enc-service) | ✅ Done | arm64 native builds |
@@ -173,10 +173,10 @@ File: `demo_reset.sh` at project root. Run before every demo session.
 #!/bin/bash
 # demo_reset.sh — restores pristine demo state
 
-POSTGRES_POD=$(kubectl get pods -n egov -l app=postgres -o jsonpath='{.items[0].metadata.name}')
+POSTGRES_POD=$(kubectl get pods -n citizen -l app=postgres -o jsonpath='{.items[0].metadata.name}')
 
 echo "Resetting beneficiary states..."
-kubectl exec -it $POSTGRES_POD -n egov -- psql -U egovuser -d egov_db << 'SQL'
+kubectl exec -it $POSTGRES_POD -n citizen -- psql -U citizenuser -d citizen_db << 'SQL'
 -- Reset Bhavesh to REMOVED (deceased)
 UPDATE scheme_engine.beneficiary b
 SET status = 'REMOVED', removal_reason = 'MEMBER_DECEASED'
@@ -201,7 +201,7 @@ WHERE p.name = 'Suresh Nair' AND b.person_id = p.id;
 SQL
 
 echo "Running scheme identification..."
-curl -s -X POST http://localhost:$(kubectl get svc scheme-engine-service -n egov \
+curl -s -X POST http://localhost:$(kubectl get svc scheme-engine-service -n citizen \
   -o jsonpath='{.spec.ports[0].nodePort}')/scheme-engine-service/v1/admin/run-identification
 
 echo "Done. Demo state restored."
@@ -230,7 +230,7 @@ echo "Done. Demo state restored."
 **Full Postgres recovery sequence (if pod restarts and wipes data):**
 ```bash
 # 1. Create schemas
-kubectl exec -it $POSTGRES_POD -n egov -- psql -U egovuser -d egov_db -c \
+kubectl exec -it $POSTGRES_POD -n citizen -- psql -U citizenuser -d citizen_db -c \
   "CREATE SCHEMA IF NOT EXISTS family_registry;
    CREATE SCHEMA IF NOT EXISTS scheme_engine;
    CREATE SCHEMA IF NOT EXISTS caste_cert;
@@ -242,32 +242,32 @@ kubectl exec -it $POSTGRES_POD -n egov -- psql -U egovuser -d egov_db -c \
    CREATE SCHEMA IF NOT EXISTS notifications;"
 
 # 2. Restart all Spring Boot services (they recreate their own tables via ddl-auto)
-kubectl rollout restart deployment -n egov \
+kubectl rollout restart deployment -n citizen \
   family-registry-service scheme-engine-service caste-certificate-service \
   pension-service family-member-service scheme-application-service \
   marriage-certificate-service auth-service grievance-service notifications-service
 
 # 3. Reload base hero seed data (in order)
-kubectl exec -i $POSTGRES_POD -n egov -- psql -U egovuser -d egov_db \
+kubectl exec -i $POSTGRES_POD -n citizen -- psql -U citizenuser -d citizen_db \
   < seed_data/seed_families.sql
-kubectl exec -i $POSTGRES_POD -n egov -- psql -U egovuser -d egov_db \
+kubectl exec -i $POSTGRES_POD -n citizen -- psql -U citizenuser -d citizen_db \
   < seed_data/seed_demo_schemes.sql
-kubectl exec -i $POSTGRES_POD -n egov -- psql -U egovuser -d egov_db \
+kubectl exec -i $POSTGRES_POD -n citizen -- psql -U citizenuser -d citizen_db \
   < seed_data/demo_hero_patch.sql
-kubectl exec -i $POSTGRES_POD -n egov -- psql -U egovuser -d egov_db \
+kubectl exec -i $POSTGRES_POD -n citizen -- psql -U citizenuser -d citizen_db \
   < seed_data/demo_beneficiaries.sql
-kubectl exec -i $POSTGRES_POD -n egov -- psql -U egovuser -d egov_db \
+kubectl exec -i $POSTGRES_POD -n citizen -- psql -U citizenuser -d citizen_db \
   < seed_data/demo_eligibility_reason_backfill.sql
-kubectl exec -i $POSTGRES_POD -n egov -- psql -U egovuser -d egov_db \
+kubectl exec -i $POSTGRES_POD -n citizen -- psql -U citizenuser -d citizen_db \
   < seed_data/demo_distribution_backfill.sql
 
 # 4. Generate large dataset (~15 min — run overnight before demo day)
-kubectl port-forward svc/postgres 5433:5432 -n egov &
+kubectl port-forward svc/postgres 5433:5432 -n citizen &
 python seed_data/generate_large_dataset.py
 kill %1
 
 # 5. Auto-identify beneficiaries from large dataset (~10–15 min)
-kubectl port-forward svc/scheme-engine-service 8096:8080 -n egov &
+kubectl port-forward svc/scheme-engine-service 8096:8080 -n citizen &
 curl -s -X POST http://localhost:8096/scheme-engine-service/v1/admin/run-identification | jq .
 kill %1
 
@@ -285,20 +285,20 @@ kill %1
 
 ```bash
 # 1. Port-forward Keycloak
-kubectl port-forward svc/keycloak 8090:8080 -n egov
+kubectl port-forward svc/keycloak 8090:8080 -n citizen
 
 # 2. Export realm (run after Keycloak is set up with all users)
-curl -s http://localhost:8090/admin/realms/egov \
+curl -s http://localhost:8090/admin/realms/citizen \
   -H "Authorization: Bearer $(curl -s http://localhost:8090/realms/master/protocol/openid-connect/token \
     -d 'client_id=admin-cli&grant_type=password&username=admin&password=admin' \
-    | jq -r '.access_token')" > egov-realm.json
+    | jq -r '.access_token')" > citizen-realm.json
 
 # 3. Create ConfigMap
 kubectl create configmap keycloak-realm \
-  --from-file=egov-realm.json=./egov-realm.json -n egov
+  --from-file=citizen-realm.json=./citizen-realm.json -n citizen
 
 # 4. Patch Keycloak deployment to import on start
-kubectl patch deployment keycloak -n egov --patch '
+kubectl patch deployment keycloak -n citizen --patch '
 spec:
   template:
     spec:
@@ -306,7 +306,7 @@ spec:
       - name: keycloak
         env:
         - name: KC_IMPORT
-          value: /opt/keycloak/data/import/egov-realm.json
+          value: /opt/keycloak/data/import/citizen-realm.json
         volumeMounts:
         - name: realm-config
           mountPath: /opt/keycloak/data/import
@@ -360,9 +360,9 @@ Bhashini fallback: if Bhashini call fails or >2s timeout → skip translation, r
 
 ### 6.2 chatbot-service spec
 
-**Location:** `/Users/sameerkhanna/Documents/Projects/DG2.0/chatbot-service/`
+**Location:** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/chatbot-service/`
 **Schema:** none (session state in ConcurrentHashMap, expires after 10 min inactivity)
-**Package:** `org.magicsword.chatbot`
+**Package:** `org.citizen.chatbot`
 
 **Session state object:**
 ```java
@@ -430,7 +430,7 @@ Bhashini endpoint: `https://dhruva-api.bhashini.gov.in/services/inference/pipeli
 Auth header: `Authorization: {your-api-key}`
 Pipeline task: `translation` (NMT model for gu-en pair)
 
-**K8s manifest:** NodePort 30088 for local access.
+**K8s manifest:** NodePort 31188 for local access.
 
 ### 6.3 Chatbot widget in citizen-portal
 
@@ -491,17 +491,17 @@ Build sequence (run from each portal directory after `npm run build`):
 ```bash
 # citizen-portal
 VITE_API_BASE=http://$(ipconfig getifaddr en0):30000 npm run build
-docker build -t citizen-portal:arm64-local .
+docker build -t cs-citizen-portal:dev .
 kubectl apply -f k8s-manifest-citizen-portal.yaml
 
 # officer-portal
 npm run build
-docker build -t officer-portal:arm64-local .
+docker build -t cs-officer-portal:dev .
 kubectl apply -f k8s-manifest-officer-portal.yaml
 
 # family-portal
 npm run build
-docker build -t family-portal:arm64-local .
+docker build -t cs-family-portal:dev .
 kubectl apply -f k8s-manifest-family-portal.yaml
 ```
 
@@ -509,19 +509,19 @@ kubectl apply -f k8s-manifest-family-portal.yaml
 
 | Portal / Service | NodePort | Access URL |
 |---|---|---|
-| citizen-portal | 30074 | `http://<mac-ip>:30074` |
-| officer-portal | 30073 | `http://<mac-ip>:30073` |
-| family-portal | 30075 | `http://<mac-ip>:30075` |
-| superset | 30076 | `http://<mac-ip>:30076` (admin/admin123; officer portal embeds via guest tokens) |
+| citizen-portal | 31174 | `http://<mac-ip>:31174` |
+| officer-portal | 31173 | `http://<mac-ip>:31173` |
+| family-portal | 31175 | `http://<mac-ip>:31175` |
+| superset | 31176 | `http://<mac-ip>:31176` (admin/admin123; officer portal embeds via guest tokens) |
 | auth-service | 30087 | `http://<mac-ip>:30087` |
 | caste-cert | 30080 | internal only |
 | pension-service | 30082 | internal only |
 | family-registry | 30085 | internal only |
 | scheme-engine | 30086 | internal only |
-| chatbot-service | 30088 | internal only |
+| chatbot-service | 31188 | internal only |
 | Keycloak | 30090 | `http://<mac-ip>:30090` |
 
-All service-to-service calls use cluster DNS (`service-name.egov.svc.cluster.local`). Only portals and auth-service are NodePort-exposed. No port-forwarding during demo.
+All service-to-service calls use cluster DNS (`service-name.citizen.svc.cluster.local`). Only portals and auth-service are NodePort-exposed. No port-forwarding during demo.
 
 **VITE_API_BASE** is set at build time to Mac's WiFi IP. Script `build_all_portals.sh`:
 ```bash
@@ -529,20 +529,20 @@ All service-to-service calls use cluster DNS (`service-name.egov.svc.cluster.loc
 MAC_IP=$(ipconfig getifaddr en0)
 echo "Building portals for IP: $MAC_IP"
 
-cd /Users/sameerkhanna/Documents/Projects/DG2.0/citizen-portal
+cd /Users/sameerkhanna/Documents/Projects/Citizen-Services/citizen-portal
 VITE_API_BASE=http://$MAC_IP npm run build
-docker build -t citizen-portal:arm64-local .
-kubectl rollout restart deployment/citizen-portal -n egov
+docker build -t cs-citizen-portal:dev .
+kubectl rollout restart deployment/citizen-portal -n citizen
 
-cd /Users/sameerkhanna/Documents/Projects/DG2.0/officer-portal
+cd /Users/sameerkhanna/Documents/Projects/Citizen-Services/officer-portal
 VITE_API_BASE=http://$MAC_IP npm run build
-docker build -t officer-portal:arm64-local .
-kubectl rollout restart deployment/officer-portal -n egov
+docker build -t cs-officer-portal:dev .
+kubectl rollout restart deployment/officer-portal -n citizen
 
-cd /Users/sameerkhanna/Documents/Projects/DG2.0/family-portal
+cd /Users/sameerkhanna/Documents/Projects/Citizen-Services/family-portal
 VITE_API_BASE=http://$MAC_IP npm run build
-docker build -t family-portal:arm64-local .
-kubectl rollout restart deployment/family-portal -n egov
+docker build -t cs-family-portal:dev .
+kubectl rollout restart deployment/family-portal -n citizen
 
 echo "All portals rebuilt and redeployed."
 ```
@@ -559,7 +559,7 @@ echo "All portals rebuilt and redeployed."
 ### 8.1 Steps
 
 ```bash
-cd /Users/sameerkhanna/Documents/Projects/DG2.0/citizen-portal
+cd /Users/sameerkhanna/Documents/Projects/Citizen-Services/citizen-portal
 
 # Install Capacitor
 npm install @capacitor/core @capacitor/cli @capacitor/android
@@ -634,9 +634,9 @@ scrcpy
 
 ### 9.1 grievance-service (new Spring Boot service)
 
-**Location:** `/Users/sameerkhanna/Documents/Projects/DG2.0/grievance-service/`
+**Location:** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/grievance-service/`
 **Schema:** `grievance`
-**Package:** `org.magicsword.grievance`
+**Package:** `org.citizen.grievance`
 **Engine:** Plain JPA (no Flowable — simple 3-status lifecycle)
 
 **Table:**
@@ -780,9 +780,9 @@ AND status = 'TALATI_VERIFICATION';
 
 ### 12.1 notifications-service (new Spring Boot service)
 
-**Location:** `/Users/sameerkhanna/Documents/Projects/DG2.0/notifications-service/`
+**Location:** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/notifications-service/`
 **Schema:** `notifications`
-**Package:** `org.magicsword.notifications`
+**Package:** `org.citizen.notifications`
 
 **Table:**
 ```sql
@@ -1626,7 +1626,7 @@ Record full 20-minute demo flow using QuickTime (File → New Screen Recording).
 
 ```bash
 # 1. Verify all pods running
-kubectl get pods -n egov | grep -v Running  # should return nothing
+kubectl get pods -n citizen | grep -v Running  # should return nothing
 
 # 2. Reset demo state
 ./demo_reset.sh
@@ -1635,21 +1635,21 @@ kubectl get pods -n egov | grep -v Running  # should return nothing
 ./build_all_portals.sh
 
 # 4. Verify citizen-portal NodePort accessible
-curl -s http://$(ipconfig getifaddr en0):30074 | grep "Digital Gujarat"
+curl -s http://$(ipconfig getifaddr en0):31174 | grep "Digital Gujarat"
 
 # 5. Verify officer login
-curl -s -X POST http://$(ipconfig getifaddr en0):30090/realms/egov/protocol/openid-connect/token \
+curl -s -X POST http://$(ipconfig getifaddr en0):30090/realms/citizen/protocol/openid-connect/token \
   -d 'client_id=officer-portal&grant_type=password&username=talati&password=officer123' \
   | jq .access_token
 
 # 6. Seed red-badge application (1 hour before)
-kubectl exec -it $(kubectl get pods -n egov -l app=postgres -o jsonpath='{.items[0].metadata.name}') -n egov -- \
-  psql -U egovuser -d egov_db -c \
+kubectl exec -it $(kubectl get pods -n citizen -l app=postgres -o jsonpath='{.items[0].metadata.name}') -n citizen -- \
+  psql -U citizenuser -d citizen_db -c \
   "UPDATE caste_cert.caste_application SET created_at = NOW() - INTERVAL '23 hours' WHERE applicant_name = 'Priya Patel';"
 
 # 7. Reset Savitaben disbursement status (so Scene 12 "Mark Disbursed" can be shown live)
-kubectl exec -it $(kubectl get pods -n egov -l app=postgres -o jsonpath='{.items[0].metadata.name}') -n egov -- \
-  psql -U egovuser -d egov_db -c \
+kubectl exec -it $(kubectl get pods -n citizen -l app=postgres -o jsonpath='{.items[0].metadata.name}') -n citizen -- \
+  psql -U citizenuser -d citizen_db -c \
   "UPDATE scheme_engine.beneficiary SET disbursement_status = NULL, disbursed_at = NULL, disbursement_ref = NULL
    WHERE person_name = 'Savitaben Patel' AND status = 'CONFIRMED';"
 
@@ -1658,7 +1658,7 @@ adb devices
 scrcpy --window-title "Priya's Phone — Digital Gujarat" --max-fps 30 --window-width 400
 
 # 8. Open officer-portal in Chrome
-open http://$(ipconfig getifaddr en0):30073
+open http://$(ipconfig getifaddr en0):31173
 ```
 
 ---
@@ -1770,7 +1770,7 @@ Citizen AI P1 (AI-1,2,4)  →  Citizen AI P2 (AI-3,5)  →  Architecture panel  
 | 17 | Rajan Nair's deceased father is **Gopal Nair** in the DB (not Suresh) | demo_reset.sh already uses correct name; don't introduce Suresh in future SQL |
 | 18 | Keycloak realm export must be refreshed after any realm change | Run `./export-keycloak-realm.sh` then update ConfigMap + rollout restart — see DS-2 |
 | 19 | Flowable variable join in demo_reset.sh: use `proc_inst_id_` not `execution_id_` | Joining `act_ru_task` to `act_ru_variable` via `execution_id_` gives UPDATE 0 on multi-task processes. Fixed join uses `t.proc_inst_id_ = v.proc_inst_id_` |
-| 20 | Parallel `docker build` with `cd` causes race condition — wrong portal image served | Both builds run in parallel bash; `cd` in citizen-portal build affects officer-portal build context. Fix: always pass absolute path as Docker build context (`docker build -t officer-portal:arm64-local /absolute/path/to/officer-portal`) — never use `.` |
+| 20 | Parallel `docker build` with `cd` causes race condition — wrong portal image served | Both builds run in parallel bash; `cd` in citizen-portal build affects officer-portal build context. Fix: always pass absolute path as Docker build context (`docker build -t cs-officer-portal:dev /absolute/path/to/officer-portal`) — never use `.` |
 | 21 | React JSX parse error when adding modal sibling outside root div | Modal placed after closing `</div>` of root causes "Expected `,` or `)` but found `{`". Fix: wrap entire return with `<>…</>` fragment so both root div and modal are siblings under one fragment |
 | 22 | `useRef` not auto-imported — causes ReferenceError at runtime | When adding AbortController pattern (`abortRef = useRef(null)`), `useRef` must be explicitly added to the React import. Common miss when only `useState/useEffect/useCallback/useMemo` were there before |
 | 23 | SimulateParameters record arity — 8th field breaks existing instantiation | Adding `annualAttritionRate` makes the record 8 fields; the default `new SimulateParameters(null,…)` instantiation had 7 nulls → compiler error. Always count fields when adding to a Java record and update all call sites |
@@ -1796,14 +1796,14 @@ Citizen AI P1 (AI-1,2,4)  →  Citizen AI P2 (AI-3,5)  →  Architecture panel  
 | scheme-engine-service | Kafka consumer | scheme_engine | internal | ✅ Done |
 | auth-service | JWT | — | 30087 | ✅ Done |
 | keycloak | IAM | H2 | 30090 | ✅ Done |
-| chatbot-service | static bilingual state machine | — | 30088 | ✅ Done (Phase 7) |
+| chatbot-service | static bilingual state machine | — | 31188 | ✅ Done (Phase 7) |
 | grievance-service | JPA | grievance | internal | ✅ Done (Phase 10) |
 | notifications-service | JPA | notifications | internal | ✅ Done (Phase 13) |
-| citizen-portal | Nginx/React | — | 30074 | ✅ Done (Phase 8) |
-| officer-portal | Nginx/React | — | 30073 | ✅ Done (Phase 8) |
-| family-portal | Nginx/React | — | 30075 | ✅ Done (Phase 8) |
+| citizen-portal | Nginx/React | — | 31174 | ✅ Done (Phase 8) |
+| officer-portal | Nginx/React | — | 31173 | ✅ Done (Phase 8) |
+| family-portal | Nginx/React | — | 31175 | ✅ Done (Phase 8) |
 | scheme-engine-service (+fraud) | Kafka + JPA | scheme_engine | internal | ✅ Done (Phase 19) |
 | scheme-engine-service (+simulate) | Kafka + JPA | scheme_engine | internal | ✅ Done (Phase 20) |
 | grievance-service (+clarification) | JPA | grievance (+ clarification table) | internal | ✅ Done (Phase 23) |
 | scheme-engine-service (+ops-summary, +birthday-check) | Kafka + JPA | scheme_engine | internal | ✅ Done (Phase 24 + 26) |
-| superset | Flask + Celery | superset | 30076 | ✅ Done (Reports module — 2 embedded dashboards, guest tokens) |
+| superset | Flask + Celery | superset | 31176 | ✅ Done (Reports module — 2 embedded dashboards, guest tokens) |

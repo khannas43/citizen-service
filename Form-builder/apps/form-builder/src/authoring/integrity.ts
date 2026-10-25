@@ -1,5 +1,5 @@
-import type { FormDefinition, ProgressiveStep } from '@dg20/form-contract'
-import { dg20Fields, dg20Widgets, getPaletteWidget, isApprovedWidgetType } from '@dg20/form-widgets'
+import type { FormDefinition, ProgressiveStep } from '@citizen/form-contract'
+import { dg20Fields, dg20Widgets, getPaletteWidget, isApprovedWidgetType } from '@citizen/form-widgets'
 
 import { isAdmittedCitizenSchema, isCitizenWidgetType } from './citizen-schema-admission.js'
 import {

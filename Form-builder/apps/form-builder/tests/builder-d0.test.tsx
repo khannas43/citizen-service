@@ -2,8 +2,8 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'vitest-axe'
 import { describe, expect, it, vi } from 'vitest'
-import { PALETTE_GROUPS, PALETTE_WIDGET_COUNT } from '@dg20/form-widgets'
-import type { FormDefinition } from '@dg20/form-contract'
+import { PALETTE_GROUPS, PALETTE_WIDGET_COUNT } from '@citizen/form-widgets'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import { BuilderShell } from '../src/shell/BuilderShell.js'
 import {

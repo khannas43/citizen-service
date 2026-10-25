@@ -63,7 +63,7 @@ export default function OfficerLogin() {
       <div className="login-hero">
         <div className="login-hero-content">
           <div className="login-emblem">🏛</div>
-          <h1 className="login-hero-title">Digital Gujarat 2.0</h1>
+          <h1 className="login-hero-title">Citizen Services</h1>
           <p className="login-hero-sub">Integrated Welfare Delivery Platform</p>
           <div className="login-hero-divider" />
           <ul className="login-hero-bullets">
@@ -79,7 +79,7 @@ export default function OfficerLogin() {
         <div className="login-form-inner">
           <div className="login-logo-row">
             <span className="login-logo-icon">🏛</span>
-            <span className="login-logo-text">DG 2.0</span>
+            <span className="login-logo-text">Citizen Services</span>
           </div>
           <h2 className="login-form-title">Officer Sign In</h2>
           <p className="login-form-sub">Authenticated via Keycloak IAM</p>

@@ -1,5 +1,5 @@
 -- Demo fraud signal cases for hero families (idempotent)
--- Run against egov_db after demo_beneficiaries.sql
+-- Run against citizen_db after demo_beneficiaries.sql
 
 SET search_path TO scheme_engine, family_registry, public;
 

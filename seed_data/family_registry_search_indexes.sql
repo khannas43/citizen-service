@@ -1,5 +1,5 @@
 -- Family Registry search indexes (idempotent)
--- Run once: psql -h localhost -p 5433 -U egovuser -d egov_db -f seed_data/family_registry_search_indexes.sql
+-- Run once: psql -h localhost -p 5433 -U citizenuser -d citizen_db -f seed_data/family_registry_search_indexes.sql
 
 -- pg_trgm installs operator classes in public; qualify gin_trgm_ops below.
 CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;

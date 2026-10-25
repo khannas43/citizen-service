@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { StrictMode, useState, type ReactElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { PrefillBinding } from '@dg20/form-contract'
-import type { CafPrefillAdapter, CafPrefillRequest, FieldIdResolver } from '@dg20/form-widgets'
+import type { PrefillBinding } from '@citizen/form-contract'
+import type { CafPrefillAdapter, CafPrefillRequest, FieldIdResolver } from '@citizen/form-widgets'
 
 import { createCafSessionCoordinator } from '../src/caf-session-coordinator.js'
 import { FormRenderer } from '../src/FormRenderer.js'
@@ -14,8 +14,8 @@ import {
 } from './fixtures.js'
 import { renderFamilyRepeaterHarness } from '../../form-widgets/tests/widget-harness.js'
 
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
 import '../src/styles/renderer.css'
 
 function createDeferred<T>(): {

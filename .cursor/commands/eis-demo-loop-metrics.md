@@ -1,6 +1,6 @@
 # Fix the two demo figures on the Money overview "Whether fixes hold" row
 
-Repo: `/Users/sameerkhanna/Documents/Projects/DG2.0` (Digital Gujarat DG 2.0). Module: `expenditure-integrity-service` (Spring Boot 3.3, Java 17) and `officer-portal` (React/Vite). Do not commit or push. Never touch `videos/` or any `.pptx`.
+Repo: `/Users/sameerkhanna/Documents/Projects/Citizen-Services` (Digital Gujarat DG 2.0). Module: `expenditure-integrity-service` (Spring Boot 3.3, Java 17) and `officer-portal` (React/Vite). Do not commit or push. Never touch `videos/` or any `.pptx`.
 
 ## What is wrong
 

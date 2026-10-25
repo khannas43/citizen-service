@@ -33,7 +33,7 @@ CHART_DESCRIPTIONS = {
     ),
     "Beneficiaries by Scheme": (
         "Breakdown of all active beneficiaries across each welfare scheme running on "
-        "the platform. Shows that DG 2.0 is not a single-purpose system — it delivers "
+        "the platform. Shows that Citizen Services is not a single-purpose system — it delivers "
         "Old Age Pension, OBC Scholarship, BPL Ration, Widow Pension, and other schemes "
         "simultaneously from one platform."
     ),

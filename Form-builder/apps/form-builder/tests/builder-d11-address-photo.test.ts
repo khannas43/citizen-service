@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 import {
   PALETTE_WIDGET_COUNT,
   PHOTO_CAPTURE_ALLOWED_MIME_TYPES,
   PHOTO_CAPTURE_MAX_BYTES,
   PHOTO_CAPTURE_MAX_DIMENSION,
   PHOTO_CAPTURE_MIN_DIMENSION,
-} from '@dg20/form-widgets'
+} from '@citizen/form-widgets'
 
 import {
   ADDABLE_COUNT,

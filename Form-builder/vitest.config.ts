@@ -12,15 +12,15 @@ export default defineConfig({
     // Exact package-root matches only — preserve CSS subpath exports.
     alias: [
       {
-        find: /^@dg20\/form-contract$/,
+        find: /^@citizen\/form-contract$/,
         replacement: path.join(packagesDir, 'form-contract/src/index.ts'),
       },
       {
-        find: /^@dg20\/form-widgets$/,
+        find: /^@citizen\/form-widgets$/,
         replacement: path.join(packagesDir, 'form-widgets/src/index.ts'),
       },
       {
-        find: /^@dg20\/form-renderer$/,
+        find: /^@citizen\/form-renderer$/,
         replacement: path.join(packagesDir, 'form-renderer/src/index.ts'),
       },
     ],

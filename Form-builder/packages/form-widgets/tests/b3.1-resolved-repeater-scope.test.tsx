@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import type { ReactElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { BilingualContent, PrefillBinding } from '@dg20/form-contract'
+import type { BilingualContent, PrefillBinding } from '@citizen/form-contract'
 
 import {
   appendArrayIndex,

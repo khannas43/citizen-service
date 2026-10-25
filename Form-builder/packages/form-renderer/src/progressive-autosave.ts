@@ -1,4 +1,4 @@
-import type { JsonObject, JsonValue } from '@dg20/form-contract'
+import type { JsonObject, JsonValue } from '@citizen/form-contract'
 
 /**
  * Host-injected progressive autosave (FB-B2 / B2.1).

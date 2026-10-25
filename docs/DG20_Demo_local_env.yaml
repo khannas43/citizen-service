@@ -3,8 +3,8 @@ global:
 
 configmaps:
   egov-config:
-    db-url: "jdbc:postgresql://postgres.egov.svc.cluster.local:5432/egov_db"
-    kafka-brokers: "kafka.egov.svc.cluster.local:9092"
+    db-url: "jdbc:postgresql://postgres.citizen.svc.cluster.local:5432/citizen_db"
+    kafka-brokers: "kafka.citizen.svc.cluster.local:9092"
     domain: "localhost"
     egov-services-fqdn-name: "http://localhost/"
     egov-state-level-tenant-id: "pg"
@@ -20,6 +20,6 @@ configmaps:
     tracer-errors-provideexceptionindetails: "true"
 
 # Per-service overrides — db-url for services that need a non-default schema.
-# egov-workflow-v2 uses a dedicated schema within the same egov_db database.
+# egov-workflow-v2 uses a dedicated schema within the same citizen_db database.
 egov-workflow-v2:
-  db-url: "jdbc:postgresql://postgres.egov.svc.cluster.local:5432/egov_db?currentSchema=egov_common_workflows"
+  db-url: "jdbc:postgresql://postgres.citizen.svc.cluster.local:5432/citizen_db?currentSchema=egov_common_workflows"

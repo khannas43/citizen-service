@@ -38,7 +38,7 @@ class S {
     'common.switch': {'en': 'Switch', 'gu': 'બદલો'},
     'common.offlineDrafts': {'en': 'Offline Drafts', 'gu': 'ઑફલાઇન ડ્રાફ્ટ'},
     'common.savedDrafts': {'en': 'Saved Drafts', 'gu': 'સાચવેલા ડ્રાફ્ટ'},
-    'chatbot.title': {'en': '🤖 Digital Gujarat Assistant', 'gu': '🤖 ડિજિટલ ગુજરાત સહાયક'},
+    'chatbot.title': {'en': '🤖 Citizen Services Assistant', 'gu': '🤖 ડિજિટલ ગુજરાત સહાયક'},
     'chatbot.online': {'en': 'Online', 'gu': 'ઑનલાઇન'},
     'chatbot.reset': {'en': 'Reset', 'gu': 'રીસેટ'},
     'language.title': {'en': 'App Language', 'gu': 'એપ ભાષા'},

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: citizen-portal
-  namespace: egov
+  namespace: citizen
 spec:
   replicas: 1
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: citizen-portal
-        image: citizen-portal:arm64-local
+        image: cs-citizen-portal:dev
         imagePullPolicy: Never
         ports:
         - containerPort: 80
@@ -24,7 +24,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: citizen-portal
-  namespace: egov
+  namespace: citizen
 spec:
   selector:
     app: citizen-portal
@@ -32,4 +32,4 @@ spec:
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30074
+    nodePort: 31174

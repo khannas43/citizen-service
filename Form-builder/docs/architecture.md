@@ -8,10 +8,10 @@ the Spring Boot store arrive in later increments.
 
 | Boundary                               | Kind                                 | Responsibility                                                |
 | -------------------------------------- | ------------------------------------ | ------------------------------------------------------------- |
-| `@dg20/form-contract`                  | npm package                          | Form Definition + validation result types only                |
-| `@dg20/form-widgets`                   | npm package                          | Controlled palette metadata + React/RJSF widgets (Unit A)     |
-| `@dg20/form-renderer`                  | npm package                          | Single runtime Renderer (Unit B; FB-B0 foundation)            |
-| Builder SPA (`@dg20/form-builder-app`) | Vite app under `apps/form-builder/`  | Design-time UI (Unit D); embeds Renderer                      |
+| `@citizen/form-contract`                  | npm package                          | Form Definition + validation result types only                |
+| `@citizen/form-widgets`                   | npm package                          | Controlled palette metadata + React/RJSF widgets (Unit A)     |
+| `@citizen/form-renderer`                  | npm package                          | Single runtime Renderer (Unit B; FB-B0 foundation)            |
+| Builder SPA (`@citizen/form-builder-app`) | Vite app under `apps/form-builder/`  | Design-time UI (Unit D); embeds Renderer                      |
 | `form-definition-service`              | Spring Boot deployable (`services/`) | JSONB persistence, server validator, publish gate (Units C/E) |
 
 The Spring service is **not** managed by npm workspaces. Frontend packages may
@@ -22,10 +22,10 @@ be listed under `packages/*` and future SPAs under `apps/*`. Maven lives under
 
 ```mermaid
 flowchart TB
-  contract["@dg20/form-contract"]
-  widgets["@dg20/form-widgets"]
-  renderer["@dg20/form-renderer (FB-B0)"]
-  builder["@dg20/form-builder-app (FB-D0/D1)"]
+  contract["@citizen/form-contract"]
+  widgets["@citizen/form-widgets"]
+  renderer["@citizen/form-renderer (FB-B0)"]
+  builder["@citizen/form-builder-app (FB-D0/D1)"]
   citizen["citizen-portal (consumer)"]
   spring["form-definition-service (FB-C0+)"]
 
@@ -92,7 +92,7 @@ Rules:
   and `POST …/builder/lifecycle-transitions` with JWT `sub` as actor; technical
   identity-bearing clone/lifecycle remain denyAll. Default SPA HTTP adapters use
   `/builder/…` and omit client `createdBy`/`actorId`.
-- **FB-E5.4.3A (officer-hosted Builder foundation):** `@dg20/form-builder-app/embed`
+- **FB-E5.4.3A (officer-hosted Builder foundation):** `@citizen/form-builder-app/embed`
   package entry; officer-portal `/form-builder` route injects request-time
   `accessTokenProvider`; Builder-role UX gate only. **No deploy/IAM.**
 - **FB-E5.4.3B (officer Builder FDS proxy allowlist):** officer nginx exact

@@ -19,25 +19,25 @@ This is a working demo built on a real cluster (not mockups), meant to be shown 
 
 | Service | Image | Notes |
 |---|---|---|
-| `postgres` | `postgres:16` | Single instance, database `egov_db` |
+| `postgres` | `postgres:16` | Single instance, database `citizen_db` |
 | `kafka` | `apache/kafka:latest` | KRaft mode, NOT Bitnami (broken for single-node) |
 | `redis-master` | `bitnamilegacy/redis` | |
-| `egov-mdms-service` | `egovio/egov-mdms-service:arm64-local` | Master data — tenant `pg` |
-| `egov-persister` | `egovio/egov-persister:arm64-local` | Kafka consumer → Postgres write |
-| `egov-indexer` | `egovio/egov-indexer:arm64-local` | |
-| `egov-user` | `egovio/egov-user:arm64-local` | Java 8, citizen user records |
-| `egov-workflow-v2` | `egovio/egov-workflow-v2:arm64-local` | DIGIT workflow engine (DGT- tasks) |
-| `egov-enc-service` | `egovio/egov-enc-service:arm64-local` | PII encryption/decryption |
-| `caste-certificate-service` | `caste-certificate-service:arm64-local` | Flowable engine (FLW- tasks) ✅ |
+| `egov-mdms-service` | `egovio/cs-egov-mdms-service:dev` | Master data — tenant `pg` |
+| `egov-persister` | `egovio/cs-egov-persister:dev` | Kafka consumer → Postgres write |
+| `egov-indexer` | `egovio/cs-egov-indexer:dev` | |
+| `egov-user` | `egovio/cs-egov-user:dev` | Java 8, citizen user records |
+| `egov-workflow-v2` | `egovio/cs-egov-workflow-v2:dev` | DIGIT workflow engine (DGT- tasks) |
+| `egov-enc-service` | `egovio/cs-egov-enc-service:dev` | PII encryption/decryption |
+| `caste-certificate-service` | `cs-caste-certificate-service:dev` | Flowable engine (FLW- tasks) ✅ |
 
-**Source repos at** `/Users/sameerkhanna/Documents/Projects/DG2.0/`:
+**Source repos at** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/`:
 - `Digit-Core/` — DIGIT service source
 - `DIGIT-DevOps/deploy-as-code/helm/` — Helm charts
 - `caste-certificate-service/` — custom Flowable service ✅
 - `officer-portal/` — React officer UI ✅
 - `citizen-portal/` — React citizen UI ✅
 
-**PostgreSQL schemas in `egov_db`:**
+**PostgreSQL schemas in `citizen_db`:**
 - `public` — all DIGIT tables (ACT_*, EG_WF_*, EG_USER, etc.)
 - `caste_cert` — Flowable ACT_* tables for caste-certificate-service ✅
 
@@ -50,7 +50,7 @@ Every Spring Boot service follows this exact sequence:
 ```bash
 # 1. Build
 export JAVA_HOME=$(/usr/libexec/java_home -v 17)
-cd /Users/sameerkhanna/Documents/Projects/DG2.0/<service-name>
+cd /Users/sameerkhanna/Documents/Projects/Citizen-Services/<service-name>
 mvn clean package -DskipTests
 
 # 2. Docker image (must be arm64)
@@ -60,8 +60,8 @@ docker image inspect <service-name>:arm64-local | grep -i architecture  # must s
 # 3. Deploy
 kubectl apply -f k8s-manifest.yaml
 # OR if already deployed:
-kubectl rollout restart deployment/<service-name> -n egov
-kubectl rollout status deployment/<service-name> -n egov --timeout=90s
+kubectl rollout restart deployment/<service-name> -n citizen
+kubectl rollout status deployment/<service-name> -n citizen --timeout=90s
 ```
 
 **Standard Dockerfile** (same every time):
@@ -90,7 +90,7 @@ ENTRYPOINT ["java", "-Xmx256m", "-Xms256m", "-jar", "/opt/app/app.jar"]
 server.port=8080
 server.servlet.context-path=/<service-name>
 
-spring.datasource.url=jdbc:postgresql://postgres.egov.svc.cluster.local:5432/egov_db?currentSchema=<schema_name>
+spring.datasource.url=jdbc:postgresql://postgres.citizen.svc.cluster.local:5432/citizen_db?currentSchema=<schema_name>
 spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
 spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 spring.datasource.driver-class-name=org.postgresql.Driver
@@ -107,7 +107,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: <service-name>
-  namespace: egov
+  namespace: citizen
 spec:
   replicas: 1
   strategy:
@@ -147,7 +147,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: <service-name>
-  namespace: egov
+  namespace: citizen
 spec:
   selector:
     app: <service-name>
@@ -158,8 +158,8 @@ spec:
 
 **Before deploying any new service, create its schema:**
 ```bash
-kubectl exec -it postgres-6d77874b49-nk7p8 -n egov -- \
-  psql -U egovuser -d egov_db -c "CREATE SCHEMA IF NOT EXISTS <schema_name>;"
+kubectl exec -it postgres-6d77874b49-nk7p8 -n citizen -- \
+  psql -U citizenuser -d citizen_db -c "CREATE SCHEMA IF NOT EXISTS <schema_name>;"
 ```
 
 **Flowable 8 schema bootstrap on fresh PostgreSQL schemas (CRITICAL):**
@@ -172,15 +172,15 @@ workflow operation.
 table structure from the working `caste_cert` schema into the new schema:
 ```bash
 # Dump Flowable DDL from caste_cert and replay into <new_schema>
-kubectl exec -it postgres-6d77874b49-nk7p8 -n egov -- \
-  pg_dump -U egovuser -d egov_db \
+kubectl exec -it postgres-6d77874b49-nk7p8 -n citizen -- \
+  pg_dump -U citizenuser -d citizen_db \
   --schema=caste_cert --schema-only --no-owner --no-acl \
   | sed 's/caste_cert\./\<new_schema\>./g' \
-  | psql -U egovuser -d egov_db
+  | psql -U citizenuser -d citizen_db
 
 # Also copy the required act_ge_property seed rows:
-kubectl exec -it postgres-6d77874b49-nk7p8 -n egov -- \
-  psql -U egovuser -d egov_db -c \
+kubectl exec -it postgres-6d77874b49-nk7p8 -n citizen -- \
+  psql -U citizenuser -d citizen_db -c \
   "INSERT INTO <new_schema>.act_ge_property \
    SELECT * FROM caste_cert.act_ge_property \
    ON CONFLICT DO NOTHING;"
@@ -195,7 +195,7 @@ This was required for pension, family_member_svc, and scheme_application schemas
 
 ## 4. Java Package Convention
 
-All custom services use `org.magicsword.<service>.*` with these sub-packages:
+All custom services use `org.citizen.<service>.*` with these sub-packages:
 - `model` — request/response records (Java 17 records, `jakarta.*` imports)
 - `controller` — `@RestController` classes
 - `service` — business logic, Flowable API calls
@@ -274,19 +274,19 @@ All 6 DIGIT services running on arm64 K3s. End-to-end workflow transition proven
 **NullPointerException fix:** `HistoricVariableInstance.getValue()` can return null. All historic variable collectors now use `getOrDefault()` / null checks.
 
 ### ✅ Phase 3a — Caste Certificate Service
-- `caste-certificate-service` at `/Users/sameerkhanna/Documents/Projects/DG2.0/caste-certificate-service/`
+- `caste-certificate-service` at `/Users/sameerkhanna/Documents/Projects/Citizen-Services/caste-certificate-service/`
 - Flowable 8.0.0 embedded, Spring Boot 3.3.4
 - BPMN: `casteCertificateApproval` — Data Entry Officer Review → Talati Verification → End (+ 24h SLA timer boundary events)
 - APIs: `POST /v1/applications`, `GET /v1/applications`, `GET /v1/applications/{id}`, `POST /v1/applications/{id}/approve`
 - `ApplicationResponse` fields: engineRef, status, currentTask, assignee, candidateGroups, applicantName, casteCode, tenantId
 
 ### ✅ Officer Portal
-- `officer-portal` at `/Users/sameerkhanna/Documents/Projects/DG2.0/officer-portal/`
+- `officer-portal` at `/Users/sameerkhanna/Documents/Projects/Citizen-Services/officer-portal/`
 - Gujarat Government header, stats bar (Pending/Approved/Escalated counts), application cards with FLW badge, applicant name, caste category badge, approve button
 - 5-second poll
 
 ### ✅ Citizen Portal (Caste Certificate)
-- `citizen-portal` at `/Users/sameerkhanna/Documents/Projects/DG2.0/citizen-portal/`
+- `citizen-portal` at `/Users/sameerkhanna/Documents/Projects/Citizen-Services/citizen-portal/`
 - 3-step progress bar, application form, confirmation screen with tracking number, status check, Gujarati-ready structure
 
 ---
@@ -300,9 +300,9 @@ All 6 DIGIT services running on arm64 K3s. End-to-end workflow transition proven
 **Purpose:** Central store for family demographics and income. All scheme eligibility checks, pension applications, and family member changes read from and write to this service. Foundational — everything else depends on it.
 
 **New service:** `family-registry-service`  
-**Location:** `/Users/sameerkhanna/Documents/Projects/DG2.0/family-registry-service/`  
+**Location:** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/family-registry-service/`  
 **Schema:** `family_registry`  
-**Package:** `org.magicsword.family`
+**Package:** `org.citizen.family`
 
 **Database tables:**
 ```sql
@@ -398,8 +398,8 @@ JAN_DHAN:       always eligible
 
 **Load command:**
 ```bash
-kubectl exec -i postgres-6d77874b49-nk7p8 -n egov -- \
-  psql -U egovuser -d egov_db < seed_data/seed_families.sql
+kubectl exec -i postgres-6d77874b49-nk7p8 -n citizen -- \
+  psql -U citizenuser -d citizen_db < seed_data/seed_families.sql
 ```
 
 ---
@@ -438,7 +438,7 @@ GET  /v1/applications         → list all pending (search egov-wf by businessSe
 **New service:** `pension-service`  
 **Engine:** Flowable (`FLW-` prefix)  
 **Schema:** `pension`  
-**Package:** `org.magicsword.pension`  
+**Package:** `org.citizen.pension`  
 **BPMN process key:** `pensionApplication`
 
 **BPMN:**
@@ -460,7 +460,7 @@ All three tasks have 48h SLA timer boundary events → EscalationEnd.
 **New service:** `family-member-service`  
 **Engine:** Flowable (`FLW-` prefix)  
 **Schema:** `family_member_svc`  
-**Package:** `org.magicsword.familymember`  
+**Package:** `org.citizen.familymember`  
 **BPMN process key:** `familyMemberChange`
 
 **BPMN:**
@@ -484,7 +484,7 @@ This triggers the Kafka event that the Scheme Engine (Phase 4) listens to.
 **New service:** `scheme-application-service`  
 **Engine:** Flowable (`FLW-` prefix)  
 **Schema:** `scheme_application`  
-**Package:** `org.magicsword.schemeapp`  
+**Package:** `org.citizen.schemeapp`  
 **BPMN process key:** `schemeApplication`
 
 **BPMN:**
@@ -505,7 +505,7 @@ Both tasks have 48h SLA timer boundary events.
 
 **New service:** `scheme-engine-service`  
 **Schema:** `scheme_engine`  
-**Package:** `org.magicsword.scheme`
+**Package:** `org.citizen.scheme`
 
 **Database tables:**
 ```sql
@@ -580,7 +580,7 @@ On `MEMBER_ADDED`:
 
 ### Phase 5 — Officer Portal Redesign (Unified Workstation)
 
-**Location:** `/Users/sameerkhanna/Documents/Projects/DG2.0/officer-portal/`  
+**Location:** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/officer-portal/`  
 Full replacement of current App.jsx.
 
 **Layout:** Fixed sidebar + main content area.
@@ -628,7 +628,7 @@ Approve action routes based on prefix:
 ### Phase 6 — Family Portal (New App)
 
 **New app:** `family-portal`  
-**Location:** `/Users/sameerkhanna/Documents/Projects/DG2.0/family-portal/`  
+**Location:** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/family-portal/`  
 **Port:** 5175  
 **CORS:** Add `http://localhost:5175` to all backend controllers
 
@@ -670,7 +670,7 @@ Panels stack vertically. Tree collapses to a compact list view on <480px. Bottom
 
 ### Phase 6b — Citizen Portal Redesign (All 5 Services)
 
-**Location:** `/Users/sameerkhanna/Documents/Projects/DG2.0/citizen-portal/`  
+**Location:** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/citizen-portal/`  
 Full replacement with React Router, 5 service flows.
 
 **Home screen:**
@@ -752,10 +752,10 @@ access is not available (requires official registration). We simulate the OTP ba
 with a fixed demo OTP `123456` while preserving the correct citizen UX flow.
 
 **New service:** `auth-service`
-**Location:** `/Users/sameerkhanna/Documents/Projects/DG2.0/auth-service/`
+**Location:** `/Users/sameerkhanna/Documents/Projects/Citizen-Services/auth-service/`
 **Schema:** none (in-memory OTP store, JWT secret from env)
 **Port:** 8080 internal / port-forward 8087
-**Package:** `org.magicsword.auth`
+**Package:** `org.citizen.auth`
 
 **Dependencies:** spring-boot-starter-web, spring-boot-starter-actuator,
 `io.jsonwebtoken:jjwt-api:0.12.3`, `io.jsonwebtoken:jjwt-impl:0.12.3`,
@@ -795,7 +795,7 @@ server.port=8080
 server.servlet.context-path=/auth-service
 jwt.secret=${JWT_SECRET:demo-secret-key-32-chars-minimum!!}
 jwt.expiry.hours=8
-family.registry.base-url=http://family-registry-service.egov.svc.cluster.local:8080/family-registry-service
+family.registry.base-url=http://family-registry-service.citizen.svc.cluster.local:8080/family-registry-service
 management.endpoints.web.exposure.include=health,info
 management.endpoint.health.probes.enabled=true
 management.health.livenessState.enabled=true
@@ -885,7 +885,7 @@ Demo users (password: officer123 for all):
 - Clean login form: Gujarat Government header, "Department Login" title.
   Username + Password inputs.
   "Login" button → POST to Keycloak token endpoint:
-    `http://localhost:8090/realms/egov/protocol/openid-connect/token`
+    `http://localhost:8090/realms/citizen/protocol/openid-connect/token`
     body: `grant_type=password&client_id=officer-portal&username={u}&password={p}`
   On success: store `access_token` in localStorage `officer_token`,
     decode JWT to get role, store role in `officer_role`.
@@ -908,8 +908,8 @@ Marriage-cert service forwards this token to egov-workflow-v2 transitions.
 
 **Port-forward for auth testing:**
 ```bash
-kubectl port-forward svc/auth-service 8087:8080 -n egov
-kubectl port-forward svc/keycloak 8090:8080 -n egov
+kubectl port-forward svc/auth-service 8087:8080 -n citizen
+kubectl port-forward svc/keycloak 8090:8080 -n citizen
 ```
 
 **Definition of done — VERIFIED ✅**
@@ -969,9 +969,9 @@ Visible to ALL roles (read-only reporting).
 **Goal:** No port-forward required during stakeholder demo. All services accessible from a single IP.
 
 **What to containerize:**
-- `citizen-portal` → Nginx container, image `citizen-portal:arm64-local`
-- `officer-portal` → Nginx container, image `officer-portal:arm64-local`
-- `family-portal` → Nginx container, image `family-portal:arm64-local`
+- `citizen-portal` → Nginx container, image `cs-citizen-portal:dev`
+- `officer-portal` → Nginx container, image `cs-officer-portal:dev`
+- `family-portal` → Nginx container, image `cs-family-portal:dev`
 
 **Nginx Dockerfile pattern:**
 ```dockerfile

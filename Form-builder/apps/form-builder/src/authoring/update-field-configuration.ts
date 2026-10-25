@@ -1,5 +1,5 @@
-import type { FormDefinition, JsonObject } from '@dg20/form-contract'
-import { getPaletteWidget } from '@dg20/form-widgets'
+import type { FormDefinition, JsonObject } from '@citizen/form-contract'
+import { getPaletteWidget } from '@citizen/form-widgets'
 
 import { parseOptionalNonnegativeSafeIntegerString } from './age-integer.js'
 import { isAdmittedCitizenSchema, isCitizenWidgetType } from './citizen-schema-admission.js'

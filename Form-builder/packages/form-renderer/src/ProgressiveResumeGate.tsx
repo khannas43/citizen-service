@@ -1,7 +1,7 @@
 import { deepEquals } from '@rjsf/utils'
 import { useCallback, useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react'
 
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import {
   admitProgressiveResumeResult,

@@ -1,4 +1,4 @@
-import type { FormDefinition, ValidationResult } from '@dg20/form-contract'
+import type { FormDefinition, ValidationResult } from '@citizen/form-contract'
 
 /**
  * Builder-owned port for Unit C Form Definition validation (FB-D6).

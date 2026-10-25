@@ -1,11 +1,13 @@
 #!/bin/bash
+# shellcheck source=/dev/null
+source "$(dirname "$0")/../scripts/lib/guard.sh"
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-NAMESPACE=egov
+NAMESPACE=citizen
 # Prefer loopback so Reports keep working when the Mac LAN IP changes.
 MAC_IP=$(ipconfig getifaddr en0 2>/dev/null || echo "127.0.0.1")
-SUPERSET_URL="${VITE_SUPERSET_URL:-http://127.0.0.1:30076}"
+SUPERSET_URL="${VITE_SUPERSET_URL:-http://127.0.0.1:31176}"
 
 echo "=== Officer portal build (with Superset embed) ==="
 
@@ -32,9 +34,9 @@ docker build --no-cache \
   --build-arg VITE_SUPERSET_URL="$SUPERSET_URL" \
   --build-arg VITE_SUPERSET_EMBEDS="$EMBED_JSON" \
   --build-arg VITE_AI_BASE="/ai-intelligence-service" \
-  -t officer-portal:arm64-local "$ROOT/officer-portal"
+  -t cs-officer-portal:dev "$ROOT/officer-portal"
 
 kubectl rollout restart deployment/officer-portal -n "$NAMESPACE"
 kubectl rollout status deployment/officer-portal -n "$NAMESPACE" --timeout=120s
 
-echo "=== Done — Reports at http://${MAC_IP}:30073/reports ==="
+echo "=== Done — Reports at http://${MAC_IP}:31173/reports ==="

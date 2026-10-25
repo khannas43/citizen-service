@@ -1,6 +1,6 @@
 # Widget authoring guide (FB-A12)
 
-Guidance for palette widgets in `@dg20/form-widgets` (Unit A complete at FB-A12).
+Guidance for palette widgets in `@citizen/form-widgets` (Unit A complete at FB-A12).
 
 ## Widget versus field (RJSF)
 

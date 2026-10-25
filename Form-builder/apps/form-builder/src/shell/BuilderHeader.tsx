@@ -1,4 +1,4 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import type { BuilderLocale } from '../locale/builder-messages.js'
 import { builderMessage } from '../locale/builder-messages.js'

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 
-import type { FormDefinition, ValidationResult } from '@dg20/form-contract'
+import type { FormDefinition, ValidationResult } from '@citizen/form-contract'
 
 import type { AuthoringUiState } from '../authoring/index.js'
 import { admitValidationResult } from './admit-validation-result.js'

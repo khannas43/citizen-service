@@ -3,7 +3,7 @@ import './WorkflowPanel.css'
 const BPMN_SNIPPET = `<?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              xmlns:flowable="http://flowable.org/bpmn"
-             targetNamespace="org.magicsword.caste">
+             targetNamespace="org.citizen.caste">
   <process id="casteCertificateApproval" name="Caste Certificate Approval" isExecutable="true">
     <startEvent id="start" name="Start"/>
     <userTask id="dataEntryReview" name="Data Entry Officer Review"

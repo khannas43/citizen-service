@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject } from 'react'
 
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import type { AuthoringAction, AuthoringUiState } from '../authoring/index.js'
 import { definitionsSemanticallyEqual } from '../validation/definitions-semantically-equal.js'

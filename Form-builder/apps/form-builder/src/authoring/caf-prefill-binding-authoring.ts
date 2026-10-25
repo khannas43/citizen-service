@@ -4,8 +4,8 @@
  * bilingual, steps, audit, previewFormData, integrationBindings, or workflowBindings.
  */
 
-import type { FormDefinition, PrefillBinding } from '@dg20/form-contract'
-import { getPaletteWidget } from '@dg20/form-widgets'
+import type { FormDefinition, PrefillBinding } from '@citizen/form-contract'
+import { getPaletteWidget } from '@citizen/form-widgets'
 
 import { cloneJsonSafeObject } from './clone.js'
 import { assertDefinitionIntegrity, readUiOrder } from './integrity.js'

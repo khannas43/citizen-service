@@ -71,7 +71,7 @@ const kChatNavLabelsGu = <String, String>{
 
 String? detectChatNavigateRoute(String replyText) {
   final trimmed = replyText.trim();
-  if (RegExp(r'^welcome to digital gujarat', caseSensitive: false).hasMatch(trimmed)) return null;
+  if (RegExp(r'^welcome to citizen services', caseSensitive: false).hasMatch(trimmed)) return null;
   if (trimmed.startsWith('ડિજિટલ ગુજરાતમાં સ્વાગત')) return null;
   final lower = replyText.toLowerCase();
   for (final (keyword, route) in kChatNavIntents) {

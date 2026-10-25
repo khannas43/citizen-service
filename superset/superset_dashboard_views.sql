@@ -1,5 +1,5 @@
--- DG 2.0 Superset Dashboard Views v2.0
--- Run as: psql -U egovuser -d egov_db -f superset_dashboard_views.sql
+-- Citizen Services Superset Dashboard Views v2.0
+-- Run as: psql -U citizenuser -d citizen_db -f superset_dashboard_views.sql
 
 CREATE SCHEMA IF NOT EXISTS reference;
 
@@ -46,8 +46,8 @@ INSERT INTO reference.gujarat_district_population (district, population_2011, es
   ('Mahisagar',        994624,  1200000)
 ON CONFLICT (district) DO NOTHING;
 
-GRANT USAGE ON SCHEMA reference TO egovuser;
-GRANT SELECT ON ALL TABLES IN SCHEMA reference TO egovuser;
+GRANT USAGE ON SCHEMA reference TO citizenuser;
+GRANT SELECT ON ALL TABLES IN SCHEMA reference TO citizenuser;
 
 CREATE OR REPLACE VIEW analytics.beneficiary_growth_weekly AS
 WITH weekly AS (
@@ -274,5 +274,5 @@ JOIN scheme_engine.scheme s ON s.id = b.scheme_id
 WHERE b.status IN ('CONFIRMED', 'ACTIVE', 'IDENTIFIED')
 GROUP BY 1, 2, 3;
 
-GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO egovuser;
-GRANT SELECT ON ALL TABLES IN SCHEMA reference TO egovuser;
+GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO citizenuser;
+GRANT SELECT ON ALL TABLES IN SCHEMA reference TO citizenuser;

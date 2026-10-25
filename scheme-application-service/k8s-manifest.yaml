@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: scheme-application-service
-  namespace: egov
+  namespace: citizen
   labels:
     app: scheme-application-service
 spec:
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: scheme-application-service
-          image: scheme-application-service:arm64-local
+          image: cs-scheme-application-service:dev
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
@@ -74,7 +74,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: scheme-application-service
-  namespace: egov
+  namespace: citizen
 spec:
   selector:
     app: scheme-application-service

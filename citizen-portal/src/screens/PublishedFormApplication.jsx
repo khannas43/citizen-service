@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { FormRenderer } from '@dg20/form-renderer'
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
-import '@dg20/form-renderer/styles/renderer.css'
+import { FormRenderer } from '@citizen/form-renderer'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
+import '@citizen/form-renderer/styles/renderer.css'
 import {
   admitServiceId,
   createAdmittingPublishedFormDefinitionAdapter,

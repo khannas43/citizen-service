@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>org.magicsword</groupId>
+    <groupId>org.citizen</groupId>
     <artifactId>chatbot-service</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>

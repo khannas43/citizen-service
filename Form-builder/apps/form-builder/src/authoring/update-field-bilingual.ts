@@ -1,4 +1,4 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import type { FieldBilingualContent } from './bilingual-types.js'
 import { isFieldBilingualDirty, readFieldBilingualContent } from './bilingual-types.js'

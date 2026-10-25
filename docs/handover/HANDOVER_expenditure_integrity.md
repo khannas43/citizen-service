@@ -1,9 +1,9 @@
 # Handover: Expenditure Integrity (UC1 beneficiary payments, UC4 payroll and pension) — state as of 2026-10-08
 
-Repo: `/Users/sameerkhanna/Documents/Projects/DG2.0` (branch `main`). Only UC1 and UC4 of `docs/uc1.pdf` are in scope. Stakeholders never answered the open questions, so the working answers are in `docs/EXPENDITURE_INTEGRITY_ASSUMPTIONS.md` (read it first). Loading data: `docs/EXPENDITURE_INTEGRITY_DATA_LOADING.md`.
+Repo: `/Users/sameerkhanna/Documents/Projects/Citizen-Services` (branch `main`). Only UC1 and UC4 of `docs/uc1.pdf` are in scope. Stakeholders never answered the open questions, so the working answers are in `docs/EXPENDITURE_INTEGRITY_ASSUMPTIONS.md` (read it first). Loading data: `docs/EXPENDITURE_INTEGRITY_DATA_LOADING.md`.
 
 ## What it is
-- `expenditure-integrity-service` (Spring Boot 3.3, Java 17, port 8092, context path `/expenditure-integrity-service`, Postgres schema `expenditure_integrity`, Hibernate `ddl-auto=update`). Image-based deployment (`expenditure-integrity-service:arm64-local`, namespace `egov`), unlike scheme-engine which runs a hostPath jar.
+- `expenditure-integrity-service` (Spring Boot 3.3, Java 17, port 8092, context path `/expenditure-integrity-service`, Postgres schema `expenditure_integrity`, Hibernate `ddl-auto=update`). Image-based deployment (`cs-expenditure-integrity-service:dev`, namespace `egov`), unlike scheme-engine which runs a hostPath jar.
 - Officer portal screens (all in `officer-portal/src/screens`): Expenditure integrity (`ExpenditureIntegrity.jsx`: Beneficiary, Payroll & pension, Pre-payment gate tabs), Money overview (`MoneyOverview.jsx`), Load data (`ImportData.jsx`), and the legacy scheme-overlap screen (`FraudSignals.jsx`, served through this service).
 - Reaches scheme-engine (eligibility) and family-registry (names), both in-cluster.
 
@@ -58,10 +58,10 @@ Properties are `officer.integrity.*` in `application.properties`.
 - Portal: run from a clean copy because the repo is in iCloud: `rsync -a --exclude node_modules --exclude dist --exclude .git officer-portal/ <scratch>/op/ && cd <scratch>/op && npx vitest run` (152 tests).
 
 ## Deploy
-- Service: `mvn -DskipTests package`, copy `Dockerfile` and `target/*.jar` into a clean scratch folder and `docker build -t expenditure-integrity-service:arm64-local .` there (building inside the repo hangs on iCloud), then `kubectl -n egov rollout restart deploy/expenditure-integrity-service`. Use `DOCKER_HOST=unix://$HOME/.rd/docker.sock`.
+- Service: `mvn -DskipTests package`, copy `Dockerfile` and `target/*.jar` into a clean scratch folder and `docker build -t cs-expenditure-integrity-service:dev .` there (building inside the repo hangs on iCloud), then `kubectl -n citizen rollout restart deploy/expenditure-integrity-service`. Use `DOCKER_HOST=unix://$HOME/.rd/docker.sock`.
 - Portal: `bash officer-portal/build_with_superset.sh`; after a rollout the local port-forwards flap for about a minute.
 - scheme-engine runs a hostPath jar (see `HANDOVER_voice_gujarati.md`): build, swap the jar with `mv`, restart.
-- Live checks: Keycloak at `127.0.0.1:8090` (client `officer-portal`), APIs through `http://127.0.0.1:30073/<service>`. Demo users are in `docs/PROJECT_PLAN.md`.
+- Live checks: Keycloak at `127.0.0.1:8090` (client `officer-portal`), APIs through `http://127.0.0.1:31173/<service>`. Demo users are in `docs/PROJECT_PLAN.md`.
 - Git: if `index.lock` or `HEAD.lock` exists and no git process runs, the lock is stale (iCloud makes git slow, and a timed-out commit leaves one). Stage explicit paths. Never commit `videos/` or any `.pptx`.
 
 ## Further work

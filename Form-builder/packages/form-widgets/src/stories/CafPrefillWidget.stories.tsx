@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import type { BilingualContent, PrefillBinding } from '@dg20/form-contract'
+import type { BilingualContent, PrefillBinding } from '@citizen/form-contract'
 
 import type { CafPrefillAdapter } from '../runtime/service-ports'
 import { DemoForm } from '../widgets/DemoForm'

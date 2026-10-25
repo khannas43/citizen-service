@@ -130,7 +130,7 @@ Historical increment; superseded by FB-D19.
 
 ## FB-D0 — visible read-only three-pane foundation
 
-Package: `@dg20/form-builder-app` under `apps/form-builder/`.
+Package: `@citizen/form-builder-app` under `apps/form-builder/`.
 
 D0 delivers a **runnable visual shell** only. Authoring (add/remove/reorder,
 property editing, definition mutation, save/submit) begins in **FB-D1**.
@@ -140,7 +140,7 @@ property editing, definition mutation, save/submit) begins in **FB-D1**.
 1. Builder header with illustrative service/version/`draft` status and a clear
    “Local technical preview” indicator
 2. Searchable controlled palette — all **6** groups and **30** widget types from
-   `@dg20/form-widgets` (no palette copy in app code)
+   `@citizen/form-widgets` (no palette copy in app code)
 3. Read-only ordered form canvas derived from an illustrative draft definition
 4. Read-only selected-field inspector (palette metadata only; no JSON dump)
 5. Embedded Unit B `FormRenderer` live preview (`mode="preview"`)
@@ -167,8 +167,8 @@ port, printing whichever URL it actually used. Do not assume the Builder is
 always reachable at `5173`, and do not add code to force or kill a port —
 always read the printed URL.
 
-Vite aliases `@dg20/form-contract`, `@dg20/form-widgets`, and
-`@dg20/form-renderer` to workspace **source** entry points so a clean checkout
+Vite aliases `@citizen/form-contract`, `@citizen/form-widgets`, and
+`@citizen/form-renderer` to workspace **source** entry points so a clean checkout
 does not require manually prebuilding package `dist/` folders.
 
 ### Illustrative definition
@@ -197,7 +197,7 @@ local, non-persisted technical preview of authoring mechanics only.
 1. **Pure authoring module** (`apps/form-builder/src/authoring/`):
    `createAuthoringSession` clones the source definition into a detached
    working copy using the strict, hostile-input-safe JSON cloning rules
-   shared with autosave (`createAutosaveSnapshot` from `@dg20/form-renderer`)
+   shared with autosave (`createAutosaveSnapshot` from `@citizen/form-renderer`)
    — the frozen `ILLUSTRATIVE_DRAFT_DEFINITION` singleton is never mutated.
    `addField`, `removeField`, `moveField`, `getMoveCapability`, and
    `getRemoveCapability` are pure functions that return a new immutable
@@ -293,7 +293,7 @@ sequencing exception.
 2. **Strict JSON cloning.** `apps/form-builder/src/authoring/clone.ts` no
    longer uses `structuredClone`. It is built on the same hostile-input-safe
    rules as autosave — the public `createAutosaveSnapshot` from
-   `@dg20/form-renderer` — rejecting cycles, accessor properties, symbol
+   `@citizen/form-renderer` — rejecting cycles, accessor properties, symbol
    keys, sparse arrays, non-finite numbers, and values beyond the documented
    depth/node bounds. Own keys named `__proto__`, `constructor`, and
    `prototype` are preserved as ordinary data properties on null-prototype

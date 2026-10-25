@@ -622,7 +622,7 @@ Both apps must support English and Gujarati via a single, session-persistent lan
 | `scheme-engine-service` | 8086 | My Family (schemes/recommendations), Apply-Scheme, Payments & Benefits, Schemes Browse |
 | `auth-service` | 8087 | Login/OTP (web; required for mobile per §5.2 target) |
 | `chatbot-service` | 8088 | ChatWidget (web), Chatbot (mobile) |
-| `ai-intelligence-service` | 30089 (mobile) / proxied (web) | AISearch, SchemeRecommendations, mobile speech features |
+| `ai-intelligence-service` | 31189 (mobile) / proxied (web) | AISearch, SchemeRecommendations, mobile speech features |
 | `grievance-service` | 8089 | My Complaints / Grievances (both apps), My Data correction requests |
 | `notifications-service` | 8099 | Notification Hub (web), push notifications (mobile) |
 

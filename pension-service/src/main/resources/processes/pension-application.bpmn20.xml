@@ -4,7 +4,7 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL
                                  http://www.omg.org/spec/BPMN/20100524/MODEL/BPMN20.xsd"
-             targetNamespace="org.magicsword.pension">
+             targetNamespace="org.citizen.pension">
 
   <process id="pensionApplication" name="Pension Application" isExecutable="true">
 

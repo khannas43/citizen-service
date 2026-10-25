@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import type { FormDefinition } from '@dg20/form-contract'
-import { PALETTE_WIDGET_COUNT } from '@dg20/form-widgets'
-import { AUTOSAVE_SNAPSHOT_MAX_DEPTH } from '@dg20/form-renderer'
+import type { FormDefinition } from '@citizen/form-contract'
+import { PALETTE_WIDGET_COUNT } from '@citizen/form-widgets'
+import { AUTOSAVE_SNAPSHOT_MAX_DEPTH } from '@citizen/form-renderer'
 
 import {
   AuthoringError,

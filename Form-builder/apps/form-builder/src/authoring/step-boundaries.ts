@@ -1,4 +1,4 @@
-import type { FormDefinition, ProgressiveStep } from '@dg20/form-contract'
+import type { FormDefinition, ProgressiveStep } from '@citizen/form-contract'
 
 import { cloneJsonSafeObject } from './clone.js'
 import { assertDefinitionIntegrity, readUiOrder } from './integrity.js'

@@ -1,7 +1,7 @@
 -- Demo loop: realistic action / audit timestamps (case opened → action in 2–12 days).
 -- Idempotent: only rows where action is more than 60 days after its case.
 -- Backup first:
---   kubectl exec -n egov deploy/postgres -- psql -U egovuser -d egov_db -c "\copy (
+--   kubectl exec -n citizen deploy/postgres -- psql -U citizenuser -d citizen_db -c "\copy (
 --     SELECT a.id, a.case_id, a.action_type, a.created_at
 --     FROM expenditure_integrity.integrity_action a
 --     JOIN expenditure_integrity.integrity_case c ON c.id = a.case_id

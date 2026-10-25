@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import {
   AuthoringError,

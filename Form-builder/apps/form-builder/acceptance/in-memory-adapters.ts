@@ -3,7 +3,7 @@
  * Acceptance-only — not production defaults and not public package exports.
  */
 
-import type { FormDefinition, ValidationResult } from '@dg20/form-contract'
+import type { FormDefinition, ValidationResult } from '@citizen/form-contract'
 
 import { cloneJsonSafe } from '../src/authoring/clone.js'
 import { assertDefinitionIntegrity } from '../src/authoring/integrity.js'

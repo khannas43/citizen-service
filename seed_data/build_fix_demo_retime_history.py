@@ -30,10 +30,10 @@ CONFIRMED = "CONFIRMED_OVERPAYMENT"
 
 def _db_creds() -> tuple[str, str]:
     user_b64 = subprocess.check_output(
-        ["kubectl", "-n", "egov", "get", "secret", "db", "-o", "jsonpath={.data.username}"], text=True
+        ["kubectl", "-n", "citizen", "get", "secret", "db", "-o", "jsonpath={.data.username}"], text=True
     )
     pass_b64 = subprocess.check_output(
-        ["kubectl", "-n", "egov", "get", "secret", "db", "-o", "jsonpath={.data.password}"], text=True
+        ["kubectl", "-n", "citizen", "get", "secret", "db", "-o", "jsonpath={.data.password}"], text=True
     )
     user = subprocess.check_output(["bash", "-c", f"echo {user_b64} | base64 -d"], text=True).strip()
     password = subprocess.check_output(["bash", "-c", f"echo {pass_b64} | base64 -d"], text=True).strip()
@@ -44,8 +44,8 @@ def kubectl_psql(sql: str, tuples_only: bool = True) -> str:
     user, password = _db_creds()
     fmt = ["-t", "-A"] if tuples_only else []
     cmd = [
-        "kubectl", "-n", "egov", "exec", "deploy/postgres", "--",
-        "env", f"PGPASSWORD={password}", "psql", "-U", user, "-d", "egov_db", *fmt, "-c", sql,
+        "kubectl", "-n", "citizen", "exec", "deploy/postgres", "--",
+        "env", f"PGPASSWORD={password}", "psql", "-U", user, "-d", "citizen_db", *fmt, "-c", sql,
     ]
     return subprocess.check_output(cmd, text=True)
 
@@ -53,8 +53,8 @@ def kubectl_psql(sql: str, tuples_only: bool = True) -> str:
 def kubectl_psql_file(path: Path) -> None:
     user, password = _db_creds()
     cmd = [
-        "kubectl", "-n", "egov", "exec", "-i", "deploy/postgres", "--",
-        "env", f"PGPASSWORD={password}", "psql", "-U", user, "-d", "egov_db", "-v", "ON_ERROR_STOP=1",
+        "kubectl", "-n", "citizen", "exec", "-i", "deploy/postgres", "--",
+        "env", f"PGPASSWORD={password}", "psql", "-U", user, "-d", "citizen_db", "-v", "ON_ERROR_STOP=1",
     ]
     subprocess.run(cmd, input=path.read_text(), text=True, check=True)
 

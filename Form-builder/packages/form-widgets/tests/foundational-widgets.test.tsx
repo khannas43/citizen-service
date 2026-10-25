@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
-import type { BilingualContent } from '@dg20/form-contract'
+import type { BilingualContent } from '@citizen/form-contract'
 
 import { IMPLEMENTED_WIDGET_TYPES, PALETTE_REGISTRY, getPaletteWidget } from '../src/index.js'
 import { DemoForm } from '../src/widgets/DemoForm.js'

@@ -4,7 +4,7 @@ generate_large_dataset.py
 Generates ~220,000 families / ~950,000 persons for DG 2.0 demo.
 
 Usage:
-  kubectl port-forward svc/postgres 5433:5432 -n egov &
+  kubectl port-forward svc/postgres 5433:5432 -n citizen &
   python3.12 -m venv .venv-seed && .venv-seed/bin/pip install psycopg2-binary
   .venv-seed/bin/python seed_data/generate_large_dataset.py
 
@@ -152,8 +152,8 @@ def connect():
     return psycopg2.connect(
         host=os.getenv("DB_HOST", "localhost"),
         port=int(os.getenv("DB_PORT", "5433")),
-        dbname=os.getenv("DB_NAME", "egov_db"),
-        user=os.getenv("DB_USER", "egovuser"),
+        dbname=os.getenv("DB_NAME", "citizen_db"),
+        user=os.getenv("DB_USER", "citizenuser"),
         password=os.getenv("DB_PASS", "egovpassword"),
     )
 

@@ -1,4 +1,4 @@
-import type { FormDefinition, JsonObject } from '@dg20/form-contract'
+import type { FormDefinition, JsonObject } from '@citizen/form-contract'
 
 import { cloneJsonSafeObject } from './clone.js'
 import { isRepeaterDescendantPath } from './family-repeater-paths.js'

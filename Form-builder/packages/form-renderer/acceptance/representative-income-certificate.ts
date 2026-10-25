@@ -1,4 +1,4 @@
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 /**
  * FB-B6 / B6.1 representative Income Certificate acceptance fixture.
@@ -6,7 +6,7 @@ import type { FormDefinition } from '@dg20/form-contract'
  * NOT an authoritative DG Service Catalogue / DST-approved production form.
  * No versioned FormDefinition with traceable provenance was found in the
  * DG2.0 monorepo. This fixture exists only for package-level technical
- * acceptance of `@dg20/form-renderer`. Design-spec §5 live real-service
+ * acceptance of `@citizen/form-renderer`. Design-spec §5 live real-service
  * acceptance remains pending.
  *
  * Intentionally omitted from the package public exports and compiled

@@ -17,8 +17,8 @@ Goal: prove a **custom-built, non-DIGIT service can route work too** — the oth
 ## 2. Project setup
 
 ```bash
-cd /Users/sameerkhanna/Documents/Projects/DG2.0
-mkdir -p caste-certificate-service/src/main/java/org/magicsword/caste/{config,model,controller,service}
+cd /Users/sameerkhanna/Documents/Projects/Citizen-Services
+mkdir -p caste-certificate-service/src/main/java/org/citizen/caste/{config,model,controller,service}
 mkdir -p caste-certificate-service/src/main/resources/processes
 ```
 
@@ -58,7 +58,7 @@ Flowable 8.0.0 targets Spring Boot 3.x — use a current Spring Boot 3.3.x paren
 server.port=8080
 server.servlet.context-path=/caste-certificate-service
 
-spring.datasource.url=jdbc:postgresql://postgres.egov.svc.cluster.local:5432/egov_db?currentSchema=caste_cert
+spring.datasource.url=jdbc:postgresql://postgres.citizen.svc.cluster.local:5432/citizen_db?currentSchema=caste_cert
 spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
 spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 spring.datasource.driver-class-name=org.postgresql.Driver
@@ -69,7 +69,7 @@ flowable.database-schema-update=true
 
 The dedicated `currentSchema=caste_cert` keeps Flowable's tables out of the `public` schema where all the DIGIT tables live — create it once:
 ```bash
-kubectl exec -it postgres-6d77874b49-nk7p8 -n egov -- psql -U egovuser -d egov_db -c "CREATE SCHEMA IF NOT EXISTS caste_cert;"
+kubectl exec -it postgres-6d77874b49-nk7p8 -n citizen -- psql -U citizenuser -d citizen_db -c "CREATE SCHEMA IF NOT EXISTS caste_cert;"
 ```
 
 ---
@@ -89,7 +89,7 @@ If hand-authoring the XML is faster than the modeler for a first pass, a minimal
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              xmlns:flowable="http://flowable.org/bpmn"
-             targetNamespace="org.magicsword.caste">
+             targetNamespace="org.citizen.caste">
   <process id="casteCertificateApproval" name="Caste Certificate Approval" isExecutable="true">
     <startEvent id="start"/>
     <userTask id="dataEntryReview" name="Data Entry Officer Review" flowable:assignee="${assignee}"/>
@@ -140,8 +140,8 @@ COPY target/*.jar app.jar
 ENTRYPOINT ["java", "-Xmx256m", "-Xms256m", "-jar", "/opt/app/app.jar"]
 EOF
 
-docker build -t caste-certificate-service:arm64-local .
-docker image inspect caste-certificate-service:arm64-local | grep -i architecture
+docker build -t cs-caste-certificate-service:dev .
+docker image inspect cs-caste-certificate-service:dev | grep -i architecture
 ```
 
 No Helm chart needed for this one — it's not part of the egov DIGIT charts, write a plain Kubernetes Deployment+Service manifest (same style as the `kafka` one in the handoff doc), referencing the `db` Secret already in the namespace for Postgres credentials.
@@ -152,7 +152,7 @@ No Helm chart needed for this one — it's not part of the egov DIGIT charts, wr
 
 ```bash
 # start an application
-curl -X POST http://caste-certificate-service.egov.svc.cluster.local:8080/caste-certificate-service/v1/applications \
+curl -X POST http://caste-certificate-service.citizen.svc.cluster.local:8080/caste-certificate-service/v1/applications \
   -d '{"applicantName":"Aarav Patel","casteCode":"OBC","tenantId":"pg"}'
 # → note the engineRef / process instance id
 

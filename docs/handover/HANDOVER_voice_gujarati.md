@@ -1,6 +1,6 @@
 # Handover: Voice eligibility assistant (Gujarati) — state as of 2026-10-07
 
-Repo: /Users/sameerkhanna/Documents/Projects/DG2.0 (branch main, local commits 5201e63, 179ffe5, c5b8d6b and 486c2c7 NOT pushed).
+Repo: /Users/sameerkhanna/Documents/Projects/Citizen-Services (branch main, local commits 5201e63, 179ffe5, c5b8d6b and 486c2c7 NOT pushed).
 
 ## Done and deployed
 - Host-side STT worker (5201e63): Gujarati clip ~6 s via the Mac vs ~19-35 s in the pod. Pod falls back to its own Whisper if the worker is down.
@@ -18,7 +18,7 @@ Repo: /Users/sameerkhanna/Documents/Projects/DG2.0 (branch main, local commits 5
 - officer-portal now sends the officer token on beneficiary actions, scheme scan and deactivate.
 - Still unauthenticated: other services' write endpoints were not reviewed. seed_data/generate_large_dataset.py and some docs still say to POST /v1/admin/run-identification without a token.
 - Tests: `JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn -o test` in scheme-engine-service (default Java 25 breaks Mockito). AdminEndpointSecurityTest covers the rules.
-- **The Java services do not run their image's jar.** scheme-engine-service and scheme-application-service deployments bind-mount `<repo>/<service>/target/<service>-1.0.0.jar` from the working tree (hostPath). To deploy: build the jar (Java 17, `mvn -o package -DskipTests`), swap it into that path with `mv`, then `kubectl -n egov rollout restart deploy/<service>`. Only officer-portal is image-based. Building elsewhere changes nothing live.
+- **The Java services do not run their image's jar.** scheme-engine-service and scheme-application-service deployments bind-mount `<repo>/<service>/target/<service>-1.0.0.jar` from the working tree (hostPath). To deploy: build the jar (Java 17, `mvn -o package -DskipTests`), swap it into that path with `mv`, then `kubectl -n citizen rollout restart deploy/<service>`. Only officer-portal is image-based. Building elsewhere changes nothing live.
 - Another effort (Expenditure Integrity: expenditure-integrity-service, ExpenditureIntegrity screens, nginx changes, api.js/auth.js/App.jsx edits) was uncommitted in the same tree; its api.js redirects fraud-signals to the new service.
 
 ## Open
@@ -31,6 +31,6 @@ Repo: /Users/sameerkhanna/Documents/Projects/DG2.0 (branch main, local commits 5
 - AI deployment rollouts: the new pod stays Pending (node memory) until the old pod is deleted. Delete the old pod by hand.
 - The project `.venv` under ~/Documents can hang on import while iCloud materializes files; the repo is iCloud-synced. Never run recursive greps over the whole repo.
 - citizen-portal tests: the in-repo node_modules is damaged by iCloud (vitest fails with ECANCELED / "Timeout waiting for worker"). Run them from a clean copy: rsync src and configs to a non-iCloud dir, `npm ci`, `npx vitest run`. Better: exclude the repo from iCloud sync.
-- Portal rebuild uses the build args in build_all_portals.sh (citizen-portal block), tag `arm64-local`, then `kubectl -n egov rollout restart deploy/citizen-portal`.
+- Portal rebuild uses the build args in build_all_portals.sh (citizen-portal block), tag `arm64-local`, then `kubectl -n citizen rollout restart deploy/citizen-portal`.
 - Build images with `DOCKER_HOST=unix://$HOME/.rd/docker.sock`, tag `arm64-local`, namespace `egov`; a rebuild takes 10+ minutes. Service port is 8089.
 - Stage explicit paths; never `git add -A`. Don't commit/push unless asked; don't echo demo credentials.

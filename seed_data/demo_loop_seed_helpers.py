@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 # When generating seeds, case and alert timestamps are spread across the 12 months before this moment
 # (same weighting as seed_data/retime_demo_lib.py and fix_demo_retime_history.sql).
 
-# Keycloak `sub` for username dept.admin (egov realm); same as JWT subject in demo.
+# Keycloak `sub` for username dept.admin (citizen realm); same as JWT subject in demo.
 DEPT_ADMIN_VERIFIED_BY = "7817b01b-fb92-4113-b6bc-629db405f659"
 
 VERIFICATION_NOTES = [

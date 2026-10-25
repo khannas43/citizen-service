@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type ReactElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import type { FieldProps } from '@rjsf/utils'
 
-import type { BilingualContent } from '@dg20/form-contract'
+import type { BilingualContent } from '@citizen/form-contract'
 
 import {
   FAMILY_REPEATER_GLOBAL_MAX_ROWS,

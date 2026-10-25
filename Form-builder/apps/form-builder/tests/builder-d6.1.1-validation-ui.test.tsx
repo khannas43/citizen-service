@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
-import type { FormDefinition, ValidationResult } from '@dg20/form-contract'
+import type { FormDefinition, ValidationResult } from '@citizen/form-contract'
 
 import {
   createAuthoringSession,

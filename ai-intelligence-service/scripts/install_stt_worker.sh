@@ -22,7 +22,7 @@ if [ ! -s "$TOKEN_FILE" ]; then
   umask 077
   "$PY" -c "import secrets; print(secrets.token_urlsafe(32))" > "$TOKEN_FILE"
   echo "Created $TOKEN_FILE. Store it for the cluster with:"
-  echo "  kubectl -n egov create secret generic stt-worker --from-literal=token=\"\$(cat $TOKEN_FILE)\""
+  echo "  kubectl -n citizen create secret generic stt-worker --from-literal=token=\"\$(cat $TOKEN_FILE)\""
 fi
 
 cat > "$DEST/run.sh" <<R

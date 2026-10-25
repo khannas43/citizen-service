@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useMemo, useState, type ReactElement } from 'react'
 
-import type { CafPrefillAdapter } from '@dg20/form-widgets'
+import type { CafPrefillAdapter } from '@citizen/form-widgets'
 
 import {
   ACCEPTANCE_CAF_ATTRIBUTES,
@@ -11,8 +11,8 @@ import { FormRenderer } from '../FormRenderer.js'
 import type { ProgressiveAutosaveAdapter } from '../progressive-autosave.js'
 import type { ProgressiveResumeAdapter } from '../progressive-resume.js'
 
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
 import '../styles/renderer.css'
 
 /**

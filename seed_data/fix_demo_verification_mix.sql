@@ -1,7 +1,7 @@
 -- Demo loop: verify most ACTION_RECORDED cases; leave 15 newest awaiting verification.
 -- verified_by = Keycloak sub for dept.admin (JWT claim sub).
 -- Backup first:
---   kubectl exec -n egov deploy/postgres -- psql -U egovuser -d egov_db -c "\copy (
+--   kubectl exec -n citizen deploy/postgres -- psql -U citizenuser -d citizen_db -c "\copy (
 --     SELECT id, domain, status, verified_at, verified_by, verification_note, updated_at
 --     FROM expenditure_integrity.integrity_case WHERE status = 'ACTION_RECORDED' OR verified_at IS NOT NULL
 --   ) TO STDOUT WITH CSV HEADER" > seed_data/backups/integrity_case_verification_before.csv

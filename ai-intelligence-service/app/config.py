@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql://egovuser:egovpass@postgres.egov.svc.cluster.local:5432/egov_db"
+    DATABASE_URL: str = "postgresql://citizenuser:egovpass@postgres.citizen.svc.cluster.local:5432/citizen_db"
     OLLAMA_BASE_URL: str = "http://host.docker.internal:11434"
     OLLAMA_MODEL: str = "gemma3:4b"
     EMBED_MODEL: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"

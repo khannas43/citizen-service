@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: expenditure-integrity-service
-  namespace: egov
+  namespace: citizen
   labels:
     app: expenditure-integrity-service
 spec:
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: expenditure-integrity-service
-          image: expenditure-integrity-service:arm64-local
+          image: cs-expenditure-integrity-service:dev
           imagePullPolicy: Never
           ports:
             - containerPort: 8092
@@ -41,7 +41,7 @@ spec:
                   key: key
                   optional: true
             - name: OFFICER_JWKS_URI
-              value: "http://keycloak.egov.svc.cluster.local:8080/realms/egov/protocol/openid-connect/certs"
+              value: "http://keycloak.citizen.svc.cluster.local:8080/realms/citizen/protocol/openid-connect/certs"
           startupProbe:
             httpGet:
               path: /expenditure-integrity-service/actuator/health/liveness
@@ -70,7 +70,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: expenditure-integrity-service
-  namespace: egov
+  namespace: citizen
 spec:
   selector:
     app: expenditure-integrity-service

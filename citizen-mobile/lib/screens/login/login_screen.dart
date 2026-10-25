@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Text('🏛', style: TextStyle(fontSize: 36)),
                   const SizedBox(height: 12),
                   const Text(
-                    'DG 2.0',
+                    'Citizen Services',
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5),
                   ),
                   Text(

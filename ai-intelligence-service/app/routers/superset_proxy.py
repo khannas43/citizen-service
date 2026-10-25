@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/v1/superset", tags=["Superset Proxy"])
 
-_SUPERSET = os.getenv("SUPERSET_INTERNAL_URL", "http://superset.egov.svc.cluster.local:8088")
+_SUPERSET = os.getenv("SUPERSET_INTERNAL_URL", "http://superset.citizen.svc.cluster.local:8088")
 _USER = os.getenv("SUPERSET_ADMIN_USER", "admin")
 _PASS = os.getenv("SUPERSET_ADMIN_PASS", "admin123")
 

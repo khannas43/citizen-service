@@ -7,7 +7,7 @@ export const SCHEME_API =
 export const CITIZEN_PORTAL =
   import.meta.env.VITE_CITIZEN_PORTAL ||
   (typeof window !== 'undefined'
-    ? `${window.location.protocol}//${window.location.hostname}:30074`
+    ? `${window.location.protocol}//${window.location.hostname}:31174`
     : 'http://localhost:5174')
 
 const AADHAAR_PATTERN = /^[\dXx]{4}-[\dXx]{4}-[\dXx]{4}$/

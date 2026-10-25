@@ -1,4 +1,4 @@
-# Form Renderer (`@dg20/form-renderer`)
+# Form Renderer (`@citizen/form-renderer`)
 
 Shared RJSF runtime used by the **citizen portal** and **Builder live preview**
 (“render once”).
@@ -71,10 +71,10 @@ Unit C validation / publish gate is **out of scope** for this package.
 ## Install / import
 
 ```ts
-import { FormRenderer } from '@dg20/form-renderer'
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
-import '@dg20/form-renderer/styles/renderer.css'
+import { FormRenderer } from '@citizen/form-renderer'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
+import '@citizen/form-renderer/styles/renderer.css'
 ```
 
 ## Public API

@@ -100,7 +100,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
 
       <aside className="arch-panel arch-panel-overlay dg-slide-right">
         <div className="arch-panel-header">
-          <span className="arch-panel-title">DG 2.0 Platform Architecture</span>
+          <span className="arch-panel-title">Citizen Services Platform Architecture</span>
           <button type="button" className="arch-close-btn" onClick={onClose} aria-label="Close">
             ✕
           </button>
@@ -113,7 +113,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
               <ArchCard
                 className="arch-card-citizen"
                 title="📱 Citizen Portal"
-                rows={['React 19 · Nginx', 'Gujarati i18n (530 keys)', 'NodePort 30074']}
+                rows={['React 19 · Nginx', 'Gujarati i18n (530 keys)', 'NodePort 31174']}
               />
               <ArchCard
                 className="arch-card-officer"
@@ -121,7 +121,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
                 rows={[
                   'React 19 · Nginx',
                   '5 roles · Keycloak IAM',
-                  'NodePort 30073',
+                  'NodePort 31173',
                   '🗺 Leaflet 1.9 — Gujarat choropleth map',
                 ]}
               />
@@ -161,7 +161,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
               <ArchCard
                 className="arch-card-ai"
                 title="🤖 AI Intelligence Service"
-                subtitle="ai-intelligence-service · FastAPI · Port 30089"
+                subtitle="ai-intelligence-service · FastAPI · Port 31189"
                 rows={[
                   'Gemma 4 (8B) — semantic rerank + explanations',
                   'sentence-transformers + pgvector — semantic search',
@@ -172,7 +172,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
               <ArchCard
                 className="arch-card-superset"
                 title="📊 Apache Superset 3.1"
-                subtitle="Executive Dashboards · Port 30076"
+                subtitle="Executive Dashboards · Port 31176"
                 rows={[
                   'Gujarat Welfare Pulse dashboard',
                   'Scheme Performance dashboard',
@@ -205,7 +205,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
           </div>
 
           <div className="arch-footer">
-            Deployed on K3s (arm64) · Rancher Desktop · Apple Silicon · Single-node egov namespace
+            Deployed on K3s (arm64) · Rancher Desktop · Apple Silicon · Single-node citizen namespace
           </div>
         </div>
       </aside>

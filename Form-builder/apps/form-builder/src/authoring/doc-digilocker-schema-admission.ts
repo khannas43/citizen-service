@@ -3,7 +3,7 @@
  * Never repairs; never invokes accessors; never embeds hostile values in messages.
  */
 
-import { DOCUMENT_UPLOAD_GLOBAL_MAX_BYTES } from '@dg20/form-widgets'
+import { DOCUMENT_UPLOAD_GLOBAL_MAX_BYTES } from '@citizen/form-widgets'
 
 import { isExactDigiLockerDocumentTypeCode } from './doc-digilocker-policy.js'
 import { isExactMasterListId } from './master-list-schema-admission.js'

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { FormDefinition } from '@dg20/form-contract'
-import { FAMILY_REPEATER_GLOBAL_MAX_ROWS, PALETTE_WIDGET_COUNT } from '@dg20/form-widgets'
+import type { FormDefinition } from '@citizen/form-contract'
+import { FAMILY_REPEATER_GLOBAL_MAX_ROWS, PALETTE_WIDGET_COUNT } from '@citizen/form-widgets'
 
 import {
   ADDABLE_COUNT,

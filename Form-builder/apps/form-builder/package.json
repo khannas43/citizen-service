@@ -1,8 +1,8 @@
 {
-  "name": "@dg20/form-builder-app",
+  "name": "@citizen/form-builder-app",
   "private": true,
   "version": "0.1.0",
-  "description": "DG 2.0 Form Builder SPA and host embed surface (FB-D0 / E5.4.3A)",
+  "description": "Citizen Services Form Builder SPA and host embed surface (FB-D0 / E5.4.3A)",
   "type": "module",
   "exports": {
     "./embed": {
@@ -24,9 +24,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@dg20/form-contract": "*",
-    "@dg20/form-renderer": "*",
-    "@dg20/form-widgets": "*",
+    "@citizen/form-contract": "*",
+    "@citizen/form-renderer": "*",
+    "@citizen/form-widgets": "*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

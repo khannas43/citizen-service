@@ -1,2 +1,2 @@
 org.springframework.context.ApplicationListener=\
-org.magicsword.formdefinition.security.FormDefinitionSecurityProfileGuard
+org.citizen.formdefinition.security.FormDefinitionSecurityProfileGuard

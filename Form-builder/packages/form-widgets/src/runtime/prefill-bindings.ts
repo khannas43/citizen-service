@@ -1,4 +1,4 @@
-import type { PrefillBinding } from '@dg20/form-contract'
+import type { PrefillBinding } from '@citizen/form-contract'
 
 import type { CafPrefillResolveResult } from './service-ports.js'
 

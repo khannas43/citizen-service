@@ -1,0 +1,35 @@
+# Citizen-Services namespace with a quota so it cannot starve the DG2.0 demo (namespace egov).
+# Tune the numbers after `kubectl top nodes` (see README.md).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: citizen
+  labels:
+    project: citizen-services
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: citizen-quota
+  namespace: citizen
+spec:
+  hard:
+    requests.cpu: "3"
+    requests.memory: 4Gi
+    limits.memory: 6Gi
+    persistentvolumeclaims: "6"
+    services.nodeports: "12"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: citizen-defaults
+  namespace: citizen
+spec:
+  limits:
+    - type: Container
+      default:
+        memory: 768Mi
+      defaultRequest:
+        cpu: 50m
+        memory: 128Mi

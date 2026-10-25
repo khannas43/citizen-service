@@ -11,8 +11,8 @@ import type {
 } from '../src/progressive-autosave.js'
 import { createProgressivePublishedDefinition } from './fixtures.js'
 
-import '@dg20/form-widgets/styles/tokens.css'
-import '@dg20/form-widgets/styles/widgets.css'
+import '@citizen/form-widgets/styles/tokens.css'
+import '@citizen/form-widgets/styles/widgets.css'
 import '../src/styles/renderer.css'
 
 function createDeferred<T = void>(): {

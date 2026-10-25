@@ -26,7 +26,7 @@ class DG20App extends StatelessWidget {
     return LocaleScope(
       notifier: LocaleService.instance,
       child: MaterialApp(
-        title: 'DG 2.0 — Citizen',
+        title: 'Citizen Services — Citizen',
         theme: appTheme(),
         debugShowCheckedModeBanner: false,
         home: const _Splash(),
@@ -95,7 +95,7 @@ class _SplashState extends State<_Splash> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'DG 2.0',
+              'Citizen Services',
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF1E293B), letterSpacing: -0.5),
             ),
             const SizedBox(height: 4),

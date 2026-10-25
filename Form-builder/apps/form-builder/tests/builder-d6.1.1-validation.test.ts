@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import type { FormDefinition } from '@dg20/form-contract'
+import type { FormDefinition } from '@citizen/form-contract'
 
 import { admitValidationResult } from '../src/validation/admit-validation-result.js'
 import { definitionsSemanticallyEqual } from '../src/validation/definitions-semantically-equal.js'

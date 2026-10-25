@@ -59,9 +59,9 @@ Java IT and portal copies must match the canonical SHA-256 (drift tests fail oth
 
 | Package               | Version |
 | --------------------- | ------- |
-| `@dg20/form-contract` | `0.1.0` |
-| `@dg20/form-widgets`  | `0.2.0` |
-| `@dg20/form-renderer` | `0.1.0` |
+| `@citizen/form-contract` | `0.1.0` |
+| `@citizen/form-widgets`  | `0.2.0` |
+| `@citizen/form-renderer` | `0.1.0` |
 
 ## FDS endpoints exercised
 

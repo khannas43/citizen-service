@@ -1,5 +1,5 @@
-import { BuilderShell } from '@dg20/form-builder-app/embed'
-import '@dg20/form-builder-app/styles/embed.css'
+import { BuilderShell } from '@citizen/form-builder-app/embed'
+import '@citizen/form-builder-app/styles/embed.css'
 import { provideOfficerBuilderAccessToken } from './provide-officer-builder-access-token.js'
 import './OfficerFormBuilder.css'
 

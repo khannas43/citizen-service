@@ -3,7 +3,7 @@
  * Side-effect stylesheet only — safe for officer-portal route import.
  * Does not include standalone document (html/body/#root) chrome.
  */
-@import '@dg20/form-widgets/styles/tokens.css';
-@import '@dg20/form-widgets/styles/widgets.css';
-@import '@dg20/form-renderer/styles/renderer.css';
+@import '@citizen/form-widgets/styles/tokens.css';
+@import '@citizen/form-widgets/styles/widgets.css';
+@import '@citizen/form-renderer/styles/renderer.css';
 @import './builder.css';
