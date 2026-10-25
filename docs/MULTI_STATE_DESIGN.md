@@ -62,3 +62,10 @@ behaviour), then `TG`.
 - Which Telangana schemes go into the first catalogue (state and central).
 - Whether production Telangana runs as its own deployment (recommended) or inside a shared one.
 - Source of Telangana demo citizens: synthetic only (recommended). Do not load real citizen data into the demo.
+
+## 8. Step 1 status (25 Oct 2026)
+Written: `db/platform/001-003` (tested on a scratch Postgres 16: state isolation, default state, cross-state insert blocked,
+tables created later scoped automatically, app role is not superuser), `platform-tenancy` library (token claim extractor
+and context tested; the Spring wiring is not yet compiled because Maven Central was not reachable from the build machine),
+`state` claim and `state_code` attribute in Keycloak (`citizen-realm.json`, `setup-keycloak.sh`), dependency added to the
+ten database services. Not yet run against the cluster.

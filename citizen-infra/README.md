@@ -9,12 +9,16 @@ All scripts source `scripts/lib/guard.sh`, which refuses `egov`.
 
 ## Order
 1. `kubectl apply -f citizen-infra/00-namespace-quota.yaml`
-2. Create the DB secret with a NEW password (do not copy DG2.0's):
-   `kubectl -n citizen create secret generic db --from-literal=username=citizenuser --from-literal=password="$(openssl rand -base64 24)"`
+2. Create two secrets with NEW passwords (do not copy DG2.0's):
+   - `kubectl -n citizen create secret generic db-admin --from-literal=username=postgres --from-literal=password="$(openssl rand -base64 24)"`
+     (Postgres superuser, for restore and migrations only)
+   - `kubectl -n citizen create secret generic db --from-literal=username=citizenuser --from-literal=password="$(openssl rand -base64 24)"`
+     (what the services use; an ordinary role, created in step 4)
 3. `kubectl apply -f postgres-pvc.yaml`, then install Postgres with `postgres-persistence-values.yaml`
-   using the same chart DG2.0 used, into namespace `citizen`.
-4. Create databases `citizen_db` and `keycloak_db`; restore data from a DG2.0 `pg_dump` into `citizen_db`
-   (dump from egov is read-only).
+   using the same chart DG2.0 used, into namespace `citizen`, with the `db-admin` credentials as the bootstrap user.
+4. Create `citizen_db`; restore a read-only DG2.0 dump into it as the superuser
+   (`pg_dump --no-owner --no-acl` from egov). Then run `db/platform/001..003` (see `db/platform/README.md`;
+   003 creates `citizenuser`). Then `CREATE DATABASE keycloak_db OWNER citizenuser;`
 5. `kubectl apply -f citizen-infra/10-ai-service-externalname.yaml`
 6. Keycloak: `kubectl apply -f keycloak-deployment.yaml`, then `./setup-keycloak.sh` (realm `citizen`).
 7. `./build_all_portals.sh` (images `cs-*:dev`, NodePorts 31173+).
