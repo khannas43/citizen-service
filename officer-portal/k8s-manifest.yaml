@@ -17,6 +17,12 @@ spec:
       - name: officer-portal
         image: cs-officer-portal:dev
         imagePullPolicy: Never
+        resources:
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
         ports:
         - containerPort: 80
 ---
