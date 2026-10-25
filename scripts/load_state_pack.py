@@ -14,7 +14,8 @@ A pack is a folder:
 
 Only the standard library is used. Re-running a pack updates it in place.
 """
-import csv, json, re, sys, os
+import csv, json, re, sys, os, zipfile, itertools
+import xml.etree.ElementTree as ET
 
 def q(v):
     return "NULL" if v is None or v == "" else "'" + str(v).replace("'", "''") + "'"
@@ -33,15 +34,78 @@ def pick(headers, must, must_not=()):
             return h
     return None
 
+_NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+
+def _cell_text(c, shared):
+    t = c.get("t")
+    if t == "inlineStr":
+        return "".join(x.text or "" for x in c.iter(_NS + "t"))
+    v = c.find(_NS + "v")
+    if v is None or v.text is None:
+        return ""
+    return shared[int(v.text)] if t == "s" else v.text
+
+def _col(ref):
+    n = 0
+    for ch in re.match(r"[A-Z]+", ref).group(0):
+        n = n * 26 + ord(ch) - 64
+    return n - 1
+
+def xlsx_rows(path):
+    """Stream the first sheet of an .xlsx file as dicts. The header is the first row with at least three filled cells
+    (LGD exports start with a title row). Memory use stays small even for the 500 MB all-India village file."""
+    z = zipfile.ZipFile(path)
+    shared = []
+    if "xl/sharedStrings.xml" in z.namelist():
+        for si in ET.fromstring(z.read("xl/sharedStrings.xml")).iter(_NS + "si"):
+            shared.append("".join(t.text or "" for t in si.iter(_NS + "t")))
+    header = None
+    with z.open("xl/worksheets/sheet1.xml") as f:
+        for _, el in ET.iterparse(f):
+            if el.tag != _NS + "row":
+                continue
+            cells = {}
+            for c in el.findall(_NS + "c"):
+                cells[_col(c.get("r"))] = _cell_text(c, shared)
+            el.clear()
+            width = (max(cells) + 1) if cells else 0
+            row = [cells.get(i, "") for i in range(width)]
+            if header is None:
+                if sum(1 for x in row if x.strip()) >= 3:
+                    header = [x.strip() for x in row]
+                continue
+            yield dict(zip(header, row))
+
+def read_table(path):
+    """rows of a .csv or .xlsx file as dicts (a generator)"""
+    if path.lower().endswith(".xlsx"):
+        yield from xlsx_rows(path)
+    else:
+        with open(path, newline="", encoding="utf-8-sig") as f:
+            yield from csv.DictReader(f)
+
 def read_csv(path):
-    with open(path, newline="", encoding="utf-8-sig") as f:
-        return list(csv.DictReader(f))
+    return list(read_table(path))
+
+def find_table(folder, stem):
+    for ext in (".csv", ".xlsx"):
+        p = os.path.join(folder, stem + ext)
+        if os.path.exists(p):
+            return p
+    return None
+
+def code_text(v):
+    """LGD spreadsheets store codes as numbers: '603.0' -> '603'"""
+    v = clean(v)
+    return v[:-2] if re.fullmatch(r"\d+\.0", v) else v
 
 def lgd_rows(path, level, lgd_state, local_lang):
-    rows = read_csv(path)
-    if not rows:
+    it = read_table(path)
+    first = next(it, None)
+    if first is None:
         return []
-    H = list(rows[0].keys())
+    rows = itertools.chain([first], it)
+    H = list(first.keys())
     if level == 1:
         c_code, c_name = pick(H, ["district", "code"], ["sub", "census", "state"]), pick(H, ["district", "name"], ["sub", "state", "local"])
         c_pd = c_pc = c_gd = c_gc = None
@@ -59,16 +123,16 @@ def lgd_rows(path, level, lgd_state, local_lang):
         sys.exit(f"{path}: cannot find a name column in {H}")
     out = []
     for r in rows:
-        if lgd_state and c_state and clean(r.get(c_state)) != str(lgd_state):
+        if lgd_state and c_state and code_text(r.get(c_state)) != str(lgd_state):
             continue
         name = clean(r.get(c_name))
         if not name:
             continue
         out.append({
-            "level": level, "lgd": clean(r.get(c_code)) if c_code else "",
+            "level": level, "lgd": code_text(r.get(c_code)) if c_code else "",
             "name": name, "local": clean(r.get(c_local)) if c_local else "",
-            "p_lgd": clean(r.get(c_pc)) if c_pc else "", "p_name": clean(r.get(c_pd)) if c_pd else "",
-            "g_lgd": clean(r.get(c_gc)) if c_gc else "", "g_name": clean(r.get(c_gd)) if c_gd else "",
+            "p_lgd": code_text(r.get(c_pc)) if c_pc else "", "p_name": clean(r.get(c_pd)) if c_pd else "",
+            "g_lgd": code_text(r.get(c_gc)) if c_gc else "", "g_name": clean(r.get(c_gd)) if c_gd else "",
         })
     return out
 
@@ -89,9 +153,9 @@ def main(pack_dir):
         "id_formats=EXCLUDED.id_formats;")
 
     levels = []
-    for lvl, fn in ((1, "districts.csv"), (2, "subdistricts.csv"), (3, "villages.csv")):
-        p = os.path.join(pack_dir, "lgd", fn)
-        if os.path.exists(p):
+    for lvl, stem in ((1, "districts"), (2, "subdistricts"), (3, "villages")):
+        p = find_table(os.path.join(pack_dir, "lgd"), stem)
+        if p:
             levels += lgd_rows(p, lvl, meta.get("lgd_state_code"), meta.get("local_lang"))
     if levels:
         sql.append("CREATE TEMP TABLE stage (level int, lgd text, name text, local text, p_lgd text, p_name text, g_lgd text, g_name text) ON COMMIT DROP;")
@@ -104,35 +168,37 @@ def main(pack_dir):
         sql.append(s.getvalue().rstrip("\n")); sql.append("\\.")
         lc = q(meta.get("local_lang") or "local")
         kind = {1: "district", 2: "sub-district", 3: "village"}
-        # level 1
-        sql.append(f"""
+        def upsert(level, kind_name, src):
+            """src = SELECT yielding parent_id, lgd, name, local for this level"""
+            local = f"CASE WHEN local = '' THEN '{{}}'::jsonb ELSE jsonb_build_object({lc}, local) END"
+            sql.append(f"""
+-- {kind_name}s with an LGD code: the code is the identity
 INSERT INTO platform.admin_unit (state_code, level, parent_id, lgd_code, name_en, name_local, kind)
-SELECT {q(code)}, 1, NULL, nullif(lgd,''), name, CASE WHEN local='' THEN '{{}}'::jsonb ELSE jsonb_build_object({lc}, local) END, 'district'
-FROM stage WHERE level = 1
-ON CONFLICT (state_code, level, (coalesce(parent_id,0)), name_en)
-DO UPDATE SET lgd_code = coalesce(EXCLUDED.lgd_code, platform.admin_unit.lgd_code), name_local = platform.admin_unit.name_local || EXCLUDED.name_local;""")
-        # level 2: parent district by LGD code, else by name
-        sql.append(f"""
+SELECT DISTINCT ON (lgd) {q(code)}, {level}, parent_id, lgd, name, {local}, '{kind_name}'
+FROM ({src}) x WHERE lgd IS NOT NULL ORDER BY lgd
+ON CONFLICT (state_code, level, lgd_code) WHERE lgd_code IS NOT NULL
+DO UPDATE SET parent_id = EXCLUDED.parent_id, name_en = EXCLUDED.name_en,
+              name_local = platform.admin_unit.name_local || EXCLUDED.name_local;
+-- {kind_name}s without a code: parent and name are the identity
 INSERT INTO platform.admin_unit (state_code, level, parent_id, lgd_code, name_en, name_local, kind)
-SELECT {q(code)}, 2, d.id, nullif(s.lgd,''), s.name, CASE WHEN s.local='' THEN '{{}}'::jsonb ELSE jsonb_build_object({lc}, s.local) END, 'sub-district'
-FROM stage s JOIN platform.admin_unit d
-  ON d.state_code = {q(code)} AND d.level = 1
- AND ((s.p_lgd <> '' AND d.lgd_code = s.p_lgd) OR (s.p_lgd = '' AND lower(d.name_en) = lower(s.p_name)))
-WHERE s.level = 2
-ON CONFLICT (state_code, level, (coalesce(parent_id,0)), name_en)
-DO UPDATE SET lgd_code = coalesce(EXCLUDED.lgd_code, platform.admin_unit.lgd_code), name_local = platform.admin_unit.name_local || EXCLUDED.name_local;""")
-        # level 3: parent sub-district, matched inside its district
-        sql.append(f"""
-INSERT INTO platform.admin_unit (state_code, level, parent_id, lgd_code, name_en, name_local, kind)
-SELECT {q(code)}, 3, sd.id, nullif(s.lgd,''), s.name, CASE WHEN s.local='' THEN '{{}}'::jsonb ELSE jsonb_build_object({lc}, s.local) END, 'village'
-FROM stage s
-JOIN platform.admin_unit sd ON sd.state_code = {q(code)} AND sd.level = 2
- AND ((s.p_lgd <> '' AND sd.lgd_code = s.p_lgd) OR (s.p_lgd = '' AND lower(sd.name_en) = lower(s.p_name)))
-JOIN platform.admin_unit d ON d.id = sd.parent_id
- AND (s.g_name = '' OR lower(d.name_en) = lower(s.g_name))
-WHERE s.level = 3
-ON CONFLICT (state_code, level, (coalesce(parent_id,0)), name_en)
-DO UPDATE SET lgd_code = coalesce(EXCLUDED.lgd_code, platform.admin_unit.lgd_code), name_local = platform.admin_unit.name_local || EXCLUDED.name_local;""")
+SELECT DISTINCT ON (coalesce(parent_id,0), name) {q(code)}, {level}, parent_id, NULL, name, {local}, '{kind_name}'
+FROM ({src}) x WHERE lgd IS NULL ORDER BY coalesce(parent_id,0), name
+ON CONFLICT (state_code, level, (coalesce(parent_id,0)), name_en) WHERE lgd_code IS NULL
+DO UPDATE SET name_local = platform.admin_unit.name_local || EXCLUDED.name_local;""")
+
+        upsert(1, "district",
+               "SELECT NULL::bigint AS parent_id, nullif(lgd,'') AS lgd, name, local FROM stage WHERE level = 1")
+        upsert(2, "sub-district",
+               f"SELECT d.id AS parent_id, nullif(s.lgd,'') AS lgd, s.name, s.local FROM stage s JOIN platform.admin_unit d "
+               f"ON d.state_code = {q(code)} AND d.level = 1 "
+               "AND ((s.p_lgd <> '' AND d.lgd_code = s.p_lgd) OR (s.p_lgd = '' AND lower(d.name_en) = lower(s.p_name))) "
+               "WHERE s.level = 2")
+        upsert(3, "village",
+               f"SELECT sd.id AS parent_id, nullif(s.lgd,'') AS lgd, s.name, s.local FROM stage s "
+               f"JOIN platform.admin_unit sd ON sd.state_code = {q(code)} AND sd.level = 2 "
+               "AND ((s.p_lgd <> '' AND sd.lgd_code = s.p_lgd) OR (s.p_lgd = '' AND lower(sd.name_en) = lower(s.p_name))) "
+               "JOIN platform.admin_unit d ON d.id = sd.parent_id AND (s.g_name = '' OR lower(d.name_en) = lower(s.g_name)) "
+               "WHERE s.level = 3")
 
     sp = os.path.join(pack_dir, "schemes.csv")
     if os.path.exists(sp):
@@ -140,10 +206,13 @@ DO UPDATE SET lgd_code = coalesce(EXCLUDED.lgd_code, platform.admin_unit.lgd_cod
             lvl = clean(r["level"]).upper()
             sc = "NULL" if lvl == "CENTRAL" else q(code)
             nl = q(r.get("name_local_json") or "{}")
+            ver = "true" if clean(r.get("verified", "")).lower() in ("true", "yes", "1") else "false"
             sql.append(
-                "INSERT INTO platform.scheme_catalog (state_code, level, code, name_en, name_local) VALUES "
-                f"({sc}, {q(lvl)}, {q(clean(r['code']))}, {q(clean(r['name_en']))}, {nl}::jsonb) "
-                "ON CONFLICT (coalesce(state_code,'--'), code) DO UPDATE SET name_en=EXCLUDED.name_en, name_local=EXCLUDED.name_local;")
+                "INSERT INTO platform.scheme_catalog (state_code, level, code, name_en, name_local, category, source_url, verified) VALUES "
+                f"({sc}, {q(lvl)}, {q(clean(r['code']))}, {q(clean(r['name_en']))}, {nl}::jsonb, {q(clean(r.get('category', '')))}, "
+                f"{q(clean(r.get('source_url', '')))}, {ver}) "
+                "ON CONFLICT (coalesce(state_code,'--'), code) DO UPDATE SET name_en=EXCLUDED.name_en, name_local=EXCLUDED.name_local, "
+                "category=EXCLUDED.category, source_url=EXCLUDED.source_url, verified=EXCLUDED.verified;")
     for fn in sorted(os.listdir(pack_dir)):
         m = re.fullmatch(r"i18n_([a-z]{2,3})\.csv", fn)
         if m:

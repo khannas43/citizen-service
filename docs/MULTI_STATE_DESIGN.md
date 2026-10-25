@@ -74,3 +74,7 @@ ten database services. Not yet run against the cluster.
 `scripts/load_state_pack.py` and `state-packs/` (GJ, TG skeleton, test fixture). GJ geography comes from the DG2.0 seed (not LGD).
 Telangana geography needs the LGD download (lgdirectory.gov.in) saved in `state-packs/TG/lgd/`; the India Data portal copy is from 2023.
 Telangana scheme catalogue not started: needs the list of schemes to include.
+
+Update: Telangana geography loaded from LGD (33 districts, 621 mandals, 11,450 villages) and a 43-entry scheme list from
+govtschemes.in (a third-party aggregator; every entry is `verified=false` until checked against the department source).
+Unit identity is now the LGD code (45 villages share a name with another village in the same mandal).
