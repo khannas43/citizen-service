@@ -27,9 +27,11 @@ CREATE TABLE IF NOT EXISTS platform.admin_unit (
     lgd_code    text,                                            -- Local Government Directory code
     name_en     text         NOT NULL,
     name_local  jsonb        NOT NULL DEFAULT '{}',
-    kind        text,                                            -- rural / urban, ward, village, city ...
-    UNIQUE (state_code, level, parent_id, name_en)
+    kind        text                                             -- rural / urban, ward, village, city ...
 );
+-- one unit per name under a parent (parent NULL = top level), so state packs can be reloaded safely
+CREATE UNIQUE INDEX IF NOT EXISTS admin_unit_natural_key
+    ON platform.admin_unit (state_code, level, (coalesce(parent_id, 0)), name_en);
 CREATE INDEX IF NOT EXISTS admin_unit_state_level ON platform.admin_unit (state_code, level);
 CREATE INDEX IF NOT EXISTS admin_unit_parent ON platform.admin_unit (parent_id);
 

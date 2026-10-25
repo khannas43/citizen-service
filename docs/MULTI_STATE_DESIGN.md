@@ -69,3 +69,8 @@ tables created later scoped automatically, app role is not superuser), `platform
 and context tested; the Spring wiring is not yet compiled because Maven Central was not reachable from the build machine),
 `state` claim and `state_code` attribute in Keycloak (`citizen-realm.json`, `setup-keycloak.sh`), dependency added to the
 ten database services. Not yet run against the cluster.
+
+## 9. Step 2 status (25 Oct 2026)
+`scripts/load_state_pack.py` and `state-packs/` (GJ, TG skeleton, test fixture). GJ geography comes from the DG2.0 seed (not LGD).
+Telangana geography needs the LGD download (lgdirectory.gov.in) saved in `state-packs/TG/lgd/`; the India Data portal copy is from 2023.
+Telangana scheme catalogue not started: needs the list of schemes to include.
