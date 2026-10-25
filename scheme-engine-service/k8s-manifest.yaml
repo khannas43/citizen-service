@@ -24,6 +24,8 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: SPRING_KAFKA_LISTENER_AUTO_STARTUP
+              value: "false"
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:

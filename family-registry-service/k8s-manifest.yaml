@@ -24,6 +24,8 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: SPRING_KAFKA_PRODUCER_PROPERTIES_MAX_BLOCK_MS
+              value: "2000"
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
