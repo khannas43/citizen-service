@@ -24,15 +24,15 @@ const LIMITS = {
 }
 
 function emptyDoc() {
-  return { title: '', titleGu: '', note: '', noteGu: '' }
+  return { title: '', titleLocal: '', note: '', noteLocal: '' }
 }
 
 function emptyStep() {
-  return { title: '', titleGu: '', detail: '', detailGu: '' }
+  return { title: '', titleLocal: '', detail: '', detailLocal: '' }
 }
 
 function emptyFaq() {
-  return { question: '', questionGu: '', answer: '', answerGu: '' }
+  return { question: '', questionLocal: '', answer: '', answerLocal: '' }
 }
 
 function trimOrNull(s) {
@@ -60,33 +60,33 @@ export function validateSchemeContentDraft(draft) {
   if (docs.length > LIMITS.docsMax) errors.documentsRequired = `At most ${LIMITS.docsMax} documents`
   docs.forEach((d, i) => {
     checkText(errors, `documentsRequired[${i}].title`, d.title, LIMITS.title, true)
-    checkText(errors, `documentsRequired[${i}].titleGu`, d.titleGu, LIMITS.title, false)
+    checkText(errors, `documentsRequired[${i}].titleLocal`, d.titleLocal, LIMITS.title, false)
     checkText(errors, `documentsRequired[${i}].note`, d.note, LIMITS.note, false)
-    checkText(errors, `documentsRequired[${i}].noteGu`, d.noteGu, LIMITS.note, false)
+    checkText(errors, `documentsRequired[${i}].noteLocal`, d.noteLocal, LIMITS.note, false)
   })
 
   if (steps.length > LIMITS.stepsMax) errors.applicationSteps = `At most ${LIMITS.stepsMax} steps`
   steps.forEach((s, i) => {
     checkText(errors, `applicationSteps[${i}].title`, s.title, LIMITS.title, true)
-    checkText(errors, `applicationSteps[${i}].titleGu`, s.titleGu, LIMITS.title, false)
+    checkText(errors, `applicationSteps[${i}].titleLocal`, s.titleLocal, LIMITS.title, false)
     checkText(errors, `applicationSteps[${i}].detail`, s.detail, LIMITS.note, false)
-    checkText(errors, `applicationSteps[${i}].detailGu`, s.detailGu, LIMITS.note, false)
+    checkText(errors, `applicationSteps[${i}].detailLocal`, s.detailLocal, LIMITS.note, false)
   })
 
   if (faqs.length > LIMITS.faqsMax) errors.faqs = `At most ${LIMITS.faqsMax} FAQs`
   faqs.forEach((f, i) => {
     checkText(errors, `faqs[${i}].question`, f.question, LIMITS.title, true)
-    checkText(errors, `faqs[${i}].questionGu`, f.questionGu, LIMITS.title, false)
+    checkText(errors, `faqs[${i}].questionLocal`, f.questionLocal, LIMITS.title, false)
     checkText(errors, `faqs[${i}].answer`, f.answer, LIMITS.note, true)
-    checkText(errors, `faqs[${i}].answerGu`, f.answerGu, LIMITS.note, false)
+    checkText(errors, `faqs[${i}].answerLocal`, f.answerLocal, LIMITS.note, false)
   })
 
   checkText(errors, 'overview', draft.overview, LIMITS.overview, false)
-  checkText(errors, 'overviewGu', draft.overviewGu, LIMITS.overview, false)
+  checkText(errors, 'overviewLocal', draft.overviewLocal, LIMITS.overview, false)
   checkText(errors, 'benefitsNote', draft.benefitsNote, LIMITS.wording, false)
-  checkText(errors, 'benefitsNoteGu', draft.benefitsNoteGu, LIMITS.wording, false)
+  checkText(errors, 'benefitsNoteLocal', draft.benefitsNoteLocal, LIMITS.wording, false)
   checkText(errors, 'eligibilityNote', draft.eligibilityNote, LIMITS.wording, false)
-  checkText(errors, 'eligibilityNoteGu', draft.eligibilityNoteGu, LIMITS.wording, false)
+  checkText(errors, 'eligibilityNoteLocal', draft.eligibilityNoteLocal, LIMITS.wording, false)
 
   checkText(errors, 'helplineLabel', draft.helplineLabel, LIMITS.title, false)
   const helpline = draft.helplineNumber
@@ -120,11 +120,11 @@ function responseToDraft(data) {
     applicationSteps: (data.applicationSteps ?? []).map((s) => ({ ...s })),
     faqs: (data.faqs ?? []).map((f) => ({ ...f })),
     overview: data.overview ?? '',
-    overviewGu: data.overviewGu ?? '',
+    overviewLocal: data.overviewLocal ?? '',
     benefitsNote: data.benefitsNote ?? '',
-    benefitsNoteGu: data.benefitsNoteGu ?? '',
+    benefitsNoteLocal: data.benefitsNoteLocal ?? '',
     eligibilityNote: data.eligibilityNote ?? '',
-    eligibilityNoteGu: data.eligibilityNoteGu ?? '',
+    eligibilityNoteLocal: data.eligibilityNoteLocal ?? '',
     helplineLabel: data.helplineLabel ?? '',
     helplineNumber: data.helplineNumber ?? '',
     officialUrl: data.officialUrl ?? '',
@@ -137,11 +137,11 @@ function draftSnapshot(draft) {
     applicationSteps: draft.applicationSteps,
     faqs: draft.faqs,
     overview: trimOrNull(draft.overview),
-    overviewGu: trimOrNull(draft.overviewGu),
+    overviewLocal: trimOrNull(draft.overviewLocal),
     benefitsNote: trimOrNull(draft.benefitsNote),
-    benefitsNoteGu: trimOrNull(draft.benefitsNoteGu),
+    benefitsNoteLocal: trimOrNull(draft.benefitsNoteLocal),
     eligibilityNote: trimOrNull(draft.eligibilityNote),
-    eligibilityNoteGu: trimOrNull(draft.eligibilityNoteGu),
+    eligibilityNoteLocal: trimOrNull(draft.eligibilityNoteLocal),
     helplineLabel: trimOrNull(draft.helplineLabel),
     helplineNumber: trimOrNull(draft.helplineNumber),
     officialUrl: trimOrNull(draft.officialUrl),
@@ -155,11 +155,11 @@ function savePayload(draft) {
     applicationSteps: draft.applicationSteps,
     faqs: draft.faqs,
     overview: trimOrNull(draft.overview),
-    overviewGu: trimOrNull(draft.overviewGu),
+    overviewLocal: trimOrNull(draft.overviewLocal),
     benefitsNote: trimOrNull(draft.benefitsNote),
-    benefitsNoteGu: trimOrNull(draft.benefitsNoteGu),
+    benefitsNoteLocal: trimOrNull(draft.benefitsNoteLocal),
     eligibilityNote: trimOrNull(draft.eligibilityNote),
-    eligibilityNoteGu: trimOrNull(draft.eligibilityNoteGu),
+    eligibilityNoteLocal: trimOrNull(draft.eligibilityNoteLocal),
     helplineLabel: trimOrNull(draft.helplineLabel),
     helplineNumber: trimOrNull(draft.helplineNumber),
     officialUrl: trimOrNull(draft.officialUrl),
@@ -592,11 +592,11 @@ export default function SchemeContentEditor() {
                       Overview (GU)
                       <textarea
                         rows={4}
-                        value={draft.overviewGu ?? ''}
-                        onChange={(e) => updateDraft({ overviewGu: e.target.value })}
+                        value={draft.overviewLocal ?? ''}
+                        onChange={(e) => updateDraft({ overviewLocal: e.target.value })}
                       />
-                      <CharCount value={draft.overviewGu} max={LIMITS.overview} />
-                      <FieldError errors={fieldErrors} name="overviewGu" />
+                      <CharCount value={draft.overviewLocal} max={LIMITS.overview} />
+                      <FieldError errors={fieldErrors} name="overviewLocal" />
                     </label>
                   </div>
                 </section>
@@ -651,11 +651,11 @@ export default function SchemeContentEditor() {
                       Benefit details (GU)
                       <textarea
                         rows={3}
-                        value={draft.benefitsNoteGu ?? ''}
-                        onChange={(e) => updateDraft({ benefitsNoteGu: e.target.value })}
+                        value={draft.benefitsNoteLocal ?? ''}
+                        onChange={(e) => updateDraft({ benefitsNoteLocal: e.target.value })}
                       />
-                      <CharCount value={draft.benefitsNoteGu} max={LIMITS.wording} />
-                      <FieldError errors={fieldErrors} name="benefitsNoteGu" />
+                      <CharCount value={draft.benefitsNoteLocal} max={LIMITS.wording} />
+                      <FieldError errors={fieldErrors} name="benefitsNoteLocal" />
                     </label>
                   </div>
                 </section>
@@ -697,11 +697,11 @@ export default function SchemeContentEditor() {
                       Eligibility guidance (GU)
                       <textarea
                         rows={3}
-                        value={draft.eligibilityNoteGu ?? ''}
-                        onChange={(e) => updateDraft({ eligibilityNoteGu: e.target.value })}
+                        value={draft.eligibilityNoteLocal ?? ''}
+                        onChange={(e) => updateDraft({ eligibilityNoteLocal: e.target.value })}
                       />
-                      <CharCount value={draft.eligibilityNoteGu} max={LIMITS.wording} />
-                      <FieldError errors={fieldErrors} name="eligibilityNoteGu" />
+                      <CharCount value={draft.eligibilityNoteLocal} max={LIMITS.wording} />
+                      <FieldError errors={fieldErrors} name="eligibilityNoteLocal" />
                     </label>
                   </div>
                 </section>
@@ -761,15 +761,15 @@ export default function SchemeContentEditor() {
                         <label>
                           Title (GU)
                           <input
-                            value={doc.titleGu ?? ''}
+                            value={doc.titleLocal ?? ''}
                             onChange={(e) => {
                               const documentsRequired = [...draft.documentsRequired]
-                              documentsRequired[i] = { ...doc, titleGu: e.target.value }
+                              documentsRequired[i] = { ...doc, titleLocal: e.target.value }
                               updateDraft({ documentsRequired })
                             }}
                           />
-                          <CharCount value={doc.titleGu} max={LIMITS.title} />
-                          <FieldError errors={fieldErrors} name={`documentsRequired[${i}].titleGu`} />
+                          <CharCount value={doc.titleLocal} max={LIMITS.title} />
+                          <FieldError errors={fieldErrors} name={`documentsRequired[${i}].titleLocal`} />
                         </label>
                       </div>
                       <label>
@@ -790,15 +790,15 @@ export default function SchemeContentEditor() {
                         Note (GU)
                         <textarea
                           rows={2}
-                          value={doc.noteGu ?? ''}
+                          value={doc.noteLocal ?? ''}
                           onChange={(e) => {
                             const documentsRequired = [...draft.documentsRequired]
-                            documentsRequired[i] = { ...doc, noteGu: e.target.value }
+                            documentsRequired[i] = { ...doc, noteLocal: e.target.value }
                             updateDraft({ documentsRequired })
                           }}
                         />
-                        <CharCount value={doc.noteGu} max={LIMITS.note} />
-                        <FieldError errors={fieldErrors} name={`documentsRequired[${i}].noteGu`} />
+                        <CharCount value={doc.noteLocal} max={LIMITS.note} />
+                        <FieldError errors={fieldErrors} name={`documentsRequired[${i}].noteLocal`} />
                       </label>
                     </div>
                   ))}
@@ -859,15 +859,15 @@ export default function SchemeContentEditor() {
                         <label>
                           Title (GU)
                           <input
-                            value={step.titleGu ?? ''}
+                            value={step.titleLocal ?? ''}
                             onChange={(e) => {
                               const applicationSteps = [...draft.applicationSteps]
-                              applicationSteps[i] = { ...step, titleGu: e.target.value }
+                              applicationSteps[i] = { ...step, titleLocal: e.target.value }
                               updateDraft({ applicationSteps })
                             }}
                           />
-                          <CharCount value={step.titleGu} max={LIMITS.title} />
-                          <FieldError errors={fieldErrors} name={`applicationSteps[${i}].titleGu`} />
+                          <CharCount value={step.titleLocal} max={LIMITS.title} />
+                          <FieldError errors={fieldErrors} name={`applicationSteps[${i}].titleLocal`} />
                         </label>
                       </div>
                       <label>
@@ -888,15 +888,15 @@ export default function SchemeContentEditor() {
                         Detail (GU)
                         <textarea
                           rows={2}
-                          value={step.detailGu ?? ''}
+                          value={step.detailLocal ?? ''}
                           onChange={(e) => {
                             const applicationSteps = [...draft.applicationSteps]
-                            applicationSteps[i] = { ...step, detailGu: e.target.value }
+                            applicationSteps[i] = { ...step, detailLocal: e.target.value }
                             updateDraft({ applicationSteps })
                           }}
                         />
-                        <CharCount value={step.detailGu} max={LIMITS.note} />
-                        <FieldError errors={fieldErrors} name={`applicationSteps[${i}].detailGu`} />
+                        <CharCount value={step.detailLocal} max={LIMITS.note} />
+                        <FieldError errors={fieldErrors} name={`applicationSteps[${i}].detailLocal`} />
                       </label>
                     </div>
                   ))}
@@ -949,15 +949,15 @@ export default function SchemeContentEditor() {
                         <label>
                           Question (GU)
                           <input
-                            value={faq.questionGu ?? ''}
+                            value={faq.questionLocal ?? ''}
                             onChange={(e) => {
                               const faqs = [...draft.faqs]
-                              faqs[i] = { ...faq, questionGu: e.target.value }
+                              faqs[i] = { ...faq, questionLocal: e.target.value }
                               updateDraft({ faqs })
                             }}
                           />
-                          <CharCount value={faq.questionGu} max={LIMITS.title} />
-                          <FieldError errors={fieldErrors} name={`faqs[${i}].questionGu`} />
+                          <CharCount value={faq.questionLocal} max={LIMITS.title} />
+                          <FieldError errors={fieldErrors} name={`faqs[${i}].questionLocal`} />
                         </label>
                       </div>
                       <label>
@@ -978,15 +978,15 @@ export default function SchemeContentEditor() {
                         Answer (GU)
                         <textarea
                           rows={2}
-                          value={faq.answerGu ?? ''}
+                          value={faq.answerLocal ?? ''}
                           onChange={(e) => {
                             const faqs = [...draft.faqs]
-                            faqs[i] = { ...faq, answerGu: e.target.value }
+                            faqs[i] = { ...faq, answerLocal: e.target.value }
                             updateDraft({ faqs })
                           }}
                         />
-                        <CharCount value={faq.answerGu} max={LIMITS.note} />
-                        <FieldError errors={fieldErrors} name={`faqs[${i}].answerGu`} />
+                        <CharCount value={faq.answerLocal} max={LIMITS.note} />
+                        <FieldError errors={fieldErrors} name={`faqs[${i}].answerLocal`} />
                       </label>
                     </div>
                   ))}

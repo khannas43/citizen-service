@@ -81,7 +81,7 @@ class SchemePublicDetailsServiceTest {
         content.setSchemeId(id);
         content.setContentSource("OFFICER");
         content.setOverview("Officer overview");
-        content.setOverviewGu("અધિકારી વિહંગાવલોકન");
+        content.setOverviewLocal("અધિકારી વિહંગાવલોકન");
         content.setBenefitsNote("Benefit note");
         content.setEligibilityNote("   ");
         when(contentRepository.findById(id)).thenReturn(Optional.of(content));
@@ -89,10 +89,10 @@ class SchemePublicDetailsServiceTest {
         SchemePublicDetailsResponse res = service.getPublicDetails(id);
 
         assertEquals("Officer overview", res.description());
-        assertEquals("અધિકારી વિહંગાવલોકન", res.overviewGu());
+        assertEquals("અધિકારી વિહંગાવલોકન", res.overviewLocal());
         assertEquals("Benefit note", res.benefitsNote());
         assertNull(res.eligibilityNote(), "blank notes are not exposed");
-        assertNull(res.benefitsNoteGu());
+        assertNull(res.benefitsNoteLocal());
     }
 
     @Test
@@ -107,7 +107,7 @@ class SchemePublicDetailsServiceTest {
         SchemePublicDetailsResponse res = service.getPublicDetails(id);
 
         assertEquals("Original description", res.description());
-        assertNull(res.overviewGu());
+        assertNull(res.overviewLocal());
     }
 
     private static Scheme activeScheme(UUID id) {

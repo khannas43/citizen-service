@@ -5,6 +5,7 @@ import i18n from '../i18n'
 import { bucketMatches, matchOutcome, FIELD_TO_FORM } from '../guestEligibility/eligibilityShared'
 import { translateCriterion } from '../reasonUtils'
 import SchemeDetailsModal, { SchemeNameButton } from './SchemeDetailsModal'
+import { LOCAL_LANG } from '../lang'
 
 const PAGE_SIZE = 8
 
@@ -69,15 +70,15 @@ export default function EligibilitySchemeResults({
     const q = search.trim().toLowerCase()
     if (q) {
       rows = rows.filter((m) => {
-        const name = (lang === 'gu' && m.schemeNameGujarati ? m.schemeNameGujarati : m.schemeName) || ''
+        const name = (lang === LOCAL_LANG && m.schemeNameLocal ? m.schemeNameLocal : m.schemeName) || ''
         return name.toLowerCase().includes(q) || (m.department || '').toLowerCase().includes(q)
       })
     }
     const sorted = [...rows]
     if (sortBy === 'name') {
       sorted.sort((a, b) => {
-        const an = (lang === 'gu' && a.schemeNameGujarati ? a.schemeNameGujarati : a.schemeName) || ''
-        const bn = (lang === 'gu' && b.schemeNameGujarati ? b.schemeNameGujarati : b.schemeName) || ''
+        const an = (lang === LOCAL_LANG && a.schemeNameLocal ? a.schemeNameLocal : a.schemeName) || ''
+        const bn = (lang === LOCAL_LANG && b.schemeNameLocal ? b.schemeNameLocal : b.schemeName) || ''
         return an.localeCompare(bn)
       })
     } else {
@@ -97,7 +98,7 @@ export default function EligibilitySchemeResults({
   }
 
   function schemeName(m) {
-    return lang === 'gu' && m.schemeNameGujarati ? m.schemeNameGujarati : m.schemeName
+    return lang === LOCAL_LANG && m.schemeNameLocal ? m.schemeNameLocal : m.schemeName
   }
 
   function outcomeBadge(outcome) {

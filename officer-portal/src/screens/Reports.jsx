@@ -5,7 +5,7 @@ import DistrictScopeBanner from '../components/DistrictScopeBanner'
 import './Reports.css'
 
 const DASHBOARDS = [
-  { id: 'welfare-pulse', label: 'Gujarat Welfare Pulse', slug: 'gujarat-welfare-pulse' },
+  { id: 'welfare-pulse', label: 'Welfare Pulse', slug: 'gujarat-welfare-pulse' },
   { id: 'scheme-perf', label: 'Scheme Performance', slug: 'scheme-performance' },
 ]
 

@@ -37,16 +37,16 @@ public class SchemeContent {
     /** Officer-written wording for the citizen page; null/blank falls back to the scheme record. */
     @Column(name = "overview", columnDefinition = "text")
     private String overview;
-    @Column(name = "overview_gu", columnDefinition = "text")
-    private String overviewGu;
+    @Column(name = "overview_local", columnDefinition = "text")
+    private String overviewLocal;
     @Column(name = "benefits_note", columnDefinition = "text")
     private String benefitsNote;
-    @Column(name = "benefits_note_gu", columnDefinition = "text")
-    private String benefitsNoteGu;
+    @Column(name = "benefits_note_local", columnDefinition = "text")
+    private String benefitsNoteLocal;
     @Column(name = "eligibility_note", columnDefinition = "text")
     private String eligibilityNote;
-    @Column(name = "eligibility_note_gu", columnDefinition = "text")
-    private String eligibilityNoteGu;
+    @Column(name = "eligibility_note_local", columnDefinition = "text")
+    private String eligibilityNoteLocal;
 
     private String helplineLabel;
     private String helplineNumber;
@@ -75,16 +75,16 @@ public class SchemeContent {
     }
     public String getOverview() { return overview; }
     public void setOverview(String v) { this.overview = v; }
-    public String getOverviewGu() { return overviewGu; }
-    public void setOverviewGu(String v) { this.overviewGu = v; }
+    public String getOverviewLocal() { return overviewLocal; }
+    public void setOverviewLocal(String v) { this.overviewLocal = v; }
     public String getBenefitsNote() { return benefitsNote; }
     public void setBenefitsNote(String v) { this.benefitsNote = v; }
-    public String getBenefitsNoteGu() { return benefitsNoteGu; }
-    public void setBenefitsNoteGu(String v) { this.benefitsNoteGu = v; }
+    public String getBenefitsNoteLocal() { return benefitsNoteLocal; }
+    public void setBenefitsNoteLocal(String v) { this.benefitsNoteLocal = v; }
     public String getEligibilityNote() { return eligibilityNote; }
     public void setEligibilityNote(String v) { this.eligibilityNote = v; }
-    public String getEligibilityNoteGu() { return eligibilityNoteGu; }
-    public void setEligibilityNoteGu(String v) { this.eligibilityNoteGu = v; }
+    public String getEligibilityNoteLocal() { return eligibilityNoteLocal; }
+    public void setEligibilityNoteLocal(String v) { this.eligibilityNoteLocal = v; }
     public String getHelplineLabel() { return helplineLabel; }
     public void setHelplineLabel(String helplineLabel) { this.helplineLabel = helplineLabel; }
     public String getHelplineNumber() { return helplineNumber; }

@@ -7,7 +7,7 @@ import java.util.UUID;
 public record OfficeNearbyItem(
         UUID id,
         String name,
-        String nameGujarati,
+        String nameLocal,
         OfficeType officeType,
         String department,
         String address,

@@ -737,7 +737,7 @@ export default function FamilyRegistry() {
           <p className="fr-empty-sub">
             {districtScope
               ? `${districtScope} district family registry`
-              : '2,21,000+ families · 10,00,000+ citizens across Gujarat'}
+              : 'Family registry · Telangana'}
           </p>
           <div className="fr-empty-chips">
             <span className="fr-empty-chip">🔍 Name · Aadhaar · Mobile</span>

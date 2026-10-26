@@ -48,7 +48,7 @@ function computeInsights(geoData, distribution, selectedScheme) {
       action: 'Review outreach strategy for low-coverage districts.' })
   } else {
     insights.push({ type: 'success', icon: '✓', title: 'Good Geographic Spread',
-      body: `Top 3 districts hold ${top3pct}% of beneficiaries — reasonable spread across Gujarat.` })
+      body: `Top 3 districts hold ${top3pct}% of beneficiaries — reasonable spread across Telangana.` })
   }
 
   const zeroDist = districts.filter(d => (d.totalCitizens ?? 0) === 0)
@@ -77,11 +77,11 @@ function computeInsights(geoData, distribution, selectedScheme) {
 
   if (underrepresented.length > 0) {
     insights.push({ type: 'warning', icon: '⚡', title: 'Caste Equity Gap Detected',
-      body: `${underrepresented.join(', ')} are significantly under-represented vs Gujarat population benchmarks.`,
+      body: `${underrepresented.join(', ')} are significantly under-represented vs state population benchmarks.`,
       action: 'Consider targeted awareness campaigns for under-served communities.' })
   } else if (total > 0) {
     insights.push({ type: 'success', icon: '✓', title: 'Caste Representation On Track',
-      body: 'No caste category is significantly under-represented relative to Gujarat population benchmarks.' })
+      body: 'No caste category is significantly under-represented relative to state population benchmarks.' })
   }
 
   const lowMajor = Object.entries(GUJARAT_DISTRICT_SHARE)
@@ -381,7 +381,7 @@ function DistributionTab({ schemeId, distribution }) {
           {casteEquityScore >= 80 ? 'Well distributed' : casteEquityScore >= 60 ? 'Moderate gaps' : 'Significant under-representation'}
         </div>
       </div>
-      <div className="dist-section-header">Caste Distribution vs Gujarat Population Benchmark</div>
+      <div className="dist-section-header">Caste Distribution vs State Population Benchmark</div>
       {Object.entries(GUJARAT_CASTE_BENCHMARK).map(([caste, benchmark]) => {
         const count = casteCounts[caste] || 0
         const pct = total > 0 ? Math.round((count / total) * 100) : 0
@@ -919,7 +919,7 @@ export default function SchemeCoverage() {
     return schemes.filter(s => {
       if (categoryFilter !== 'ALL' && (s.category || 'OTHER') !== categoryFilter) return false
       if (!q) return true
-      return s.schemeName?.toLowerCase().includes(q) || s.schemeNameGujarati?.toLowerCase().includes(q) || s.department?.toLowerCase().includes(q)
+      return s.schemeName?.toLowerCase().includes(q) || s.schemeNameLocal?.toLowerCase().includes(q) || s.department?.toLowerCase().includes(q)
     })
   }, [schemes, categoryFilter, schemeSearch])
 
@@ -975,7 +975,7 @@ export default function SchemeCoverage() {
       <div className="sc-command-bar">
         <div className="sc-command-left">
           <div className="sc-command-title">Scheme Coverage Intelligence</div>
-          <div className="sc-command-sub">Gujarat Government · Welfare Scheme Analytics</div>
+          <div className="sc-command-sub">Government of Telangana · Welfare Scheme Analytics</div>
           <DistrictScopeBanner noun="coverage" />
         </div>
         <div className="sc-command-kpis">
@@ -1015,7 +1015,7 @@ export default function SchemeCoverage() {
             <option value="">— Select scheme —</option>
             {filteredSchemes.map(s => (
               <option key={s.schemeId} value={s.schemeId}>
-                {s.schemeName}{s.schemeNameGujarati ? ` · ${s.schemeNameGujarati}` : ''}
+                {s.schemeName}{s.schemeNameLocal ? ` · ${s.schemeNameLocal}` : ''}
               </option>
             ))}
           </select>

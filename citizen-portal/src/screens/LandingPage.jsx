@@ -11,15 +11,17 @@ import {
   SCHEME_TAG_STYLES,
 } from '../landingLocales'
 import '../LandingPage.css'
+import { LOCAL_LANG } from '../lang'
 
 const STEP_ICONS = ['ti-fingerprint', 'ti-apps', 'ti-file-upload', 'ti-truck-delivery']
 const AI_FEATURE_ICONS = ['ti-message-chatbot', 'ti-target-arrow', 'ti-shield-check', 'ti-bell-ringing', 'ti-bulb', 'ti-bolt']
 
 const DEMO_USERS = [
-  { label: 'Priya Patel', aadhaar: 'XXXX-XXXX-1001' },
-  { label: 'Rajan Nair', aadhaar: 'XXXX-XXXX-2001' },
-  { label: 'Kavita Rathod', aadhaar: 'XXXX-XXXX-5001' },
-  { label: 'Meera Rathod', aadhaar: 'XXXX-XXXX-5005' },
+  { label: 'Padmavathi Goud', aadhaar: 'XXXX-XXXX-1001' },
+  { label: 'Rajender Pagidipalli', aadhaar: 'XXXX-XXXX-2001' },
+  { label: 'Meera Madavi', aadhaar: 'XXXX-XXXX-3001' },
+  { label: 'Ahmed Shaikh', aadhaar: 'XXXX-XXXX-4001' },
+  { label: 'Yellavva Erukala', aadhaar: 'XXXX-XXXX-5001' },
 ]
 
 const APPLICATION_CARDS = [
@@ -42,7 +44,7 @@ const OFFICER_ROLES = [
 ]
 
 function readLandingLang() {
-  return localStorage.getItem('landing_lang') === 'gu' ? 'gu' : 'en'
+  return localStorage.getItem('landing_lang') === LOCAL_LANG ? LOCAL_LANG : 'en'
 }
 
 function decodeJwtPayload(token) {
@@ -131,7 +133,7 @@ export default function LandingPage() {
   }, [t.marquee.length])
 
   function toggleLang() {
-    const next = lang === 'en' ? 'gu' : 'en'
+    const next = lang === 'en' ? LOCAL_LANG : 'en'
     localStorage.setItem('landing_lang', next)
     setLang(next)
     document.documentElement.lang = next
@@ -283,13 +285,13 @@ export default function LandingPage() {
   }
 
   return (
-    <div className={`dg-landing${lang === 'gu' ? ' dg-landing-gu' : ''}${a11y ? ' dg-a11y' : ''}`}>
+    <div className={`dg-landing${lang === LOCAL_LANG ? ' dg-landing-gu' : ''}${a11y ? ' dg-a11y' : ''}`}>
       <a href="#main-content" className="skip-link">{t.skipToContent}</a>
 
       <div className="goi-bar">
         <div className="goi-bar-left">
           <span>Government of India</span>
-          <span>Government of Gujarat</span>
+          <span>Government of Telangana</span>
           <span>Department of Science &amp; Technology</span>
         </div>
         <div className="goi-bar-right">
@@ -360,7 +362,7 @@ export default function LandingPage() {
           <div className="hero-wrap">
             <div className="hero-left">
               <div className="hero-gu-wrap">
-                <p className="hero-gu-heading" lang="gu">સરકારી સેવાઓ, તમારી સેવામાં!</p>
+                <p className="hero-gu-heading" lang="te">ప్రభుత్వ సేవలు, మీ సేవలో!</p>
               </div>
 
               <div className="hero-login-panel" id="login-panel" ref={loginPanelRef}>

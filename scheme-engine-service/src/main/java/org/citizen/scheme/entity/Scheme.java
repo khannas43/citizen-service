@@ -17,7 +17,7 @@ public class Scheme {
     private UUID id;
 
     private String name;
-    private String nameGujarati;
+    private String nameLocal;
     private String description;
     private String department;
     private String benefitType;
@@ -48,8 +48,8 @@ public class Scheme {
     public void setId(UUID id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public String getNameGujarati() { return nameGujarati; }
-    public void setNameGujarati(String nameGujarati) { this.nameGujarati = nameGujarati; }
+    public String getNameLocal() { return nameLocal; }
+    public void setNameLocal(String nameLocal) { this.nameLocal = nameLocal; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     public String getDepartment() { return department; }

@@ -31,7 +31,7 @@ import { geocodePlace, fetchRoadRoute } from '../utils/officeRouting'
 const office = {
   id: '11111111-1111-1111-1111-111111111111',
   name: 'Ahmedabad Jan Seva Kendra',
-  nameGujarati: null,
+  nameLocal: null,
   officeType: 'JAN_SEVA_KENDRA',
   address: 'Jan Seva Kendra, Civic Centre, Ahmedabad (sample address)',
   district: 'Ahmedabad',

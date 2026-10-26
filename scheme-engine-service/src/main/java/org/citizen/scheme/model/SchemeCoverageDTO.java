@@ -5,7 +5,7 @@ import java.util.UUID;
 public record SchemeCoverageDTO(
         UUID schemeId,
         String schemeName,
-        String schemeNameGujarati,
+        String schemeNameLocal,
         String department,
         String benefitType,
         String benefitValue,

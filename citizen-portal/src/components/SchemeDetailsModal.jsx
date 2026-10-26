@@ -6,6 +6,7 @@ import { fetchSchemePublicDetails } from '../api'
 import { criterionStatusFromMatch } from '../guestEligibility/schemeDetailsUtils'
 import { formatBenefit, formatCriterionValue, formatDate, humanize } from '../guestEligibility/schemeDetailsFormatting'
 import './SchemeDetailsModal.css'
+import { LOCAL_LANG } from '../lang'
 
 function formatMoney(n) {
   if (n == null) return '—'
@@ -28,7 +29,7 @@ export default function SchemeDetailsModal({
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const lang = i18n.language === 'gu' ? 'gu' : 'en'
+  const lang = i18n.language === LOCAL_LANG ? LOCAL_LANG : 'en'
   const titleId = useId()
   const dialogRef = useRef(null)
   const closeBtnRef = useRef(null)
@@ -94,7 +95,7 @@ export default function SchemeDetailsModal({
   if (!schemeId) return null
 
   const displayName = data
-    ? (lang === 'gu' && data.nameGujarati ? data.nameGujarati : data.name)
+    ? (lang === LOCAL_LANG && data.nameLocal ? data.nameLocal : data.name)
     : ''
 
   function statusChip(status, validTo) {
@@ -196,7 +197,7 @@ export default function SchemeDetailsModal({
                 ) : (
                   <ul className="criteria-list">
                     {data.eligibility.map((c, idx) => {
-                      const label = lang === 'gu' && c.labelGu ? c.labelGu : c.label
+                      const label = lang === LOCAL_LANG && c.labelLocal ? c.labelLocal : c.label
                       const status = criterionStatusFromMatch(c.key, eligibilityMatch)
                       return (
                         <li key={`${c.key}-${idx}`}>

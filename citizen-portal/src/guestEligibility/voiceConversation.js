@@ -1,3 +1,4 @@
+import { LOCAL_LANG } from '../lang'
 /** Voice eligibility: slot merge, required-field prompts, spoken summaries. */
 
 const REQUIRED_ORDER = ['ageOrDob', 'gender', 'casteCategory', 'district']
@@ -61,7 +62,7 @@ export function formToVoiceSlots(form) {
 }
 
 export function schemeDisplayName(m, lang) {
-  if (lang === 'gu' && m.schemeNameGujarati) return m.schemeNameGujarati
+  if (lang === LOCAL_LANG && m.schemeNameLocal) return m.schemeNameLocal
   return m.schemeName
 }
 

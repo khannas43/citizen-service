@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { LOCAL_LANG } from '../lang'
 
 const AI_BASE = import.meta.env.VITE_AI_BASE ?? '/ai-intelligence-service'
 const MAX_RECORD_MS = 60000
@@ -7,7 +8,7 @@ const MAX_RECORD_MS = 60000
  * Shared mic + STT + TTS helpers (ChatWidget hold-to-talk + tap-to-toggle callers).
  */
 export function useVoiceRecorder({ language = 'en', speakEnabled = true } = {}) {
-  const lang = language === 'gu' ? 'gu' : 'en'
+  const lang = language === LOCAL_LANG ? LOCAL_LANG : 'en'
   const [listening, setListening] = useState(false)
   const [voiceBusy, setVoiceBusy] = useState(false)
   const [voiceError, setVoiceError] = useState(null)
@@ -107,7 +108,7 @@ export function useVoiceRecorder({ language = 'en', speakEnabled = true } = {}) 
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' })
         chunksRef.current = []
         if (blob.size < 500) {
-          setVoiceError(lang === 'gu' ? 'કંઈ સંભળાયું નહીં — ફરી પ્રયાસ કરો.' : 'No speech captured — try again.')
+          setVoiceError(lang === LOCAL_LANG ? 'ఏమీ వినిపించలేదు — మళ్లీ ప్రయత్నించండి.' : 'No speech captured — try again.')
           return
         }
         setVoiceBusy(true)
@@ -115,13 +116,13 @@ export function useVoiceRecorder({ language = 'en', speakEnabled = true } = {}) 
           const text = await transcribeBlob(blob)
           if (generation !== generationRef.current) return undefined // cancelled while transcribing
           if (!text) {
-            setVoiceError(lang === 'gu' ? 'સમજી શક્યા નહીં — ફરી બોલો.' : 'Could not understand — please speak again.')
+            setVoiceError(lang === LOCAL_LANG ? 'అర్థం కాలేదు — దయచేసి మళ్లీ చెప్పండి.' : 'Could not understand — please speak again.')
             return
           }
           if (onStopRef.current) await onStopRef.current(text)
           return text
         } catch (err) {
-          setVoiceError(err.message || (lang === 'gu' ? 'વૉઇસ સેવા ઉપલબ્ધ નથી.' : 'Voice service unavailable.'))
+          setVoiceError(err.message || (lang === LOCAL_LANG ? 'వాయిస్ సేవ అందుబాటులో లేదు.' : 'Voice service unavailable.'))
           throw err
         } finally {
           setVoiceBusy(false)
@@ -132,7 +133,7 @@ export function useVoiceRecorder({ language = 'en', speakEnabled = true } = {}) 
       setListening(true)
       recordTimeoutRef.current = setTimeout(stopListening, MAX_RECORD_MS)
     } catch {
-      setVoiceError(lang === 'gu' ? 'માઇક્રોફોનની પરવાનગી આપો.' : 'Please allow microphone access.')
+      setVoiceError(lang === LOCAL_LANG ? 'మైక్రోఫోన్ అనుమతి ఇవ్వండి.' : 'Please allow microphone access.')
       throw new Error('mic_denied')
     }
   }

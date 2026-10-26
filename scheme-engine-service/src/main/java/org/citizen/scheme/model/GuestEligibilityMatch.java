@@ -6,7 +6,7 @@ import java.util.UUID;
 public record GuestEligibilityMatch(
         UUID schemeId,
         String schemeName,
-        String schemeNameGujarati,
+        String schemeNameLocal,
         String department,
         String category,
         // Legacy: true only when outcome is LIKELY_ELIGIBLE

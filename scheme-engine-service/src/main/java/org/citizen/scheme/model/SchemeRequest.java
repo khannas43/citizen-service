@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public record SchemeRequest(
         String name,
-        String nameGujarati,
+        String nameLocal,
         String description,
         String department,
         String benefitType,

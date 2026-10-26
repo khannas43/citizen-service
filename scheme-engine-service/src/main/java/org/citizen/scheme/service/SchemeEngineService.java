@@ -140,7 +140,7 @@ public class SchemeEngineService {
             matches.add(new GuestEligibilityMatch(
                     scheme.getId(),
                     scheme.getName(),
-                    scheme.getNameGujarati(),
+                    scheme.getNameLocal(),
                     scheme.getDepartment(),
                     scheme.getCategory(),
                     outcome == GuestEligibilityOutcome.LIKELY_ELIGIBLE,
@@ -1390,7 +1390,7 @@ public class SchemeEngineService {
             result.add(new SchemeCoverageDTO(
                     scheme.getId(),
                     scheme.getName(),
-                    scheme.getNameGujarati(),
+                    scheme.getNameLocal(),
                     scheme.getDepartment(),
                     scheme.getBenefitType(),
                     scheme.getBenefitValue(),
@@ -2425,7 +2425,7 @@ public class SchemeEngineService {
 
     private void applyRequest(Scheme scheme, SchemeRequest req) {
         scheme.setName(req.name());
-        scheme.setNameGujarati(req.nameGujarati());
+        scheme.setNameLocal(req.nameLocal());
         scheme.setDescription(req.description());
         scheme.setDepartment(req.department());
         scheme.setBenefitType(req.benefitType());

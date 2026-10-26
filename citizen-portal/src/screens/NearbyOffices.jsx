@@ -13,6 +13,7 @@ import LandingChromeHeader from '../components/LandingChromeHeader'
 import OfficesMap from '../components/OfficesMap'
 import { directionsUrl, fetchRoadRoute, geocodePlace, haversineKm } from '../utils/officeRouting'
 import './NearbyOffices.css'
+import { LOCAL_LANG } from '../lang'
 
 const OFFICE_CHIP_TYPES = [
   'JAN_SEVA_KENDRA',
@@ -74,10 +75,10 @@ export default function NearbyOffices({ guestShell = false }) {
   }, [])
 
   const lang = i18n.language
-  const landingLang = lang === 'gu' ? 'gu' : 'en'
+  const landingLang = lang === LOCAL_LANG ? LOCAL_LANG : 'en'
 
   function toggleLang() {
-    const next = lang === 'en' ? 'gu' : 'en'
+    const next = lang === 'en' ? LOCAL_LANG : 'en'
     localStorage.setItem('lang', next)
     i18n.changeLanguage(next)
   }
@@ -145,7 +146,7 @@ export default function NearbyOffices({ guestShell = false }) {
     if (!q) return schemes
     return schemes.filter((s) => {
       const name = (s.name || '').toLowerCase()
-      const gu = (s.nameGujarati || '').toLowerCase()
+      const gu = (s.nameLocal || '').toLowerCase()
       return name.includes(q) || gu.includes(q)
     })
   }, [schemes, schemeQuery])
@@ -287,7 +288,7 @@ export default function NearbyOffices({ guestShell = false }) {
   }
 
   function officeDisplayName(o) {
-    return lang === 'gu' && o.nameGujarati ? o.nameGujarati : o.name
+    return lang === LOCAL_LANG && o.nameLocal ? o.nameLocal : o.name
   }
 
   function formatDistance(km) {
@@ -376,7 +377,7 @@ export default function NearbyOffices({ guestShell = false }) {
             <option value="">{t('nearbyOffices.anyService')}</option>
             {filteredSchemes.map((s) => (
               <option key={s.id} value={s.id}>
-                {lang === 'gu' && s.nameGujarati ? s.nameGujarati : s.name}
+                {lang === LOCAL_LANG && s.nameLocal ? s.nameLocal : s.name}
               </option>
             ))}
           </select>
@@ -751,7 +752,7 @@ export default function NearbyOffices({ guestShell = false }) {
   }
 
   return (
-    <div className={`dg-landing eligibility-on-landing${landingLang === 'gu' ? ' dg-landing-gu' : ''}`}>
+    <div className={`dg-landing eligibility-on-landing${landingLang === LOCAL_LANG ? ' dg-landing-gu' : ''}`}>
       <LandingChromeHeader lang={landingLang} onToggleLang={toggleLang} activeRoute="/nearby-offices" />
       <main className="eligibility-guest-main" id="main-content">{body}</main>
     </div>

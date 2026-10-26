@@ -249,7 +249,7 @@ function GeographicExplorer({ schemeId, statusTotal }) {
   }
 
   const breadcrumb = [
-    'Gujarat',
+    'Telangana',
     expandedDistrict,
     expandedTaluka,
   ].filter(Boolean)
@@ -675,7 +675,7 @@ export default function SchemeManagement() {
       <div className="sm-command-bar">
         <div className="sm-command-left">
           <div className="sm-command-title">Beneficiary Operations</div>
-          <div className="sm-command-sub">Scheme Management · Gujarat Government</div>
+          <div className="sm-command-sub">Scheme Management · Government of Telangana</div>
           <DistrictScopeBanner noun="scheme operations" />
         </div>
         <div className="sm-command-kpis">

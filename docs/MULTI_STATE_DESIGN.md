@@ -93,3 +93,15 @@ Unit identity is now the LGD code (45 villages share a name with another village
 Districts, mandals and villages come from the LGD files in `state-packs/TG/lgd/`; names follow Telangana communities.
 Caste codes stay SC/ST/OBC/NT/GENERAL (OBC = BC). Run after `db/platform/001..003`. Other service seeds
 (schemes, applications, grievances, payments) still carry Gujarat content and are rebuilt one service at a time.
+
+## 12. Local-language slot (Telugu first)
+
+The UI is English plus one *state-configured local language*, not a hard-coded Gujarati toggle.
+
+- Portal: `citizen-portal/src/lang.js` exports `LOCAL_LANG` (default `te`; set `VITE_LOCAL_LANG` at build time, e.g. `ta`).
+  Locale file `src/locales/te.json` (970 keys, machine-translated, needs native review); landing page strings in `landingLocales.js`.
+- API/DB (scheme-engine): `nameGujarati` -> `nameLocal` (column `name_local`), `overviewGu` -> `overviewLocal`, `benefitsNoteGu`, `eligibilityNoteGu`,
+  `labelGu`, `titleGu`/`detailGu`/`questionGu`/`answerGu`/`noteGu` -> `...Local`. Hibernate `ddl-auto=update` adds the new columns.
+  Telugu scheme names: `seed_data/telangana/scheme_names_te.csv`, loaded by `seed_schemes_tg.py`.
+- NOT changed (known gaps): Form-builder renderer and form-contract (still `en|gu`), AI/speech/chatbot service (shared DG2.0 service, no Telugu),
+  static `data/serviceCatalogue.js` (Gujarat catalogue), officer-portal Gujarat district maps/GeoJSON.

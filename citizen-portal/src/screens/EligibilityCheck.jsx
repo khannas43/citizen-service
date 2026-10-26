@@ -22,6 +22,7 @@ import {
   parseIncomeDisplay,
 } from '../guestEligibility/eligibilityShared'
 import './EligibilityCheck.css'
+import { LOCAL_LANG } from '../lang'
 
 const GUEST_PROFILE_KEY = 'dg20_guest_eligibility_profile'
 const GUEST_PENDING_FIELD_KEY = 'dg20_guest_eligibility_pending_field'
@@ -42,7 +43,7 @@ export default function EligibilityCheck({ guestShell = false }) {
   const fieldRefs = useRef({})
 
   const lang = i18n.language
-  const landingLang = lang === 'gu' ? 'gu' : 'en'
+  const landingLang = lang === LOCAL_LANG ? LOCAL_LANG : 'en'
 
   useEffect(() => {
     if (profile) setForm(emptyForm(profile))
@@ -164,7 +165,7 @@ export default function EligibilityCheck({ guestShell = false }) {
   }
 
   function toggleLang() {
-    const next = i18n.language === 'en' ? 'gu' : 'en'
+    const next = i18n.language === 'en' ? LOCAL_LANG : 'en'
     localStorage.setItem('lang', next)
     localStorage.setItem('landing_lang', next)
     i18n.changeLanguage(next)
@@ -454,7 +455,7 @@ export default function EligibilityCheck({ guestShell = false }) {
   if (!guestShell) return body
 
   return (
-    <div className={`dg-landing eligibility-on-landing${landingLang === 'gu' ? ' dg-landing-gu' : ''}`}>
+    <div className={`dg-landing eligibility-on-landing${landingLang === LOCAL_LANG ? ' dg-landing-gu' : ''}`}>
       <LandingChromeHeader lang={landingLang} onToggleLang={toggleLang} activeRoute="/eligibility-check" />
       <main className="eligibility-guest-main" id="main-content">{body}</main>
     </div>

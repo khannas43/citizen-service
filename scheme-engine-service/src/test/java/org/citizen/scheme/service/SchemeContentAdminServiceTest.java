@@ -96,9 +96,9 @@ class SchemeContentAdminServiceTest {
         verify(contentRepository, never()).save(any());
     }
 
-    private SchemeContentSaveRequest withWording(Long version, String overview, String overviewGu, String benefits, String eligibility) {
+    private SchemeContentSaveRequest withWording(Long version, String overview, String overviewLocal, String benefits, String eligibility) {
         return new SchemeContentSaveRequest(version, List.of(), List.of(), List.of(), null, null, null,
-                overview, overviewGu, benefits, null, eligibility, null);
+                overview, overviewLocal, benefits, null, eligibility, null);
     }
 
     @Test
@@ -122,7 +122,7 @@ class SchemeContentAdminServiceTest {
 
         var ok = assertInstanceOf(SchemeContentAdminService.SaveResult.Ok.class, result);
         assertEquals("A monthly pension for eligible widows.", ok.body().overview());
-        assertEquals("વિધવાઓ માટે માસિક પેન્શન", ok.body().overviewGu());
+        assertEquals("વિધવાઓ માટે માસિક પેન્શન", ok.body().overviewLocal());
         assertEquals("Paid into the bank account each month.", ok.body().benefitsNote());
         assertEquals("Widows of any age above 18.", ok.body().eligibilityNote());
         assertEquals("Monthly pension for widows", ok.body().scheme().description(), "scheme facts stay untouched");

@@ -145,7 +145,7 @@ export default function AISearch({ profile }) {
         <input
           type="text"
           className="ai-search-input"
-          placeholder="Search services and schemes… (English or ગુજરાતી)"
+          placeholder="Search services and schemes… (English or తెలుగు)"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => (results.length > 0 || error) && setOpen(true)}

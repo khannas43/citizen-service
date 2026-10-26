@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { pinDemoSchemeFirst, translateCriterion, uniqueSchemeEnrollments } from '../reasonUtils'
 import SchemeDetailsModal, { SchemeNameButton } from './SchemeDetailsModal'
 import './SchemeRecommendations.css'
+import { LOCAL_LANG } from '../lang'
 
 const AI_BASE = import.meta.env.VITE_AI_BASE || '/ai-intelligence-service'
 const REC_TIMEOUT_MS = 30000
@@ -38,7 +39,7 @@ function cafApplyPath(rec) {
  */
 export default function SchemeRecommendations({ enrollments, profile, variant = 'home' }) {
   const { t, i18n } = useTranslation()
-  const lang = i18n.language === 'gu' ? 'gu' : 'en'
+  const lang = i18n.language === LOCAL_LANG ? LOCAL_LANG : 'en'
   const isFamily = variant === 'family'
   const dismissKey = isFamily ? 'ai_rec_dismissed_family' : 'ai_rec_dismissed'
 

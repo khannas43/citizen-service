@@ -11,7 +11,7 @@ import java.util.UUID;
 public record SchemePublicDetailsResponse(
         UUID id,
         String name,
-        String nameGujarati,
+        String nameLocal,
         String description,
         String department,
         String category,
@@ -32,9 +32,9 @@ public record SchemePublicDetailsResponse(
         boolean contentIsSample,
         List<SchemeRelatedSummary> relatedSchemes,
         /** Gujarati overview (the English one replaces `description` when an officer wrote it). */
-        String overviewGu,
+        String overviewLocal,
         String benefitsNote,
-        String benefitsNoteGu,
+        String benefitsNoteLocal,
         String eligibilityNote,
-        String eligibilityNoteGu
+        String eligibilityNoteLocal
 ) {}

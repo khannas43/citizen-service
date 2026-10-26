@@ -50,7 +50,7 @@ public class SchemePublicDetailsService {
         return new SchemePublicDetailsResponse(
                 scheme.getId(),
                 scheme.getName(),
-                scheme.getNameGujarati(),
+                scheme.getNameLocal(),
                 content != null && hasText(content.getOverview()) ? content.getOverview() : scheme.getDescription(),
                 scheme.getDepartment(),
                 scheme.getCategory(),
@@ -70,11 +70,11 @@ public class SchemePublicDetailsService {
                 content != null ? content.getLastReviewedOn() : null,
                 sample,
                 relatedSchemes(scheme),
-                content != null ? blankToNull(content.getOverviewGu()) : null,
+                content != null ? blankToNull(content.getOverviewLocal()) : null,
                 content != null ? blankToNull(content.getBenefitsNote()) : null,
-                content != null ? blankToNull(content.getBenefitsNoteGu()) : null,
+                content != null ? blankToNull(content.getBenefitsNoteLocal()) : null,
                 content != null ? blankToNull(content.getEligibilityNote()) : null,
-                content != null ? blankToNull(content.getEligibilityNoteGu()) : null
+                content != null ? blankToNull(content.getEligibilityNoteLocal()) : null
         );
     }
 
@@ -106,7 +106,7 @@ public class SchemePublicDetailsService {
             if (excludeId != null && excludeId.equals(s.getId())) continue;
             if (!seen.add(s.getId())) continue;
             out.add(new SchemeRelatedSummary(
-                    s.getId(), s.getName(), s.getNameGujarati(), s.getDepartment(),
+                    s.getId(), s.getName(), s.getNameLocal(), s.getDepartment(),
                     s.getBenefitType(), s.getBenefitValue()));
         }
     }

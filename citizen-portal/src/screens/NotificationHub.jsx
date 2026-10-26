@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { loadCitizenProfile } from '../auth'
 import { fetchNotifications, markNotificationRead } from '../api'
+import { LOCAL_LANG } from '../lang'
 
 const PAGE_SIZE = 10
 
@@ -359,7 +360,7 @@ function PreferencesTab() {
       <section className="section-card">
         <h3 className="notif-prefs-title">{t('notifications.langPrefTitle')}</h3>
         <div className="notif-radio-group">
-          {[['en', 'notifications.langEn'], ['gu', 'notifications.langGu']].map(([val, lblKey]) => (
+          {[['en', 'notifications.langEn'], [LOCAL_LANG, 'notifications.langGu']].map(([val, lblKey]) => (
             <label key={val} className="notif-radio-label">
               <input type="radio" name="notif-lang" value={val} checked={language === val} onChange={() => setLanguage(val)} />
               {t(lblKey)}

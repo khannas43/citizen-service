@@ -21,6 +21,7 @@ import {
 } from '../guestEligibility/voiceConversation'
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder'
 import './VoiceEligibilityAssistant.css'
+import { LOCAL_LANG } from '../lang'
 
 const CHIP_FIELDS = [
   { key: 'age', labelKey: 'age' },
@@ -42,7 +43,7 @@ export default function VoiceEligibilityAssistant({
   onReset,
 }) {
   const { t } = useTranslation()
-  const lang = i18n.language === 'gu' ? 'gu' : 'en'
+  const lang = i18n.language === LOCAL_LANG ? LOCAL_LANG : 'en'
   const [open, setOpen] = useState(false)
   const [privacyOk, setPrivacyOk] = useState(false)
   const [slots, setSlots] = useState(() => formToVoiceSlots(form))

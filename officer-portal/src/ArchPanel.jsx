@@ -113,7 +113,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
               <ArchCard
                 className="arch-card-citizen"
                 title="📱 Citizen Portal"
-                rows={['React 19 · Nginx', 'Gujarati i18n (530 keys)', 'NodePort 31174']}
+                rows={['React 19 · Nginx', 'Telugu i18n (970 keys)', 'NodePort 31174']}
               />
               <ArchCard
                 className="arch-card-officer"
@@ -122,7 +122,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
                   'React 19 · Nginx',
                   '5 roles · Keycloak IAM',
                   'NodePort 31173',
-                  '🗺 Leaflet 1.9 — Gujarat choropleth map',
+                  '🗺 Leaflet 1.9 — state choropleth map',
                 ]}
               />
             </div>
@@ -174,7 +174,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
                 title="📊 Apache Superset 3.1"
                 subtitle="Executive Dashboards · Port 31176"
                 rows={[
-                  'Gujarat Welfare Pulse dashboard',
+                  'Welfare Pulse dashboard',
                   'Scheme Performance dashboard',
                   'Embedded via @superset-ui/embedded-sdk · Guest tokens',
                 ]}

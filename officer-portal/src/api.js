@@ -100,6 +100,8 @@ export async function fetchAllTasks(includeCompleted = false) {
         : ''
       const res = await fetchWithRetry(`${base}/v1/applications${qs}`)
       const contentType = res.headers.get('content-type') || ''
+      // 502/503/504 = service not deployed in this environment: skip quietly
+      if ([502, 503, 504].includes(res.status)) return []
       if (!res.ok) throw new Error(`${service} HTTP ${res.status}`)
       if (!contentType.includes('application/json')) {
         throw new Error(`${service} returned non-JSON (check API proxy)`)
@@ -127,6 +129,7 @@ export async function fetchApplicationStats() {
   const results = await Promise.allSettled(
     SERVICE_FETCHERS.map(async ({ service, base }) => {
       const res = await fetchWithRetry(`${base}/v1/applications/stats`)
+      if ([502, 503, 504].includes(res.status)) return { service, unavailable: true }
       if (!res.ok) throw new Error(`${service} HTTP ${res.status}`)
       const data = await res.json()
       return { service, ...data }
@@ -137,7 +140,7 @@ export async function fetchApplicationStats() {
   const errors = []
   results.forEach((result, i) => {
     if (result.status === 'fulfilled') {
-      stats.push(result.value)
+      if (!result.value.unavailable) stats.push(result.value)
     } else {
       errors.push(`${SERVICE_FETCHERS[i].service}: ${result.reason.message}`)
     }

@@ -9,6 +9,7 @@ import { criterionStatusFromMatch } from '../guestEligibility/schemeDetailsUtils
 import { formatBenefit, formatCriterionValue, formatDate, humanize } from '../guestEligibility/schemeDetailsFormatting'
 import { directionsUrl } from '../utils/officeRouting'
 import './SchemeDetailsPage.css'
+import { LOCAL_LANG } from '../lang'
 
 function formatMoney(n) {
   if (n == null) return '—'
@@ -31,7 +32,7 @@ export default function SchemeDetailsPage({ guestShell = false }) {
   const { schemeId } = useParams()
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const lang = i18n.language === 'gu' ? 'gu' : 'en'
+  const lang = i18n.language === LOCAL_LANG ? LOCAL_LANG : 'en'
   const landingLang = lang
 
   const [data, setData] = useState(null)
@@ -87,7 +88,7 @@ export default function SchemeDetailsPage({ guestShell = false }) {
   }, [data?.id, guestSession?.form?.district])
 
   const displayName = data
-    ? (lang === 'gu' && data.nameGujarati ? data.nameGujarati : data.name)
+    ? (lang === LOCAL_LANG && data.nameLocal ? data.nameLocal : data.name)
     : ''
 
   useEffect(() => {
@@ -123,7 +124,7 @@ export default function SchemeDetailsPage({ guestShell = false }) {
   }, [data, displayName, t])
 
   function toggleLang() {
-    const next = lang === 'en' ? 'gu' : 'en'
+    const next = lang === 'en' ? LOCAL_LANG : 'en'
     localStorage.setItem('lang', next)
     localStorage.setItem('landing_lang', next)
     i18n.changeLanguage(next)
@@ -140,11 +141,11 @@ export default function SchemeDetailsPage({ guestShell = false }) {
   }
 
   function officeDisplayName(o) {
-    return lang === 'gu' && o.nameGujarati ? o.nameGujarati : o.name
+    return lang === LOCAL_LANG && o.nameLocal ? o.nameLocal : o.name
   }
 
   function pickLocalized(en, gu) {
-    return lang === 'gu' && gu ? gu : en
+    return lang === LOCAL_LANG && gu ? gu : en
   }
 
   const body = (
@@ -206,7 +207,7 @@ export default function SchemeDetailsPage({ guestShell = false }) {
               <section className="scheme-details-panel card" aria-labelledby="scheme-overview-heading">
                 <h2 id="scheme-overview-heading">{t('schemeDetails.overview')}</h2>
                 <p className="scheme-details-desc">
-                  {(lang === 'gu' && data.overviewGu) || data.description || t('schemeDetails.noDescription')}
+                  {(lang === LOCAL_LANG && data.overviewLocal) || data.description || t('schemeDetails.noDescription')}
                 </p>
               </section>
 
@@ -239,8 +240,8 @@ export default function SchemeDetailsPage({ guestShell = false }) {
                     </table>
                   </div>
                 )}
-                {((lang === 'gu' && data.benefitsNoteGu) || data.benefitsNote) && (
-                  <p className="scheme-details-note">{(lang === 'gu' && data.benefitsNoteGu) || data.benefitsNote}</p>
+                {((lang === LOCAL_LANG && data.benefitsNoteLocal) || data.benefitsNote) && (
+                  <p className="scheme-details-note">{(lang === LOCAL_LANG && data.benefitsNoteLocal) || data.benefitsNote}</p>
                 )}
               </section>
 
@@ -251,7 +252,7 @@ export default function SchemeDetailsPage({ guestShell = false }) {
                 ) : (
                   <ul className="criteria-list">
                     {data.eligibility.map((c, idx) => {
-                      const label = lang === 'gu' && c.labelGu ? c.labelGu : c.label
+                      const label = lang === LOCAL_LANG && c.labelLocal ? c.labelLocal : c.label
                       const status = criterionStatusFromMatch(c.key, eligibilityMatch)
                       return (
                         <li key={`${c.key}-${idx}`}>
@@ -263,8 +264,8 @@ export default function SchemeDetailsPage({ guestShell = false }) {
                     })}
                   </ul>
                 )}
-                {((lang === 'gu' && data.eligibilityNoteGu) || data.eligibilityNote) && (
-                  <p className="scheme-details-note">{(lang === 'gu' && data.eligibilityNoteGu) || data.eligibilityNote}</p>
+                {((lang === LOCAL_LANG && data.eligibilityNoteLocal) || data.eligibilityNote) && (
+                  <p className="scheme-details-note">{(lang === LOCAL_LANG && data.eligibilityNoteLocal) || data.eligibilityNote}</p>
                 )}
                 <p className="muted small" style={{ marginTop: '0.85rem' }}>{t('schemeDetails.disclaimer')}</p>
               </section>
@@ -279,9 +280,9 @@ export default function SchemeDetailsPage({ guestShell = false }) {
                       <li key={`${doc.title}-${idx}`}>
                         <input type="checkbox" id={`doc-${idx}`} />
                         <label htmlFor={`doc-${idx}`}>
-                          <strong>{pickLocalized(doc.title, doc.titleGu)}</strong>
-                          {pickLocalized(doc.note, doc.noteGu) && (
-                            <span className="muted small block">{pickLocalized(doc.note, doc.noteGu)}</span>
+                          <strong>{pickLocalized(doc.title, doc.titleLocal)}</strong>
+                          {pickLocalized(doc.note, doc.noteLocal) && (
+                            <span className="muted small block">{pickLocalized(doc.note, doc.noteLocal)}</span>
                           )}
                         </label>
                       </li>
@@ -299,10 +300,10 @@ export default function SchemeDetailsPage({ guestShell = false }) {
                     {data.applicationSteps.map((step, idx) => (
                       <li key={`${step.title}-${idx}`}>
                         <span className="step-num" aria-hidden="true">{idx + 1}</span>
-                        <strong>{pickLocalized(step.title, step.titleGu)}</strong>
-                        {pickLocalized(step.detail, step.detailGu) && (
+                        <strong>{pickLocalized(step.title, step.titleLocal)}</strong>
+                        {pickLocalized(step.detail, step.detailLocal) && (
                           <p className="muted small" style={{ margin: '0.35rem 0 0' }}>
-                            {pickLocalized(step.detail, step.detailGu)}
+                            {pickLocalized(step.detail, step.detailLocal)}
                           </p>
                         )}
                       </li>
@@ -319,7 +320,7 @@ export default function SchemeDetailsPage({ guestShell = false }) {
                   <ul className="faq-list">
                     {data.faqs.map((faq, idx) => {
                       const open = openFaq === idx
-                      const q = pickLocalized(faq.question, faq.questionGu)
+                      const q = pickLocalized(faq.question, faq.questionLocal)
                       return (
                         <li key={`${q}-${idx}`} className="faq-item">
                           <button
@@ -335,7 +336,7 @@ export default function SchemeDetailsPage({ guestShell = false }) {
                           </button>
                           {open && (
                             <p className="faq-answer" id={`faq-answer-${idx}`} role="region" aria-labelledby={`faq-question-${idx}`}>
-                              {pickLocalized(faq.answer, faq.answerGu)}
+                              {pickLocalized(faq.answer, faq.answerLocal)}
                             </p>
                           )}
                         </li>
@@ -354,7 +355,7 @@ export default function SchemeDetailsPage({ guestShell = false }) {
                     {data.relatedSchemes.map((s) => (
                       <li key={s.id}>
                         <Link to={`/schemes/${encodeURIComponent(s.id)}`}>
-                          {lang === 'gu' && s.nameGujarati ? s.nameGujarati : s.name}
+                          {lang === LOCAL_LANG && s.nameLocal ? s.nameLocal : s.name}
                         </Link>
                       </li>
                     ))}
@@ -447,7 +448,7 @@ export default function SchemeDetailsPage({ guestShell = false }) {
   }
 
   return (
-    <div className={`dg-landing eligibility-on-landing${landingLang === 'gu' ? ' dg-landing-gu' : ''}`}>
+    <div className={`dg-landing eligibility-on-landing${landingLang === LOCAL_LANG ? ' dg-landing-gu' : ''}`}>
       <LandingChromeHeader lang={landingLang} onToggleLang={toggleLang} activeRoute="/eligibility-check" />
       <main className="eligibility-guest-main" id="main-content">{body}</main>
     </div>

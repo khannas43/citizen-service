@@ -21,7 +21,7 @@ const SCHEME_ID = 'a1000001-0000-0000-0000-000000000004'
 const fixture = {
   id: SCHEME_ID,
   name: 'Widow Pension',
-  nameGujarati: 'વિધવા પેન્શન',
+  nameLocal: 'વિધવા પેન્શન',
   description: 'Support for widows in Gujarat.',
   department: 'Social Justice',
   category: 'Pension',
@@ -32,17 +32,17 @@ const fixture = {
   validTo: '2030-12-31',
   benefitComponents: [],
   eligibility: [
-    { key: 'maritalStatus', label: 'Marital status', labelGu: null, value: 'WIDOWED', operator: 'must be', source: 'OVERLAY' },
-    { key: 'age', label: 'Age', labelGu: null, value: '18-60', operator: 'between', source: 'RULE' },
+    { key: 'maritalStatus', label: 'Marital status', labelLocal: null, value: 'WIDOWED', operator: 'must be', source: 'OVERLAY' },
+    { key: 'age', label: 'Age', labelLocal: null, value: '18-60', operator: 'between', source: 'RULE' },
   ],
-  documentsRequired: [{ title: 'Aadhaar', titleGu: null, note: 'Copy', noteGu: null }],
-  applicationSteps: [{ title: 'Apply online', titleGu: null, detail: 'Use the portal', detailGu: null }],
-  faqs: [{ question: 'Who can apply?', questionGu: null, answer: 'Eligible widows.', answerGu: null }],
+  documentsRequired: [{ title: 'Aadhaar', titleLocal: null, note: 'Copy', noteLocal: null }],
+  applicationSteps: [{ title: 'Apply online', titleLocal: null, detail: 'Use the portal', detailLocal: null }],
+  faqs: [{ question: 'Who can apply?', questionLocal: null, answer: 'Eligible widows.', answerLocal: null }],
   helplineLabel: 'Helpline',
   helplineNumber: '1800-000-000',
   officialUrl: 'https://example.gov.in',
   contentIsSample: true,
-  relatedSchemes: [{ id: 'b2000002-0000-0000-0000-000000000001', name: 'Other Scheme', nameGujarati: null }],
+  relatedSchemes: [{ id: 'b2000002-0000-0000-0000-000000000001', name: 'Other Scheme', nameLocal: null }],
 }
 
 function renderPage(schemeId = SCHEME_ID) {
@@ -135,15 +135,15 @@ describe('SchemeDetailsPage', () => {
   })
 
   describe('in Gujarati', () => {
-    beforeEach(async () => { await i18n.changeLanguage('gu') })
+    beforeEach(async () => { await i18n.changeLanguage('te') })
     afterEach(async () => { await i18n.changeLanguage('en') })
 
     it('prefers the Gujarati overview and notes, and falls back to English when none was written', async () => {
       vi.mocked(fetchSchemePublicDetails).mockResolvedValue({
         ...fixture,
-        overviewGu: 'ગુજરાતમાં વિધવાઓ માટે સહાય.',
+        overviewLocal: 'ગુજરાતમાં વિધવાઓ માટે સહાય.',
         benefitsNote: 'English benefit note only.',
-        benefitsNoteGu: 'માસિક બેંક ખાતામાં જમા.',
+        benefitsNoteLocal: 'માસિક બેંક ખાતામાં જમા.',
         eligibilityNote: 'English eligibility note only.',
       })
       renderPage()

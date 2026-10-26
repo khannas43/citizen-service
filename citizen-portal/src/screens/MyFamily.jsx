@@ -16,6 +16,7 @@ import {
   isHouseholdHead,
   isSelf,
 } from '../utils/familyAccess'
+import { LOCAL_LANG } from '../lang'
 
 const REL_ORDER = { HEAD: 0, SPOUSE: 1, FATHER: 2, MOTHER: 3, MOTHER_IN_LAW: 3, SON: 4, DAUGHTER: 5, OTHER: 6 }
 
@@ -39,7 +40,7 @@ function relClass(rel) {
 
 export default function MyFamily() {
   const { t, i18n } = useTranslation()
-  const lang = i18n.language === 'gu' ? 'gu' : 'en'
+  const lang = i18n.language === LOCAL_LANG ? LOCAL_LANG : 'en'
   const profile = loadCitizenProfile()
   const [searchParams, setSearchParams] = useSearchParams()
   const [tab, setTab] = useState(() => {

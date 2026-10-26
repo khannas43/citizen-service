@@ -15,11 +15,11 @@ public record SchemeContentSaveRequest(
         String helplineNumber,
         String officialUrl,
         String overview,
-        String overviewGu,
+        String overviewLocal,
         String benefitsNote,
-        String benefitsNoteGu,
+        String benefitsNoteLocal,
         String eligibilityNote,
-        String eligibilityNoteGu
+        String eligibilityNoteLocal
 ) {
     /** Convenience for callers (and tests) that only deal with the original sections. */
     public SchemeContentSaveRequest(Long version, List<SchemeContentDocumentItem> documentsRequired,

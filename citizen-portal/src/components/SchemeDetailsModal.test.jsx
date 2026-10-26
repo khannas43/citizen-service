@@ -29,7 +29,7 @@ describe('SchemeDetailsModal', () => {
       validTo: '2030-12-31',
       benefitComponents: [],
       eligibility: [
-        { key: 'maritalStatus', label: 'Marital status', labelGu: null, value: 'WIDOWED', operator: 'must be', source: 'OVERLAY' },
+        { key: 'maritalStatus', label: 'Marital status', labelLocal: null, value: 'WIDOWED', operator: 'must be', source: 'OVERLAY' },
       ],
     })
   })

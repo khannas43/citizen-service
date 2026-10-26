@@ -94,11 +94,11 @@ public class SchemeContentAdminService {
                 body.helplineNumber(),
                 body.officialUrl(),
                 body.overview(),
-                body.overviewGu(),
+                body.overviewLocal(),
                 body.benefitsNote(),
-                body.benefitsNoteGu(),
+                body.benefitsNoteLocal(),
                 body.eligibilityNote(),
-                body.eligibilityNoteGu());
+                body.eligibilityNoteLocal());
         if (!errors.isEmpty()) {
             return SaveResult.validation(errors);
         }
@@ -119,11 +119,11 @@ public class SchemeContentAdminService {
         content.setApplicationSteps(copySteps(body.applicationSteps()));
         content.setFaqs(copyFaqs(body.faqs()));
         content.setOverview(trim(body.overview()));
-        content.setOverviewGu(trim(body.overviewGu()));
+        content.setOverviewLocal(trim(body.overviewLocal()));
         content.setBenefitsNote(trim(body.benefitsNote()));
-        content.setBenefitsNoteGu(trim(body.benefitsNoteGu()));
+        content.setBenefitsNoteLocal(trim(body.benefitsNoteLocal()));
         content.setEligibilityNote(trim(body.eligibilityNote()));
-        content.setEligibilityNoteGu(trim(body.eligibilityNoteGu()));
+        content.setEligibilityNoteLocal(trim(body.eligibilityNoteLocal()));
         content.setHelplineLabel(trim(body.helplineLabel()));
         content.setHelplineNumber(trim(body.helplineNumber()));
         content.setOfficialUrl(trim(body.officialUrl()));
@@ -191,11 +191,11 @@ public class SchemeContentAdminService {
                 content.getHelplineNumber(),
                 content.getOfficialUrl(),
                 content.getOverview(),
-                content.getOverviewGu(),
+                content.getOverviewLocal(),
                 content.getBenefitsNote(),
-                content.getBenefitsNoteGu(),
+                content.getBenefitsNoteLocal(),
                 content.getEligibilityNote(),
-                content.getEligibilityNoteGu(),
+                content.getEligibilityNoteLocal(),
                 context,
                 content.getLastReviewedOn(),
                 content.getContentSource(),
@@ -207,15 +207,15 @@ public class SchemeContentAdminService {
     private static List<String> detectSections(SchemeContent before, SchemeContentSaveRequest after) {
         List<String> changed = new ArrayList<>();
         if (!Objects.equals(trim(before.getOverview()), trim(after.overview()))
-                || !Objects.equals(trim(before.getOverviewGu()), trim(after.overviewGu()))) {
+                || !Objects.equals(trim(before.getOverviewLocal()), trim(after.overviewLocal()))) {
             changed.add("overview");
         }
         if (!Objects.equals(trim(before.getBenefitsNote()), trim(after.benefitsNote()))
-                || !Objects.equals(trim(before.getBenefitsNoteGu()), trim(after.benefitsNoteGu()))) {
+                || !Objects.equals(trim(before.getBenefitsNoteLocal()), trim(after.benefitsNoteLocal()))) {
             changed.add("benefits");
         }
         if (!Objects.equals(trim(before.getEligibilityNote()), trim(after.eligibilityNote()))
-                || !Objects.equals(trim(before.getEligibilityNoteGu()), trim(after.eligibilityNoteGu()))) {
+                || !Objects.equals(trim(before.getEligibilityNoteLocal()), trim(after.eligibilityNoteLocal()))) {
             changed.add("eligibility");
         }
         if (!Objects.equals(before.getDocumentsRequired(), after.documentsRequired())) changed.add("documents");

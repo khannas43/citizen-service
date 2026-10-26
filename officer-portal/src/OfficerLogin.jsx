@@ -69,10 +69,10 @@ export default function OfficerLogin() {
           <ul className="login-hero-bullets">
             <li>✦ 6 citizen services · BPMN 2.0 workflows</li>
             <li>✦ AI-powered eligibility · LightGBM + Gemma 4</li>
-            <li>✦ ~221,000 families · Gujarat-wide coverage</li>
+            <li>✦ 1,000 demo families · Telangana-wide coverage</li>
           </ul>
         </div>
-        <p className="login-hero-footer">Government of Gujarat · NIC · Digital India</p>
+        <p className="login-hero-footer">Government of Telangana · NIC · Digital India</p>
       </div>
 
       <div className="login-form-panel">

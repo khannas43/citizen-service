@@ -10,7 +10,7 @@ import java.util.UUID;
 public record SchemeResponse(
         UUID id,
         String name,
-        String nameGujarati,
+        String nameLocal,
         String description,
         String department,
         String benefitType,
@@ -40,7 +40,7 @@ public record SchemeResponse(
         return new SchemeResponse(
                 scheme.getId(),
                 scheme.getName(),
-                scheme.getNameGujarati(),
+                scheme.getNameLocal(),
                 scheme.getDescription(),
                 scheme.getDepartment(),
                 scheme.getBenefitType(),

@@ -17,7 +17,7 @@ public class ServiceOffice {
     private UUID id;
 
     private String name;
-    private String nameGujarati;
+    private String nameLocal;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 40)
@@ -46,8 +46,8 @@ public class ServiceOffice {
     public void setId(UUID id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public String getNameGujarati() { return nameGujarati; }
-    public void setNameGujarati(String nameGujarati) { this.nameGujarati = nameGujarati; }
+    public String getNameLocal() { return nameLocal; }
+    public void setNameLocal(String nameLocal) { this.nameLocal = nameLocal; }
     public OfficeType getOfficeType() { return officeType; }
     public void setOfficeType(OfficeType officeType) { this.officeType = officeType; }
     public String getDepartment() { return department; }

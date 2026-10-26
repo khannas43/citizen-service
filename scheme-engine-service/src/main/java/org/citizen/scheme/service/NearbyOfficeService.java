@@ -169,7 +169,7 @@ public class NearbyOfficeService {
 
     private OfficeNearbyItem toItem(ServiceOffice o, Double distanceKm) {
         return new OfficeNearbyItem(
-                o.getId(), o.getName(), o.getNameGujarati(), o.getOfficeType(), o.getDepartment(),
+                o.getId(), o.getName(), o.getNameLocal(), o.getOfficeType(), o.getDepartment(),
                 o.getAddress(), o.getDistrict(), o.getTaluka(), o.getVillage(), o.getPincode(),
                 o.getLatitude(), o.getLongitude(), o.getPhone(), o.getEmail(),
                 o.getWorkingHours(), o.getWeeklyOff(), distanceKm,

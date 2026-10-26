@@ -42,7 +42,7 @@ export default function LandingChromeHeader({
       <div className="goi-bar">
         <div className="goi-bar-left">
           <span>Government of India</span>
-          <span>Government of Gujarat</span>
+          <span>Government of Telangana</span>
           <span>Department of Science &amp; Technology</span>
         </div>
         <div className="goi-bar-right">

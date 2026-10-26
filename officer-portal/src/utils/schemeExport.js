@@ -37,7 +37,7 @@ export async function collectSchemeExportData(schemeId, onProgress) {
 
     if (talukas.length === 0) {
       geoRows.push({
-        state: 'Gujarat',
+        state: 'Telangana',
         district: district.name,
         taluka: '',
         village: '',
@@ -58,7 +58,7 @@ export async function collectSchemeExportData(schemeId, onProgress) {
 
       if (villages.length === 0) {
         geoRows.push({
-          state: 'Gujarat',
+          state: 'Telangana',
           district: district.name,
           taluka: taluka.name,
           village: '',
@@ -69,7 +69,7 @@ export async function collectSchemeExportData(schemeId, onProgress) {
 
       for (const village of villages) {
         geoRows.push({
-          state: 'Gujarat',
+          state: 'Telangana',
           district: district.name,
           taluka: taluka.name,
           village: village.name,
@@ -184,7 +184,7 @@ export function downloadSchemePdf(scheme, statusCounts, geoRows) {
   @media print { body { margin: 12px; } }
 </style></head><body>
   <h1>${safeName}</h1>
-  <div class="meta">Gujarat Government · Scheme Management · Generated ${generated}</div>
+  <div class="meta">Government of Telangana · Scheme Management · Generated ${generated}</div>
   <h2>Scheme Details</h2>
   <table class="summary">${summaryRows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>
   <h2>Beneficiary Pipeline</h2>

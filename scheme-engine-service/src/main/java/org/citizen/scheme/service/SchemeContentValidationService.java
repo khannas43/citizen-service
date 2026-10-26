@@ -37,27 +37,27 @@ public class SchemeContentValidationService {
             String helplineNumber,
             String officialUrl,
             String overview,
-            String overviewGu,
+            String overviewLocal,
             String benefitsNote,
-            String benefitsNoteGu,
+            String benefitsNoteLocal,
             String eligibilityNote,
-            String eligibilityNoteGu) {
+            String eligibilityNoteLocal) {
 
         Map<String, String> errors = new LinkedHashMap<>();
         checkText(errors, "overview", overview, 2000, false);
-        checkText(errors, "overviewGu", overviewGu, 2000, false);
+        checkText(errors, "overviewLocal", overviewLocal, 2000, false);
         checkText(errors, "benefitsNote", benefitsNote, 1000, false);
-        checkText(errors, "benefitsNoteGu", benefitsNoteGu, 1000, false);
+        checkText(errors, "benefitsNoteLocal", benefitsNoteLocal, 1000, false);
         checkText(errors, "eligibilityNote", eligibilityNote, 1000, false);
-        checkText(errors, "eligibilityNoteGu", eligibilityNoteGu, 1000, false);
+        checkText(errors, "eligibilityNoteLocal", eligibilityNoteLocal, 1000, false);
         if (documents != null) {
             if (documents.size() > 20) errors.put("documentsRequired", "At most 20 documents");
             for (int i = 0; i < (documents == null ? 0 : documents.size()); i++) {
                 SchemeContentDocumentItem d = documents.get(i);
                 checkText(errors, "documentsRequired[" + i + "].title", d.title(), 160, true);
-                checkText(errors, "documentsRequired[" + i + "].titleGu", d.titleGu(), 160, false);
+                checkText(errors, "documentsRequired[" + i + "].titleLocal", d.titleLocal(), 160, false);
                 checkText(errors, "documentsRequired[" + i + "].note", d.note(), 2000, false);
-                checkText(errors, "documentsRequired[" + i + "].noteGu", d.noteGu(), 2000, false);
+                checkText(errors, "documentsRequired[" + i + "].noteLocal", d.noteLocal(), 2000, false);
             }
         }
         if (steps != null) {
@@ -65,9 +65,9 @@ public class SchemeContentValidationService {
             for (int i = 0; i < steps.size(); i++) {
                 SchemeContentStepItem s = steps.get(i);
                 checkText(errors, "applicationSteps[" + i + "].title", s.title(), 160, true);
-                checkText(errors, "applicationSteps[" + i + "].titleGu", s.titleGu(), 160, false);
+                checkText(errors, "applicationSteps[" + i + "].titleLocal", s.titleLocal(), 160, false);
                 checkText(errors, "applicationSteps[" + i + "].detail", s.detail(), 2000, false);
-                checkText(errors, "applicationSteps[" + i + "].detailGu", s.detailGu(), 2000, false);
+                checkText(errors, "applicationSteps[" + i + "].detailLocal", s.detailLocal(), 2000, false);
             }
         }
         if (faqs != null) {
@@ -75,9 +75,9 @@ public class SchemeContentValidationService {
             for (int i = 0; i < faqs.size(); i++) {
                 SchemeContentFaqItem f = faqs.get(i);
                 checkText(errors, "faqs[" + i + "].question", f.question(), 160, true);
-                checkText(errors, "faqs[" + i + "].questionGu", f.questionGu(), 160, false);
+                checkText(errors, "faqs[" + i + "].questionLocal", f.questionLocal(), 160, false);
                 checkText(errors, "faqs[" + i + "].answer", f.answer(), 2000, true);
-                checkText(errors, "faqs[" + i + "].answerGu", f.answerGu(), 2000, false);
+                checkText(errors, "faqs[" + i + "].answerLocal", f.answerLocal(), 2000, false);
             }
         }
         checkText(errors, "helplineLabel", helplineLabel, 160, false);

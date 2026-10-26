@@ -70,6 +70,7 @@ export default function PublishedFormApplication({
     )
   }, [adapterProp])
 
+  // The shared form renderer only supports 'en' | 'gu' today; Telugu forms need a renderer update.
   const locale = i18n.language?.startsWith('gu') ? 'gu' : 'en'
 
   const invalidateSubmission = useCallback(() => {

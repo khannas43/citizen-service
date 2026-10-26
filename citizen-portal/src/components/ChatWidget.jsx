@@ -4,12 +4,13 @@ import { sendChatMessage } from '../api'
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder'
 import i18n from '../i18n'
 import './ChatWidget.css'
+import { LOCAL_LANG } from '../lang'
 
 const MAX_RECORD_MS = 60000
 
 const WELCOME_INTRO = {
   en: 'Welcome to Citizen Services! I can help you:',
-  gu: 'ડિજિટલ ગુજરાતમાં સ્વાગત! હું મદદ કરી શકું:',
+  [LOCAL_LANG]: 'పౌర సేవలకు స్వాగతం! నేను మీకు సహాయం చేయగలను:',
 }
 
 const WELCOME_BULLETS = {
@@ -18,21 +19,21 @@ const WELCOME_BULLETS = {
     'Find schemes your family qualifies for',
     'Access certificates, consents & grievances',
   ],
-  gu: [
-    'અરજી અને ચૂકવણીની સ્થિતિ ટ્રૅક',
-    'પરિવાર માટે સ્કીમ શોધો',
-    'પ્રમાણપત્ર, સંમતિ અને ફરિયાદ',
+  [LOCAL_LANG]: [
+    'దరఖాస్తులు & చెల్లింపుల స్థితిని ట్రాక్ చేయండి',
+    'మీ కుటుంబానికి అర్హత ఉన్న పథకాలు కనుగొనండి',
+    'సర్టిఫికెట్లు, సమ్మతులు & ఫిర్యాదులు',
   ],
 }
 
 const WELCOME_FOOTER = {
   en: 'Type a message, or hold the mic to speak.',
-  gu: 'સંદેશ ટાઇપ કરો, અથવા માઇક દબાવીને બોલો.',
+  [LOCAL_LANG]: 'సందేశం టైప్ చేయండి, లేదా మైక్ నొక్కి మాట్లాడండి.',
 }
 
 const RESET_LABEL = {
   en: 'Reset',
-  gu: 'રીસેટ',
+  [LOCAL_LANG]: 'రీసెట్',
 }
 
 const QUICK_ACTIONS = {
@@ -44,13 +45,13 @@ const QUICK_ACTIONS = {
     { label: 'Download my certificates', send: 'Show my certificates' },
     { label: 'Submit a complaint / grievance', send: 'I want to file a grievance' },
   ],
-  gu: [
-    { label: 'અરજીની સ્થિતિ ચેક', send: 'અરજીની સ્થિતિ' },
-    { label: 'પાત્ર સ્કીમ શોધો', send: 'કઈ સ્કીમ માટે પાત્ર છું' },
-    { label: 'જ્ઞાતિ પ્રમાણપત્ર અરજી', send: 'જ્ઞાતિ પ્રમાણ પત્ર' },
-    { label: 'ચૂકવણી અને લાભ', send: 'મારી ચૂકવણી' },
-    { label: 'મારા પ્રમાણપત્ર', send: 'પ્રમાણપત્ર જુઓ' },
-    { label: 'ફરિયાદ/ગ્રીવન્સ', send: 'ફરિયાદ નોંધાવવી' },
+  [LOCAL_LANG]: [
+    { label: 'దరఖాస్తు స్థితి తనిఖీ', send: 'Check application status' },
+    { label: 'అర్హత ఉన్న పథకాలు', send: 'What schemes am I eligible for' },
+    { label: 'కుల ధృవీకరణ దరఖాస్తు', send: 'Apply for Caste Certificate' },
+    { label: 'చెల్లింపులు & ప్రయోజనాలు', send: 'Show my payments and benefits' },
+    { label: 'నా సర్టిఫికెట్లు', send: 'Show my certificates' },
+    { label: 'ఫిర్యాదు నమోదు', send: 'I want to file a grievance' },
   ],
 }
 
@@ -102,20 +103,20 @@ const NAV_LABELS = {
     '/apply/family-member': 'Apply for Family Member Change →',
     '/my-family': 'Go to My Family →',
   },
-  gu: {
-    '/payments': 'ચૂકવણી અને લાભ →',
-    '/certificates': 'પ્રમાણપત્ર →',
-    '/notifications': 'સૂચનાઓ →',
-    '/contact': 'સંપર્ક કેન્દ્ર →',
-    '/my-consents': 'મારો ડેટા અને સંમતિ →',
-    '/grievances': 'ફરિયાદ / ગ્રીવન્સ →',
-    '/apply/caste': 'જ્ઞાતિ પ્રમાણપત્ર અરજી →',
-    '/apply/pension': 'પેન્શન અરજી →',
-    '/apply/marriage': 'લગ્ન પ્રમાણપત્ર અરજી →',
-    '/apply/scheme': 'સ્કીમ અરજી →',
-    '/apply/caf': 'CAF અરજી ફોર્મ →',
-    '/apply/family-member': 'કુટુંબ સભ્ય બદલાવ અરજી →',
-    '/my-family': 'મારું કુટુંબ →',
+  [LOCAL_LANG]: {
+    '/payments': 'చెల్లింపులు & ప్రయోజనాలు →',
+    '/certificates': 'సర్టిఫికెట్లు →',
+    '/notifications': 'నోటిఫికేషన్లు →',
+    '/contact': 'సంప్రదింపు కేంద్రం →',
+    '/my-consents': 'నా డేటా & సమ్మతి →',
+    '/grievances': 'ఫిర్యాదులు →',
+    '/apply/caste': 'కుల ధృవీకరణ దరఖాస్తు →',
+    '/apply/pension': 'పింఛన్ దరఖాస్తు →',
+    '/apply/marriage': 'వివాహ ధృవీకరణ దరఖాస్తు →',
+    '/apply/scheme': 'పథకం దరఖాస్తు →',
+    '/apply/caf': 'CAF దరఖాస్తు ఫారం →',
+    '/apply/family-member': 'కుటుంబ సభ్యుల మార్పు దరఖాస్తు →',
+    '/my-family': 'నా కుటుంబం →',
   },
 }
 
@@ -123,7 +124,7 @@ function detectNavigateIntent(replyText) {
   const trimmed = replyText.trim()
   // Generic welcome / menu replies should not offer navigation buttons
   if (/^welcome to citizen services/i.test(trimmed)) return null
-  if (/^ડિજિટલ ગુજરાતમાં સ્વાગત/i.test(trimmed)) return null
+  if (/^(పౌర సేవలకు స్వాగతం|ડિજિટલ ગુજરાતમાં સ્વાગત)/i.test(trimmed)) return null
   const lower = replyText.toLowerCase()
   for (const [keyword, route] of NAVIGATE_INTENTS) {
     if (lower.includes(keyword)) return route
@@ -134,7 +135,7 @@ function detectNavigateIntent(replyText) {
 function BotMessage({ message, lang, onNavigate, onSpeak }) {
   if (message.kind === 'welcome') {
     return (
-      <span className={`chat-bubble-msg ${lang === 'gu' ? 'dg-gu' : ''}`}>
+      <span className={`chat-bubble-msg ${lang === LOCAL_LANG ? 'dg-gu' : ''}`}>
         {WELCOME_INTRO[lang]}
         <ul className="chat-welcome-actions" style={{ listStyle: 'disc', paddingLeft: '1.25rem' }}>
           {WELCOME_BULLETS[lang].map((bullet) => (
@@ -148,7 +149,7 @@ function BotMessage({ message, lang, onNavigate, onSpeak }) {
 
   if (message.kind === 'navigate') {
     return (
-      <span className={`chat-bubble-msg ${lang === 'gu' ? 'dg-gu' : ''}`}>
+      <span className={`chat-bubble-msg ${lang === LOCAL_LANG ? 'dg-gu' : ''}`}>
         <button
           type="button"
           className="chat-nav-btn"
@@ -164,7 +165,7 @@ function BotMessage({ message, lang, onNavigate, onSpeak }) {
   const navLabel = message.label
 
   return (
-    <span className={`chat-bubble-msg ${lang === 'gu' ? 'dg-gu' : ''}`}>
+    <span className={`chat-bubble-msg ${lang === LOCAL_LANG ? 'dg-gu' : ''}`}>
       {message.text.split('\n').map((line, j) => (
         <span key={j}>{line}<br /></span>
       ))}
@@ -174,8 +175,8 @@ function BotMessage({ message, lang, onNavigate, onSpeak }) {
             type="button"
             className="chat-speak-btn"
             onClick={onSpeak}
-            aria-label={lang === 'gu' ? 'સાંભળો' : 'Listen'}
-            title={lang === 'gu' ? 'સાંભળો' : 'Listen'}
+            aria-label={lang === LOCAL_LANG ? 'వినండి' : 'Listen'}
+            title={lang === LOCAL_LANG ? 'వినండి' : 'Listen'}
           >
             🔊
           </button>
@@ -211,7 +212,7 @@ export default function ChatWidget() {
   const inputRef = useRef(null)
   const recordTimeoutRef = useRef(null)
 
-  const lang = i18n.language === 'gu' ? 'gu' : 'en'
+  const lang = i18n.language === LOCAL_LANG ? LOCAL_LANG : 'en'
   const {
     listening,
     voiceBusy,
@@ -299,8 +300,8 @@ export default function ChatWidget() {
         ...prev,
         {
           role: 'bot',
-          text: lang === 'gu'
-            ? 'કનેક્ટ કરી શક્યા નહીં. ફરી પ્રયાસ કરો.'
+          text: lang === LOCAL_LANG
+            ? 'కనెక్ట్ కాలేకపోయాము. మళ్లీ ప్రయత్నించండి.'
             : 'Could not connect. Please try again.',
         },
       ])
@@ -323,14 +324,14 @@ export default function ChatWidget() {
         <div className="chat-panel dg-slide-right">
           <div className="chat-panel-header">
             <span className="chat-panel-title">
-              {lang === 'gu' ? '🤖 ડિજિટલ ગુજરાત સહાયક' : '🤖 Citizen Services Assistant'}
+              {lang === LOCAL_LANG ? '🤖 పౌర సేవల సహాయకుడు' : '🤖 Citizen Services Assistant'}
             </span>
             <div className="chat-header-actions">
               <button
                 type="button"
                 className={`chat-tts-toggle${speakReplies ? ' on' : ''}`}
                 onClick={() => setSpeakReplies((v) => !v)}
-                title={lang === 'gu' ? 'જવાબ બોલો' : 'Speak replies'}
+                title={lang === LOCAL_LANG ? 'సమాధానాలు చదివి వినిపించు' : 'Speak replies'}
               >
                 {speakReplies ? '🔊' : '🔇'}
               </button>
@@ -345,7 +346,7 @@ export default function ChatWidget() {
               </button>
               <span className="chat-live">
                 <span className="dg-live-dot" />
-                {lang === 'gu' ? 'ઑનલાઇન' : 'Online'}
+                {lang === LOCAL_LANG ? 'ఆన్‌లైన్' : 'Online'}
               </span>
             </div>
           </div>
@@ -361,7 +362,7 @@ export default function ChatWidget() {
                     onSpeak={m.text?.trim() ? () => speakText(m.text, { force: true }) : undefined}
                   />
                 ) : (
-                  <span className={`chat-bubble-msg ${lang === 'gu' ? 'dg-gu' : ''}`}>{m.text}</span>
+                  <span className={`chat-bubble-msg ${lang === LOCAL_LANG ? 'dg-gu' : ''}`}>{m.text}</span>
                 )}
               </div>
             ))}
@@ -382,7 +383,7 @@ export default function ChatWidget() {
                   className="chat-chip"
                   onClick={() => handleSend(action.send)}
                 >
-                  <span className={lang === 'gu' ? 'dg-gu' : undefined}>{action.label}</span>
+                  <span className={lang === LOCAL_LANG ? 'dg-gu' : undefined}>{action.label}</span>
                 </button>
               ))}
             </div>
@@ -390,8 +391,8 @@ export default function ChatWidget() {
 
           {(listening || voiceBusy || voiceError) && (
             <div className={`chat-voice-status${listening ? ' listening' : ''}`}>
-              {listening && (lang === 'gu' ? '🎙 સાંભળી રહ્યા છીએ… છોડો ત્યારે રોકો' : '🎙 Listening… release to stop')}
-              {voiceBusy && (lang === 'gu' ? '⏳ અવાજ સમજી રહ્યા છીએ…' : '⏳ Transcribing…')}
+              {listening && (lang === LOCAL_LANG ? '🎙 వింటున్నాము… ఆపడానికి వదలండి' : '🎙 Listening… release to stop')}
+              {voiceBusy && (lang === LOCAL_LANG ? '⏳ గొంతును అర్థం చేసుకుంటున్నాము…' : '⏳ Transcribing…')}
               {voiceError && <span className="chat-voice-error">{voiceError}</span>}
             </div>
           )}
@@ -406,15 +407,15 @@ export default function ChatWidget() {
               onMouseLeave={() => { if (listening) stopListening() }}
               onTouchStart={(e) => { e.preventDefault(); startListening() }}
               onTouchEnd={(e) => { e.preventDefault(); stopListening() }}
-              aria-label={lang === 'gu' ? 'વૉઇસ' : 'Voice'}
-              title={lang === 'gu' ? 'દબાવીને બોલો' : 'Hold to speak'}
+              aria-label={lang === LOCAL_LANG ? 'వాయిస్' : 'Voice'}
+              title={lang === LOCAL_LANG ? 'నొక్కి పట్టి మాట్లాడండి' : 'Hold to speak'}
             >
               {listening ? '⏹' : '🎤'}
             </button>
             <input
               ref={inputRef}
-              className={`chat-input ${lang === 'gu' ? 'dg-gu' : ''}`}
-              placeholder={lang === 'gu' ? 'સંદેશ લખો…' : 'Type a message…'}
+              className={`chat-input ${lang === LOCAL_LANG ? 'dg-gu' : ''}`}
+              placeholder={lang === LOCAL_LANG ? 'సందేశం రాయండి…' : 'Type a message…'}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {

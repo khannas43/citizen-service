@@ -1,27 +1,28 @@
+import { LOCAL_LANG } from './lang'
 const TRANSLATIONS = {
-  Age: 'ઉંમર',
-  minimum: 'ન્યૂનતમ',
-  maximum: 'મહત્તમ',
-  Income: 'આવક',
-  ceiling: 'મર્યાદા',
-  Caste: 'જ્ઞાતિ',
-  'in eligible list': 'પાત્ર',
-  'All castes eligible': 'તમામ જ્ઞાતિ પાત્ર',
-  'Family income': 'કુટુંબ આવક',
-  Percentile: 'પર્સેન્ટાઈલ',
-  'Std 10': 'ધોરણ 10',
-  'Std 12': 'ધોરણ 12',
-  Diploma: 'ડિપ્લોમા',
-  'D-to-D': 'ડિપ્લોમાથી ડિગ્રી',
-  'NEET-based MBBS admission': 'NEET આધારિત MBBS પ્રવેશ',
-  Course: 'અભ્યાસક્રમ',
-  Tuition: 'ટ્યુશન ફી',
-  Boarding: 'બોર્ડિંગ',
-  Books: 'પુસ્તકો',
+  Age: 'వయస్సు',
+  minimum: 'కనిష్ఠ',
+  maximum: 'గరిష్ఠ',
+  Income: 'ఆదాయం',
+  ceiling: 'పరిమితి',
+  Caste: 'కులం',
+  'in eligible list': 'అర్హత',
+  'All castes eligible': 'అన్ని కులాలు అర్హులు',
+  'Family income': 'కుటుంబ ఆదాయం',
+  Percentile: 'పర్సంటైల్',
+  'Std 10': '10వ తరగతి',
+  'Std 12': 'ఇంటర్మీడియట్',
+  Diploma: 'డిప్లొమా',
+  'D-to-D': 'డిప్లొమా నుండి డిగ్రీ',
+  'NEET-based MBBS admission': 'NEET ఆధారిత MBBS ప్రవేశం',
+  Course: 'కోర్సు',
+  Tuition: 'ట్యూషన్ ఫీజు',
+  Boarding: 'వసతి',
+  Books: 'పుస్తకాలు',
 }
 
 export function translateCriterion(criterion, lang) {
-  if (lang !== 'gu') return criterion
+  if (lang !== LOCAL_LANG) return criterion
   let result = criterion
   Object.entries(TRANSLATIONS).forEach(([en, gu]) => {
     result = result.replace(en, gu)

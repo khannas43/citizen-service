@@ -44,7 +44,7 @@ public class OfficeImportService {
                     }
                     ServiceOffice o = new ServiceOffice();
                     o.setName(cols[0].trim());
-                    o.setNameGujarati(blankNull(cols[1]));
+                    o.setNameLocal(blankNull(cols[1]));
                     o.setOfficeType(OfficeType.valueOf(cols[2].trim()));
                     o.setDepartment(blankNull(cols[3]));
                     o.setAddress(cols[4].trim());

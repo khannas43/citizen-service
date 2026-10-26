@@ -6,6 +6,7 @@ import { loadCitizenProfile, logoutCitizen } from '../auth'
 import ChatWidget from './ChatWidget'
 import NotificationBell from './NotificationBell'
 import './NotificationBell.css'
+import { LOCAL_LANG } from '../lang'
 
 const MORE_LINKS = [
   { to: '/payments',      icon: '💰', labelKey: 'nav.paymentsFull' },
@@ -52,7 +53,7 @@ export default function Layout() {
   const [moreOpen, setMoreOpen] = useState(false)
 
   function toggleLang() {
-    const next = i18n.language === 'en' ? 'gu' : 'en'
+    const next = i18n.language === 'en' ? LOCAL_LANG : 'en'
     localStorage.setItem('lang', next)
     i18n.changeLanguage(next)
   }

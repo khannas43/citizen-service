@@ -38,7 +38,7 @@
   --color-info-bg:        #EDF2FB;
 
   /* Typography */
-  --font-primary: 'Noto Sans', 'Noto Sans Gujarati', sans-serif;
+  --font-primary: 'Noto Sans', 'Noto Sans Telugu', sans-serif;
   --text-xs:   0.75rem;
   --text-sm:   0.875rem;
   --text-base: 1rem;
@@ -91,7 +91,7 @@
   --text-secondary: var(--color-text-secondary);
   --text-hint: var(--color-text-muted);
   --font-body: var(--font-primary);
-  --font-gu: 'Noto Sans Gujarati', 'Noto Sans', sans-serif;
+  --font-gu: 'Noto Sans Telugu', 'Noto Sans', sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', monospace;
   --text-hero: var(--text-3xl);
   --weight-normal: 400;

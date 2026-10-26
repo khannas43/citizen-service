@@ -5,12 +5,14 @@ import i18n from './i18n'
 import { AUTH_API } from './auth'
 import { APIs, buildCitizenSessionProfile } from './api'
 import './Login.css'
+import { LOCAL_LANG } from './lang'
 
 const DEMO_USERS = [
-  { label: 'Priya Patel', aadhaar: 'XXXX-XXXX-1001' },
-  { label: 'Rajan Nair', aadhaar: 'XXXX-XXXX-2001' },
-  { label: 'Kavita Rathod', aadhaar: 'XXXX-XXXX-5001' },
-  { label: 'Meera Rathod', aadhaar: 'XXXX-XXXX-5005' },
+  { label: 'Padmavathi Goud', aadhaar: 'XXXX-XXXX-1001' },
+  { label: 'Rajender Pagidipalli', aadhaar: 'XXXX-XXXX-2001' },
+  { label: 'Meera Madavi', aadhaar: 'XXXX-XXXX-3001' },
+  { label: 'Ahmed Shaikh', aadhaar: 'XXXX-XXXX-4001' },
+  { label: 'Yellavva Erukala', aadhaar: 'XXXX-XXXX-5001' },
 ]
 
 export default function Login() {
@@ -23,7 +25,7 @@ export default function Login() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  const LANG_CYCLE = ['en', 'gu', 'hi']
+  const LANG_CYCLE = ['en', LOCAL_LANG, 'hi']
 
   function toggleLang() {
     const next = LANG_CYCLE[(LANG_CYCLE.indexOf(i18n.language) + 1) % LANG_CYCLE.length]

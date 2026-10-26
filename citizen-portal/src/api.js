@@ -1,3 +1,4 @@
+import { LOCAL_LANG } from './lang'
 const rel = (path, port) => import.meta.env.DEV ? `http://localhost:${port}${path}` : path
 
 export const APIs = {
@@ -473,7 +474,7 @@ export async function extractVoiceProfile({ transcript, language, priorSlots }) 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       transcript,
-      language: language === 'gu' ? 'gu' : 'en',
+      language: language === LOCAL_LANG ? LOCAL_LANG : 'en',
       priorSlots: priorSlots || undefined,
     }),
   })

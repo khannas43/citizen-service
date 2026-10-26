@@ -89,7 +89,7 @@ describe('SchemeContentEditor', () => {
     const errors = validateSchemeContentDraft({
       documentsRequired: [],
       applicationSteps: [],
-      faqs: [{ question: 'Q?', questionGu: '', answer: '<b>bad</b>', answerGu: '' }],
+      faqs: [{ question: 'Q?', questionLocal: '', answer: '<b>bad</b>', answerLocal: '' }],
       helplineLabel: '',
       helplineNumber: '',
       officialUrl: '',
@@ -110,11 +110,11 @@ describe('SchemeContentEditor', () => {
       helplineNumber: null,
       officialUrl: null,
       overview: null,
-      overviewGu: null,
+      overviewLocal: null,
       benefitsNote: null,
-      benefitsNoteGu: null,
+      benefitsNoteLocal: null,
       eligibilityNote: null,
-      eligibilityNoteGu: null,
+      eligibilityNoteLocal: null,
       scheme: {
         description: 'Monthly pension for widows',
         benefitType: 'MONTHLY',
@@ -177,7 +177,7 @@ describe('SchemeContentEditor', () => {
       expect(payload.overview).toBe('A monthly pension for widows.')
       expect(payload.benefitsNote).toBe('Paid into the bank account.')
       expect(payload.eligibilityNote).toBe('Remarried widows are not eligible.')
-      expect(payload.overviewGu).toBeNull()
+      expect(payload.overviewLocal).toBeNull()
     })
 
     it('rejects HTML and over-long text in the new sections before saving', () => {
@@ -185,7 +185,7 @@ describe('SchemeContentEditor', () => {
       expect(validateSchemeContentDraft({ ...base, overview: '<script>x</script>' }).overview).toBe('HTML not allowed')
       expect(validateSchemeContentDraft({ ...base, overview: 'x'.repeat(2001) }).overview).toBe('Max length 2000')
       expect(validateSchemeContentDraft({ ...base, benefitsNote: 'y'.repeat(1001) }).benefitsNote).toBe('Max length 1000')
-      expect(validateSchemeContentDraft({ ...base, eligibilityNoteGu: '<b>x</b>' }).eligibilityNoteGu).toBe('HTML not allowed')
+      expect(validateSchemeContentDraft({ ...base, eligibilityNoteLocal: '<b>x</b>' }).eligibilityNoteLocal).toBe('HTML not allowed')
       expect(validateSchemeContentDraft({ ...base, overview: 'Plain text is fine.' })).toEqual({})
     })
 
