@@ -56,6 +56,9 @@ public class GuestEligibilityEvaluator {
     }
 
     private List<RuleCondition> overlayConditions(Scheme scheme) {
+        if (scheme.getExtraConditions() != null && !scheme.getExtraConditions().isEmpty()) {
+            return scheme.getExtraConditions();
+        }
         if (WIDOW_PENSION_ID.equals(scheme.getId())) {
             return List.of(new RuleCondition("marital_status", "=", "WIDOWED"));
         }

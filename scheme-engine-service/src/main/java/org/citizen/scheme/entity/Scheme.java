@@ -3,7 +3,10 @@ package org.citizen.scheme.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import org.citizen.scheme.config.RuleConditionConverter;
+import org.citizen.scheme.model.RuleCondition;
 
 @Entity
 @Table(name = "scheme")
@@ -35,6 +38,11 @@ public class Scheme {
     private Double minPercentile;         // e.g. 80.0 for STD10/STD12 exam-based schemes
     private Double diplomaMinPercentage;  // e.g. 65.0 for DIPLOMA (D-to-D) students
     private Boolean neetMbbsEligible = false; // NEET-based MBBS admission bypasses percentile check
+
+    /** Extra eligibility rules (AND), same model as custom rules; evaluated on the family head. Null/empty = none. */
+    @Convert(converter = RuleConditionConverter.class)
+    @Column(name = "extra_conditions", columnDefinition = "text")
+    private List<RuleCondition> extraConditions;
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -78,6 +86,8 @@ public class Scheme {
     public void setMinPercentile(Double minPercentile) { this.minPercentile = minPercentile; }
     public Double getDiplomaMinPercentage() { return diplomaMinPercentage; }
     public void setDiplomaMinPercentage(Double diplomaMinPercentage) { this.diplomaMinPercentage = diplomaMinPercentage; }
+    public List<RuleCondition> getExtraConditions() { return extraConditions; }
+    public void setExtraConditions(List<RuleCondition> extraConditions) { this.extraConditions = extraConditions; }
     public Boolean getNeetMbbsEligible() { return neetMbbsEligible; }
     public void setNeetMbbsEligible(Boolean neetMbbsEligible) { this.neetMbbsEligible = neetMbbsEligible; }
 }

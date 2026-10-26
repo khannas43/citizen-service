@@ -110,6 +110,7 @@ public class RuleEvaluatorService {
         return switch (ruleField) {
             case "marital_status" -> "Marital status";
             case "employment" -> "Employment / occupation";
+            case "occupation" -> "Occupation";
             case "education" -> "Education level";
             case "examType" -> "Exam type";
             case "examPercentile" -> "Exam percentile";
@@ -132,6 +133,7 @@ public class RuleEvaluatorService {
             case "education"      -> "Education " + symbol(c.operator()) + " " + c.value();
             case "marital_status" -> "Marital status " + symbol(c.operator()) + " " + c.value();
             case "employment"     -> "Employment " + symbol(c.operator()) + " " + c.value();
+            case "occupation"     -> "Occupation " + symbol(c.operator()) + " " + c.value();
             default -> c.field() + " " + c.operator() + " " + c.value();
         };
     }
@@ -168,6 +170,7 @@ public class RuleEvaluatorService {
             }
             case "marital_status" -> compareStr(head != null ? head.getMaritalStatus() : null, c.operator(), c.value());
             case "employment"     -> compareStr(head != null ? head.getEmploymentStatus() : null, c.operator(), c.value());
+            case "occupation"     -> compareStr(head != null ? head.getOccupation() : null, c.operator(), c.value());
             default -> true;
         };
     }

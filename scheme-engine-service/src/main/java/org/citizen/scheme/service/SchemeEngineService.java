@@ -1008,6 +1008,11 @@ public class SchemeEngineService {
             }
         }
 
+        if (scheme.getExtraConditions() != null && !scheme.getExtraConditions().isEmpty()
+                && !ruleEvaluatorService.evaluate(scheme.getExtraConditions(), "AND", family)) {
+            return false;
+        }
+
         if (scheme.getMinAge() != null || scheme.getMaxAge() != null) {
             boolean ageMatch = family.getMembers().stream()
                     .filter(m -> m.getDob() != null)
