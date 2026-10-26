@@ -1,0 +1,38 @@
+code,department,benefit_type,benefit_value,income_ceiling,eligible_castes,min_age,max_age,gender,category,description
+TG-AASARA-PENSION-SCHEME,Rural Development (SERP),MONTHLY,2016,150000,,57,,ANY,SENIOR_CITIZEN,Monthly pension for elderly people from poor households
+TG-CHEYUTHA-PENSION-SCHEME,Rural Development (SERP),MONTHLY,4000,200000,,60,,ANY,SENIOR_CITIZEN,Enhanced monthly pension for elderly people from low-income households
+TG-RYTHU-BHAROSA-SCHEME,Agriculture,ANNUAL,12000,,,18,,ANY,AGRICULTURE,Yearly investment support per acre for farmers
+TG-RYTHU-BANDHU-AGRICULTURE-INVESTMENT-SUPPORT-SCHEME,Agriculture,ANNUAL,10000,,,18,,ANY,AGRICULTURE,Investment support per acre for each crop season
+TG-RYTHU-BIMA-FARMER-INSURANCE-SCHEME,Agriculture,ONE_TIME,500000,,,18,59,ANY,AGRICULTURE,Life insurance cover for farmers; payout to the nominee
+TG-KALYANA-LAKSHMI-PATHAKAM-SCHEME,Social Welfare,ONE_TIME,100116,200000,"SC,ST,OBC,NT",18,,FEMALE,WOMEN_EMPOWERMENT,Marriage assistance for brides from SC/ST/BC families
+TG-SHAADI-MUBARAK-SCHEME,Minorities Welfare,ONE_TIME,100116,200000,GENERAL,18,,FEMALE,WOMEN_EMPOWERMENT,Marriage assistance for brides from minority families
+TG-MCH-KIT-SCHEME,Health,IN_KIND,Mother and child health kit,300000,,18,45,FEMALE,HEALTH,Kit of essentials for mothers after institutional delivery
+TG-KCR-NUTRITION-KIT-SCHEME,Health,IN_KIND,Nutrition kit for expectant mothers,300000,,18,40,FEMALE,HEALTH,Nutrition kit for pregnant women in low-income households
+TG-AROGYA-LAKSHMI-SCHEME,Women and Child Welfare,IN_KIND,One full meal a day at the anganwadi,300000,,18,45,FEMALE,HEALTH,Daily meal with egg and milk for pregnant and lactating women
+TG-2BHK-HOUSING-SCHEME,Housing,IN_KIND,Two-bedroom house,150000,,21,,ANY,HOUSING,Free two-bedroom house for poor families
+TG-GRUHA-LAKSHMI-SCHEME,Housing,ONE_TIME,300000,150000,,21,,ANY,HOUSING,Assistance to build a house on own plot
+TG-INDIRAMMA-INDLU-SCHEME,Housing,ONE_TIME,500000,150000,,21,,ANY,HOUSING,Assistance to build an Indiramma house for homeless and poor families
+TG-INDIRAMMA-LOW-INCOME-GROUP-HOUSING-SCHEME,Housing,SUBSIDY,Subsidised housing for low-income group,300000,,21,,ANY,HOUSING,Housing support for low-income group families
+TG-DALIT-BANDHU-SCHEME,Social Welfare,ONE_TIME,1000000,300000,SC,18,,ANY,OTHER,One-time grant to start an income-generating unit
+TG-MAHALAKSHMI-SCHEME,Women and Child Welfare,MONTHLY,2500,500000,,18,,FEMALE,WOMEN_EMPOWERMENT,Monthly financial assistance for women
+TG-GRUHA-JYOTHI-SCHEME,Energy,SUBSIDY,Free electricity up to 200 units a month,,,18,,ANY,OTHER,Free household electricity up to a monthly limit
+TG-RAJIV-YUVA-VIKASAM-SCHEME,Industries,LOAN,Subsidy and loan up to 400000,300000,,18,45,ANY,OTHER,Self-employment loan with subsidy for unemployed youth
+TG-RAJIV-AAROGYASRI-SCHEME,Health,IN_KIND,Cashless treatment up to 1000000 per family,500000,,0,,ANY,HEALTH,Cashless hospital treatment for eligible families
+TG-RAJIV-GANDHI-CIVILS-ABHAYAHASTHAM-SCHEME,Social Welfare,ONE_TIME,100000,800000,,21,40,ANY,EDUCATION,Support for civil services prelims qualifiers
+TG-FARM-LOAN-WAIVER-SCHEME,Agriculture,LOAN,Crop loan waiver up to 200000,,,18,,ANY,AGRICULTURE,Waiver of outstanding crop loans of farmers
+TG-INDIRAMMA-ATMIYA-BHAROSA-SCHEME,Rural Development,ANNUAL,12000,200000,,18,,ANY,AGRICULTURE,Yearly assistance for landless agricultural labour families
+TG-SEWING-MACHINE-SCHEME,Women and Child Welfare,IN_KIND,Sewing machine,200000,,18,55,FEMALE,WOMEN_EMPOWERMENT,Free sewing machine for women to earn from tailoring
+TG-INTINTIKI-INDIRAMMA-KUTTU-MACHINE-SCHEME,Women and Child Welfare,IN_KIND,Stitching machine,200000,,18,55,FEMALE,WOMEN_EMPOWERMENT,Machine and training for women's self-employment
+TG-ECONOMIC-REHABILITATION-SCHEME,Social Welfare,SUBSIDY,Subsidy for an income-generating unit,150000,"SC,ST,OBC",18,55,ANY,OTHER,Subsidy for income-generating units
+TG-INDIRAMMA-MINORITY-MAHILA-YOJANA,Minorities Welfare,SUBSIDY,Subsidy and loan for women,200000,GENERAL,18,55,FEMALE,WOMEN_EMPOWERMENT,Livelihood support for women from minority communities
+TG-INDIRAMMA-SAREE-SCHEME,Women and Child Welfare,IN_KIND,One saree,200000,,18,,FEMALE,WOMEN_EMPOWERMENT,Saree for women members of self-help groups
+TG-INDIRAMMA-FAMILY-LIFE-INSURANCE-SCHEME,Women and Child Welfare,ONE_TIME,1000000,300000,,18,60,FEMALE,OTHER,Life insurance cover for women members of self-help groups
+TG-VIVEKANANDA-OVERSEAS-EDUCATION-SCHEME,Education,ONE_TIME,2000000,500000,GENERAL,21,35,ANY,EDUCATION,Support for overseas postgraduate studies
+TG-CHIEF-MINISTER-S-OVERSEAS-SCHOLARSHIP-SCHEME-FOR-MINORITIES,Minorities Welfare,ONE_TIME,2000000,500000,GENERAL,21,35,ANY,EDUCATION,Overseas scholarship for minority students
+TG-MAHATMA-JYOTHIBA-PHULE-BC-OVERSEAS-VIDYA-NIDHI-MJPOVN,BC Welfare,ONE_TIME,2000000,500000,OBC,21,35,ANY,EDUCATION,Overseas scholarship for students from backward classes
+TG-BREAKFAST-SCHEME,Education,IN_KIND,Free breakfast at school,,,6,15,ANY,EDUCATION,Free breakfast for government school children
+TG-MID-DAY-MEAL-SCHEME,Education,IN_KIND,Free mid-day meal at school,,,6,15,ANY,EDUCATION,Free mid-day meal for government school children
+TG-OWN-YOUR-AUTO-SCHEME,Transport,SUBSIDY,Subsidy to buy an auto-rickshaw,200000,"SC,ST,OBC",21,55,ANY,OTHER,Subsidy for drivers to own an auto-rickshaw
+TG-SHEEP-AND-GOAT-INSURANCE-SCHEME,Animal Husbandry,SUBSIDY,Insurance cover for sheep and goat,,OBC,18,,ANY,AGRICULTURE,Insurance for sheep and goat rearers
+TG-PONGULETI-SEENANNA-YUVA-NESTHAM-SCHEME,Education,IN_KIND,Free coaching,300000,,18,30,ANY,EDUCATION,Free coaching for competitive examinations
+TG-MARRIAGE-INCENTIVE-AWARD-SCHEME,Social Welfare,ONE_TIME,250000,,SC,18,,ANY,OTHER,Incentive for inter-caste marriage
