@@ -1217,7 +1217,7 @@ public class SchemeEngineService {
 
     /** State names used as district_scope mean statewide eligibility, not a single district. */
     private boolean isStateWideDistrictScope(String scope) {
-        return "Gujarat".equalsIgnoreCase(scope) || "ગુજરાત".equals(scope);
+        return org.citizen.platform.tenancy.StateNames.isStateWide(scope);
     }
 
     private int ageFromDob(LocalDate dob) {

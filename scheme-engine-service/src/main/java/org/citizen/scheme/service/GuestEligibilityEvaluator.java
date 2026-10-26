@@ -209,7 +209,7 @@ public class GuestEligibilityEvaluator {
     }
 
     private boolean isStateWideDistrictScope(String scope) {
-        return "Gujarat".equalsIgnoreCase(scope) || "ગુજરાત".equals(scope);
+        return org.citizen.platform.tenancy.StateNames.isStateWide(scope);
     }
 
     private FamilyData.MemberData findAgeEligibleMember(Scheme scheme, FamilyData family, FamilyData.MemberData head) {

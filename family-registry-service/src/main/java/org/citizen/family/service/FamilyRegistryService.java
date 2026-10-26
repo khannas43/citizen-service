@@ -161,7 +161,7 @@ public class FamilyRegistryService {
         family.setVillage(req.village());
         family.setTaluka(req.taluka());
         family.setDistrict(req.district());
-        family.setState("Gujarat");
+        family.setState(org.citizen.platform.tenancy.StateNames.currentName());
         family = familyRepository.save(family);
 
         HeadPersonRequest head = req.headPerson();

@@ -55,7 +55,7 @@ public class SchemeEligibilityCriteriaBuilder {
 
         if (scheme.getDistrictScope() != null && !scheme.getDistrictScope().isBlank()) {
             String scope = scheme.getDistrictScope().trim();
-            String human = isStateWide(scope) ? "Gujarat (state-wide)" : scope;
+            String human = isStateWide(scope) ? scope + " (state-wide)" : scope;
             out.add(new SchemePublicCriterion(
                     "district", "District / area", "જિલ્લો / વિસ્તાર", human, "=", "SCHEME"));
         }
@@ -117,7 +117,7 @@ public class SchemeEligibilityCriteriaBuilder {
     }
 
     private static boolean isStateWide(String scope) {
-        return "Gujarat".equalsIgnoreCase(scope) || "ગુજરાત".equals(scope);
+        return org.citizen.platform.tenancy.StateNames.isStateWide(scope);
     }
 
     private static String humanGender(String g) {

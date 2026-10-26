@@ -55,6 +55,16 @@ STRUCTURES = [(0.30, lambda r: (1, r.randint(1, 2), False, False)), (0.20, lambd
               (0.25, lambda r: (1, r.randint(1, 2), True, False)), (0.10, lambda r: (0, r.randint(2, 3), False, False)),
               (0.15, lambda r: (1, r.randint(2, 3), True, True))]
 
+EDU = ["NONE", "PRIMARY", "SECONDARY", "MATRIC", "HIGHER_SEC", "GRADUATE", "POST_GRADUATE"]
+EDU_ADULT = {  # weights over EDU for adults 18-59 by caste group
+    "SC": [18, 17, 20, 18, 14, 10, 3], "ST": [24, 20, 20, 15, 11, 8, 2], "NT": [28, 22, 20, 14, 9, 6, 1],
+    "OBC": [10, 14, 20, 20, 16, 15, 5], "GENERAL": [5, 8, 14, 18, 20, 25, 10]}
+WORK_STATUS = {"farmer": "SELF_EMPLOYED", "shopkeeper": "SELF_EMPLOYED", "businessman": "SELF_EMPLOYED",
+               "auto driver": "SELF_EMPLOYED", "weaver": "SELF_EMPLOYED", "daily wage": "EMPLOYED", "teacher": "EMPLOYED",
+               "government employee": "EMPLOYED", "private job": "EMPLOYED", "ASHA worker": "EMPLOYED",
+               "homemaker": "HOMEMAKER", "student": "STUDENT", "retired": "RETIRED", "unemployed": "UNEMPLOYED"}
+COURSES = [("ENGINEERING_GROUP", 0.35), ("ARTS_COMMERCE", 0.35), ("MEDICAL_DENTAL", 0.10), ("DIPLOMA", 0.20)]
+
 
 def load_geography():
     """[(district, mandal, [villages])] for inhabited rural villages that have a name."""
@@ -81,6 +91,7 @@ class Gen:
         self.geo = load_geography()
         self.aadhaar = 6000
         self.mobile = 6000
+        self.ration = 10000
 
     def pick(self, pairs):
         x, c = self.r.random(), 0.0
@@ -103,15 +114,41 @@ class Gen:
         lo, hi = OCCUPATION_INCOME[occ]
         return 0 if hi == 0 else self.r.randint(lo, hi)
 
-    def person(self, name, dob, gender, occ, caste, alive=True, income=None):
+    def education(self, age, caste, occ):
+        r = self.r
+        if age < 6: return "NONE"
+        if age <= 10: return "PRIMARY"
+        if age <= 14: return "SECONDARY"
+        if age <= 17: return r.choice(["SECONDARY", "MATRIC"])
+        if occ == "student": return "HIGHER_SEC"
+        w = list(EDU_ADULT[caste])
+        if age >= 60:  # older cohort: shift weight to the lower levels
+            w = [w[0] * 2, w[1] * 2, w[2] * 1.5, w[3], w[4] * 0.5, w[5] * 0.4, w[6] * 0.2]
+        if occ in ("teacher", "government employee"): w = [0, 0, 0, 0, 10, 60, 30]
+        return r.choices(EDU, weights=w)[0]
+
+    def person(self, name, dob, gender, occ, caste, alive=True, income=None, marital=None):
         self.aadhaar += 1
+        age = self.age(dob)
         mobile = None
-        if alive and occ != "student" and self.age(dob) >= 18:
+        if alive and occ != "student" and age >= 18:
             self.mobile += 1
             mobile = str(9876540000 + self.mobile)
         inc = self.income(occ) if income is None else income
         return (str(uuid.UUID(int=self.r.getrandbits(128), version=4)), name, dob, gender,
-                f"XXXX-XXXX-{self.aadhaar:04d}", occ, inc, caste, alive, mobile)
+                f"XXXX-XXXX-{self.aadhaar:04d}", occ, inc, caste, alive, mobile) + self.attrs(dob, occ, caste, marital)
+
+    def attrs(self, dob, occ, caste, marital=None):
+        """(education_level, marital_status, employment_status, exam_type, exam_percentile, course_category)"""
+        age = self.age(dob)
+        if marital is None:
+            marital = "SINGLE" if age < 25 else "MARRIED"
+        exam = (None, None, None)
+        if occ == "student" and 15 <= age <= 22:
+            if age <= 16: exam = ("STD10", round(self.r.uniform(35, 98), 1), None)
+            elif age <= 18: exam = ("STD12", round(self.r.uniform(35, 98), 1), None)
+            else: exam = ("STD12", round(self.r.uniform(35, 98), 1), self.pick(COURSES))
+        return (self.education(age, caste, occ), marital, WORK_STATUS.get(occ, "EMPLOYED")) + exam
 
     def family(self):
         r = self.r
@@ -122,7 +159,9 @@ class Gen:
         district, mandal, villages = r.choice(self.geo)
         village = r.choice(villages)
         fid = str(uuid.UUID(int=r.getrandbits(128), version=4))
-        fam = (fid, f"{r.randint(1, 200)} {r.choice(STREETS)}, {village}", village, mandal, district)
+        self.ration += 1
+        rc = f"TG-RC-{self.ration:08d}" if r.random() < 0.75 else None   # synthetic number, not a real card format
+        fam = (fid, f"{r.randint(1, 200)} {r.choice(STREETS)}, {village}", village, mandal, district, rc)
         x, c, struct = r.random(), 0.0, STRUCTURES[0][1]
         for w, fn in STRUCTURES:
             c += w
@@ -133,25 +172,32 @@ class Gen:
         hg = "F" if r.random() < 0.30 else "M"
         hage = r.randint(30, 55)
         hocc = r.choice(WORKING)
-        head = self.person(self.name(caste, hg, pool), self.dob(hage), hg, hocc, caste)
+        spouse_dead = spouse and hg == "F"
+        hmar = "MARRIED" if (spouse and not spouse_dead) else ("WIDOWED" if r.random() < 0.8 else "SEPARATED")
+        head = self.person(self.name(caste, hg, pool), self.dob(hage), hg, hocc, caste, marital=hmar)
         persons, members = [head], [(fid, head[0], "HEAD")]
         if spouse:
             sg = "F" if hg == "M" else "M"
             alive = hg != "F"
             socc = r.choice(WORKING + ["homemaker"]) if alive else "daily wage"
             sp = self.person(self.name(caste, sg, pool), self.dob(max(hage + r.randint(-5, 5), 22)), sg, socc, caste,
-                             alive=alive, income=None if alive else 0)
+                             alive=alive, income=None if alive else 0, marital="MARRIED" if alive else "WIDOWED")
             persons.append(sp); members.append((fid, sp[0], "SPOUSE"))
         eldest = max(5, hage - r.randint(15, 20))
         for i in range(kids):
             cage = max(3, eldest - i * r.randint(2, 4))
             cg = r.choice("MF")
             cocc = "student" if cage < 22 else r.choice(WORKING)
-            ch = self.person(self.name(caste, cg, pool), self.dob(cage), cg, cocc, caste)
+            cinc = None
+            if cage >= 22 and cage <= 30 and r.random() < 0.15:
+                cocc, cinc = "unemployed", 0
+            cmar = "SINGLE" if cage <= 30 else "MARRIED"
+            ch = self.person(self.name(caste, cg, pool), self.dob(cage), cg, cocc, caste, income=cinc, marital=cmar)
             persons.append(ch); members.append((fid, ch[0], "SON" if cg == "M" else "DAUGHTER"))
         for flag, g, occ, rel in ((father, "M", "retired", "FATHER"), (mother, "F", "homemaker", "MOTHER")):
             if flag:
-                p = self.person(self.name(caste, g, pool), self.dob(hage + r.randint(25, 35)), g, occ, caste)
+                p = self.person(self.name(caste, g, pool), self.dob(hage + r.randint(25, 35)), g, occ, caste,
+                                marital="MARRIED" if (father and mother) else "WIDOWED")
                 persons.append(p); members.append((fid, p[0], rel))
         return fam, persons, members
 
@@ -161,7 +207,8 @@ def hid(prefix, seq): return f"{prefix:08d}-0000-0000-0000-{seq:012d}"
 
 def heroes():
     """Five demo families. Same ids as the DG2.0 demo so later demo scripts can reuse them. Hamlets are real LGD villages."""
-    def fam(n, addr, village, mandal, district): return (f"a{n}000000-0000-0000-0000-00000000000{n}", addr, village, mandal, district)
+    gen = Gen(7)
+    def fam(n, addr, village, mandal, district): return (f"a{n}000000-0000-0000-0000-00000000000{n}", addr, village, mandal, district, f"TG-RC-0000000{n}")
     spec = [
         (1, ("12 Indiramma Colony, Chityal", "Chityal", "Chityal", "Jayashankar Bhupalapally"), "OBC", [
             ("Padmavathi Goud", date(1985, 3, 15), "F", "farmer", 95000, True, "HEAD"),
@@ -196,20 +243,27 @@ def heroes():
     for n, (addr, village, mandal, district), caste, people in spec:
         f = fam(n, addr, village, mandal, district)
         persons, members = [], []
-        for k, (nm, dob, g, occ, inc, alive, rel) in enumerate(people, 1):
+        for k, (nm, dob, gg, occ, inc, alive, rel) in enumerate(people, 1):
             pid = hid(n * 10_000_000 + k, 1)
             mob = None if (occ == "student" or not alive or TODAY.year - dob.year < 18) else f"98765{n}{k:04d}"
-            persons.append((pid, nm, dob, g, f"XXXX-XXXX-{n}{k:03d}", occ, inc, caste, alive, mob))
+            married = rel in ("HEAD", "SPOUSE", "FATHER", "MOTHER") and TODAY.year - dob.year >= 25
+            if rel == "HEAD" and any(not x[5] for x in people if x[6] == "SPOUSE"): mar = "WIDOWED"
+            else: mar = "MARRIED" if married else "SINGLE"
+            persons.append((pid, nm, dob, gg, f"XXXX-XXXX-{n}{k:03d}", occ, inc, caste, alive, mob) + gen.attrs(dob, occ, caste, mar))
             members.append((f[0], pid, rel))
         out.append((f, persons, members))
     return out
 
 
 def emit(o, fam, persons, members):
-    o.write(f"INSERT INTO family (id, address, village, taluka, district, state) VALUES ('{fam[0]}', {s(fam[1])}, {s(fam[2])}, {s(fam[3])}, {s(fam[4])}, 'Telangana');\n")
+    o.write("INSERT INTO family (id, address, village, taluka, district, state, ration_card_number) VALUES "
+            f"('{fam[0]}', {s(fam[1])}, {s(fam[2])}, {s(fam[3])}, {s(fam[4])}, 'Telangana', {s(fam[5])});\n")
     for p in persons:
-        o.write("INSERT INTO person (id, name, dob, gender, aadhaar_ref, occupation, annual_income, caste_category, is_alive, mobile) VALUES "
-                f"('{p[0]}', {s(p[1])}, '{p[2].isoformat()}', {s(p[3])}, {s(p[4])}, {s(p[5])}, {p[6]}, {s(p[7])}, {b(p[8])}, {s(p[9])});\n")
+        pct = "NULL" if p[14] is None else p[14]
+        o.write("INSERT INTO person (id, name, dob, gender, aadhaar_ref, occupation, annual_income, caste_category, is_alive, mobile, "
+                "education_level, marital_status, employment_status, exam_type, exam_percentile, course_category, onboarding_completed) VALUES "
+                f"('{p[0]}', {s(p[1])}, '{p[2].isoformat()}', {s(p[3])}, {s(p[4])}, {s(p[5])}, {p[6]}, {s(p[7])}, {b(p[8])}, {s(p[9])}, "
+                f"{s(p[10])}, {s(p[11])}, {s(p[12])}, {s(p[13])}, {pct}, {s(p[15])}, true);\n")
     for m in members:
         o.write(f"INSERT INTO family_member (family_id, person_id, relationship_to_head) VALUES ('{m[0]}', '{m[1]}', {s(m[2])});\n")
 

@@ -15,7 +15,7 @@ public class Family {
     private String village;
     private String taluka;
     private String district;
-    private String state = "Gujarat";
+    private String state = "Telangana";
     private String rationCardNumber;
 
     public UUID getId() { return id; }
