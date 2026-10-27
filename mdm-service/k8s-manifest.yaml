@@ -46,9 +46,9 @@ spec:
             - name: MDM_READ_ROLES
               value: "*"
             - name: MDM_WRITE_ROLES
-              value: "MDM_STEWARD,MDM_ADMIN,ADMIN"
+              value: "MDM_STEWARD,MDM_ADMIN,ADMIN,DEPT_ADMIN"
             - name: MDM_ADMIN_ROLES
-              value: "MDM_ADMIN,ADMIN"
+              value: "MDM_ADMIN,ADMIN,IT_ADMIN"
           startupProbe:
             httpGet:
               path: /mdm-service/api/health

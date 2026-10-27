@@ -2,11 +2,13 @@ import { pinDemoSchemeFirst, translateCriterion } from '../reasonUtils'
 
 export const CASTE_OPTIONS = ['SC', 'ST', 'OBC', 'NT', 'GENERAL', 'EWS']
 export const DISTRICTS = [
-  'Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Gandhinagar', 'Bhavnagar', 'Jamnagar',
-  'Junagadh', 'Kutch', 'Mehsana', 'Anand', 'Bharuch', 'Narmada', 'Sabarkantha',
-  'Banaskantha', 'Patan', 'Surendranagar', 'Morbi', 'Amreli', 'Botad', 'Porbandar',
-  'Navsari', 'Valsad', 'Dang', 'Tapi', 'Mahisagar', 'Chhota Udaipur', 'Aravalli',
-  'Dahod', 'Panchmahal', 'Kheda', 'Gir Somnath',
+  'Adilabad', 'Bhadradri Kothagudem', 'Hanumakonda', 'Hyderabad', 'Jagitial',
+  'Jangoan', 'Jayashankar Bhupalapally', 'Jogulamba Gadwal', 'Kamareddy', 'Karimnagar',
+  'Khammam', 'Kumuram Bheem Asifabad', 'Mahabubabad', 'Mahabubnagar', 'Mancherial',
+  'Medak', 'Medchal Malkajgiri', 'Mulugu', 'Nagarkurnool', 'Nalgonda',
+  'Narayanpet', 'Nirmal', 'Nizamabad', 'Peddapalli', 'Rajanna Sircilla',
+  'Ranga Reddy', 'Sangareddy', 'Siddipet', 'Suryapet', 'Vikarabad',
+  'Wanaparthy', 'Warangal', 'Yadadri Bhuvanagiri',
 ]
 
 export const MARITAL_OPTIONS = ['SINGLE', 'MARRIED', 'WIDOWED', 'DIVORCED', 'SEPARATED']

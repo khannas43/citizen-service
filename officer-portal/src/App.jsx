@@ -11,6 +11,7 @@ import ExpenditureIntegrity from './screens/ExpenditureIntegrity'
 import MoneyOverview from './screens/MoneyOverview'
 import StoryMode from './screens/StoryMode'
 import DataHub from './screens/DataHub'
+import MdmHub from './screens/mdm/MdmHub'
 import SchemeSimulator from './screens/SchemeSimulator'
 import OpsDashboard from './screens/OpsDashboard'
 import Reports from './screens/Reports'
@@ -136,7 +137,62 @@ function RoleRoute({ children }) {
   return children
 }
 
+const GROUP_ICONS = { Scheme: '🏛' }
+const GROUPS_KEY = 'officer_nav_groups'
+
+function NavItem({ item: l, sub = false }) {
+  const { icon, text } = navParts(l.label)
+  const content = (
+    <>
+      <span className="nav-icon" aria-hidden="true">{icon}</span>
+      <span className="nav-text">{text}</span>
+    </>
+  )
+  const cls = sub ? 'nav-link nav-sub' : 'nav-link'
+  return l.external ? (
+    <a href={l.href} target="_blank" rel="noopener noreferrer" className={cls} title={text || l.label}>{content}</a>
+  ) : (
+    <NavLink to={l.to} end={l.end} className={({ isActive }) => (isActive ? `${cls} active` : cls)} title={text || l.label}>
+      {content}
+    </NavLink>
+  )
+}
+
+/** A heading that opens and closes a list of related screens. It opens by itself when one of them is the current page. */
+function NavGroup({ entry, collapsed, pathname }) {
+  const hasActive = entry.items.some((i) => i.to && (pathname === i.to || pathname.startsWith(`${i.to}/`)))
+  const [open, setOpen] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(GROUPS_KEY) || '{}')[entry.group] !== false } catch { return true }
+  })
+  const toggle = () => {
+    const next = !open
+    setOpen(next)
+    try {
+      const saved = JSON.parse(localStorage.getItem(GROUPS_KEY) || '{}')
+      localStorage.setItem(GROUPS_KEY, JSON.stringify({ ...saved, [entry.group]: next }))
+    } catch { /* ignore */ }
+  }
+  if (collapsed) return entry.items.map((i) => <NavItem key={i.to} item={i} />)
+  const shown = open || hasActive
+  const id = `nav-group-${entry.group.toLowerCase()}`
+  return (
+    <div className="nav-group">
+      <button type="button" className={`nav-link nav-group-head${hasActive ? ' has-active' : ''}`} onClick={toggle} aria-expanded={shown} aria-controls={id}>
+        <span className="nav-icon" aria-hidden="true">{entry.icon}</span>
+        <span className="nav-text">{entry.group}</span>
+        <span className="nav-chevron" aria-hidden="true">{shown ? '▾' : '▸'}</span>
+      </button>
+      {shown && (
+        <div id={id} className="nav-sub-list">
+          {entry.items.map((i) => <NavItem key={i.to} item={i} sub />)}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function Sidebar({ mode, onSidebarToggle }) {
+  const { pathname } = useLocation()
   const role = localStorage.getItem('officer_role') ?? 'UNKNOWN'
   const showFormBuilder = officerHasBuilderUxAccess()
   const links = [...officerNavItems(role)]
@@ -148,6 +204,16 @@ function Sidebar({ mode, onSidebarToggle }) {
   }
 
   if (mode === 'hidden') return null
+
+  // Items that share a group sit under one heading, at the position of the group's first item.
+  const entries = []
+  const seen = new Set()
+  links.forEach((l) => {
+    if (!l.group) return entries.push({ item: l })
+    if (seen.has(l.group)) return
+    seen.add(l.group)
+    entries.push({ group: l.group, icon: GROUP_ICONS[l.group] ?? '📁', items: links.filter((x) => x.group === l.group) })
+  })
 
   return (
     <aside className={`sidebar${mode === 'collapsed' ? ' sidebar-collapsed' : ''}`}>
@@ -166,37 +232,13 @@ function Sidebar({ mode, onSidebarToggle }) {
         </button>
       </div>
       <nav>
-        {links.map((l) => {
-          const { icon, text } = navParts(l.label)
-          const content = (
-            <>
-              <span className="nav-icon" aria-hidden="true">{icon}</span>
-              <span className="nav-text">{text}</span>
-            </>
-          )
-          return l.external ? (
-            <a
-              key={l.href}
-              href={l.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nav-link"
-              title={text || l.label}
-            >
-              {content}
-            </a>
+        {entries.map((entry) =>
+          entry.group ? (
+            <NavGroup key={`group-${entry.group}`} entry={entry} collapsed={mode === 'collapsed'} pathname={pathname} />
           ) : (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.end}
-              className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-              title={text || l.label}
-            >
-              {content}
-            </NavLink>
-          )
-        })}
+            <NavItem key={entry.item.to || entry.item.href} item={entry.item} />
+          ),
+        )}
       </nav>
     </aside>
   )
@@ -266,6 +308,7 @@ function MainApp() {
             <Route path="/fraud-signals" element={<Navigate to="/expenditure-integrity?domain=beneficiary" replace />} />
             <Route path="/fraud-signals/legacy" element={<RoleRoute><FraudSignals /></RoleRoute>} />
             <Route path="/scheme-simulator" element={<RoleRoute><SchemeSimulator /></RoleRoute>} />
+            <Route path="/mdm" element={<RoleRoute><MdmHub /></RoleRoute>} />
             <Route path="/families" element={<RoleRoute><FamilyRegistry /></RoleRoute>} />
             <Route path="/reports" element={<RoleRoute><Reports /></RoleRoute>} />
             <Route path="/analytics" element={<RoleRoute><AnalyticsDashboard /></RoleRoute>} />

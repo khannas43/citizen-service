@@ -43,7 +43,6 @@ export default function LandingChromeHeader({
         <div className="goi-bar-left">
           <span>Government of India</span>
           <span>Government of Telangana</span>
-          <span>Department of Science &amp; Technology</span>
         </div>
         <div className="goi-bar-right">
           <button type="button" className="landing-lang-toggle" onClick={onToggleLang}>
@@ -57,7 +56,6 @@ export default function LandingChromeHeader({
           <div className="header-left">
             <Link to="/" className="emblem-wrap" aria-label="Citizen Services home">
               <img src="/emblem-of-india.png" alt={t.emblemAlt} className="india-emblem" />
-              <img src="/logodig.png" alt={t.logoAlt} className="header-logo" />
             </Link>
             <nav className="header-nav" aria-label="Main navigation">
               <ul>

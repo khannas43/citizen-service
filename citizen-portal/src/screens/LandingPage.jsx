@@ -292,7 +292,6 @@ export default function LandingPage() {
         <div className="goi-bar-left">
           <span>Government of India</span>
           <span>Government of Telangana</span>
-          <span>Department of Science &amp; Technology</span>
         </div>
         <div className="goi-bar-right">
           <button
@@ -314,7 +313,6 @@ export default function LandingPage() {
           <div className="header-left">
             <div className="emblem-wrap">
               <img src="/emblem-of-india.png" alt={t.emblemAlt} className="india-emblem" />
-              <img src="/logodig.png" alt={t.logoAlt} className="header-logo" />
             </div>
             <nav className="header-nav" aria-label="Main navigation">
               <ul>

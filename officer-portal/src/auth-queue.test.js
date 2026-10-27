@@ -152,11 +152,11 @@ describe('officerHasFeature', () => {
   it('keeps Data and Guided Story off the sidebar but gated by path for admins', () => {
     expect(officerNavItems('DEPT_ADMIN').map((i) => i.to)).toEqual([
       '/', '/tasks', '/grievances', '/schemes', '/scheme-content', '/beneficiaries', '/scheme-simulator',
-      '/money-overview', '/expenditure-integrity', '/fraud-signals/legacy', '/coverage', '/families',
+      '/money-overview', '/expenditure-integrity', '/fraud-signals/legacy', '/coverage', '/families', '/mdm',
       '/analytics', '/reports',
     ])
     expect(officerNavItems('IT_ADMIN').map((i) => i.to)).toEqual([
-      '/', '/ops-dashboard', '/money-overview', '/expenditure-integrity', '/analytics', '/reports',
+      '/', '/ops-dashboard', '/money-overview', '/expenditure-integrity', '/mdm', '/analytics', '/reports',
     ])
     expect(officerCanAccessPath('DEPT_ADMIN', '/story')).toBe(true)
     expect(officerCanAccessPath('SCHEME_DEPT', '/story')).toBe(true)

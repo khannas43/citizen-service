@@ -1926,3 +1926,11 @@ input[type="date"].complaints-filter-select {
     grid-template-columns: 1fr;
   }
 }
+
+/* grouped menu: a heading that opens a list of related screens */
+.nav-group-head { width: 100%; background: transparent; border: 0; border-left: 3px solid transparent; font: inherit; font-size: var(--text-sm); text-align: left; cursor: pointer; }
+.nav-group-head.has-active { color: white; font-weight: 600; }
+.nav-group-head:focus-visible, .nav-link:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.nav-chevron { margin-left: auto; font-size: 0.75rem; }
+.nav-sub-list { display: flex; flex-direction: column; background: rgba(0, 0, 0, 0.16); }
+.nav-link.nav-sub { padding: 8px 20px 8px 38px; font-size: 0.82rem; }
