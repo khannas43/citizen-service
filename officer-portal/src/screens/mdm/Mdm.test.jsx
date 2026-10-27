@@ -34,6 +34,15 @@ describe('Master Data', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('cannot be reached'))
   })
 
+  it('use cases tab lists the six situations and describes events plainly', async () => {
+    const { describeEvent } = await import('./UseCases')
+    expect(describeEvent({ event_type: 'DEATH_REGISTERED', payload: { name: 'A B', age_at_death: 80, date_of_death: '2026-06-17', place_of_death: 'Telangana' } })).toContain('Death registered: A B')
+    expect(describeEvent({ event_type: 'BIRTH_REGISTERED', payload: { child_name: null, date_of_birth: '2026-05-01' } })).toContain('name not given yet')
+    globalThis.fetch = vi.fn(async () => ({ ok: true, status: 200, json: async () => ['UC1', 'UC2', 'UC3', 'UC4', 'UC5', 'UC6'].map((id) => ({ id, title: `Title ${id}`, question: 'Q?', events: 2, open_proposals: 1, extra: null })) }))
+    render(<MemoryRouter initialEntries={['/mdm?tab=usecases']}><MdmHub /></MemoryRouter>)
+    await waitFor(() => expect(screen.getByText('Title UC6')).toBeInTheDocument())
+  })
+
   it('helpers', () => {
     expect(dqLabel('UNKNOWN_CODE')).toBe('UNKNOWN_CODE')
     expect(pct(1, 4)).toBe(25)

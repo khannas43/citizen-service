@@ -98,6 +98,37 @@ CREATE TABLE IF NOT EXISTS mdm.audit (
     prev_hash text NOT NULL, hash text NOT NULL
 );
 
+-- department events (births, deaths, marriages) and the proposals they produce; a steward approves before anything is acted on
+CREATE TABLE IF NOT EXISTS mdm.event (
+    id bigserial PRIMARY KEY,
+    seq int,
+    event_key text NOT NULL,                         -- registration number in the department's own system
+    event_type text NOT NULL,
+    uc text, scenario text, case_kind text,
+    payload jsonb NOT NULL,
+    received_at timestamptz NOT NULL DEFAULT now(),
+    status text NOT NULL,                            -- PROCESSED | HELD | DUPLICATE | WITHDRAWN | NO_MATCH | AMENDMENT
+    note text,
+    person_id bigint REFERENCES mdm.person(id) ON DELETE SET NULL,
+    record_id bigint REFERENCES mdm.source_record(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS event_key_ix ON mdm.event (event_key);
+CREATE INDEX IF NOT EXISTS event_uc_ix ON mdm.event (uc, status);
+
+CREATE TABLE IF NOT EXISTS mdm.proposal (
+    id bigserial PRIMARY KEY,
+    event_id bigint REFERENCES mdm.event(id) ON DELETE CASCADE,
+    parent_id bigint,                                -- set on follow-up actions created when a death or marriage is confirmed
+    uc text, kind text NOT NULL, system text,
+    person_id bigint REFERENCES mdm.person(id) ON DELETE SET NULL,
+    summary text NOT NULL, detail jsonb NOT NULL DEFAULT '{}', options jsonb NOT NULL DEFAULT '[]',
+    status text NOT NULL DEFAULT 'PROPOSED',         -- PROPOSED | APPROVED | REJECTED | WITHDRAWN
+    chosen jsonb, note text, decided_by text, decided_at timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS proposal_status_ix ON mdm.proposal (status, uc);
+CREATE INDEX IF NOT EXISTS proposal_event_ix ON mdm.proposal (event_id);
+
 -- scope the new tables to the serving state (the event trigger does this for tables created after 002; this covers re-runs)
 SELECT platform.scope_all();
 

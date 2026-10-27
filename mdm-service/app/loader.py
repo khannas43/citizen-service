@@ -12,7 +12,7 @@ from .matching import MatchConfig, cluster_records
 from .survivorship import DEFAULT_SURVIVORSHIP
 from . import audit, store
 
-RESET_ORDER = ["dq_issue", "relationship", "golden_attribute", "review_task", "source_record", "person"]
+RESET_ORDER = ["proposal", "event", "dq_issue", "relationship", "golden_attribute", "review_task", "source_record", "person"]
 
 
 def _js(x):

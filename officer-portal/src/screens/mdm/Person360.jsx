@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { mdm } from '../../mdmApi'
 import { useMdm, Status, Badge } from './shared'
+import ExchangePanel from '../dx/ExchangePanel'
 import { dqLabel, fmtDate, lifeLabel, linkLabel, RELATION_TEXT, COMPONENT_LABELS } from './labels'
 
 const ATTR_LABEL = { name: 'Name', dob: 'Date of birth', birth_year: 'Year of birth', gender: 'Gender', address: 'Address', date_of_death: 'Date of death' }
@@ -78,6 +79,8 @@ export default function Person360({ id, back, openPerson }) {
           </ul>
         </section>
       )}
+
+      <ExchangePanel id={id} />
 
       <section className="mdm-card">
         <h3>The golden record</h3>

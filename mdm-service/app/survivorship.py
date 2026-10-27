@@ -47,6 +47,8 @@ def build_golden(recs: list[dict], surv: dict | None = None) -> dict:
 
     # name
     cands = [(clean_name(r["name"]), r["source"]) for r in recs if r.get("name")]
+    cands += [(clean_name(r["payload"]["bride_name_after"]), r["source"]) for r in recs
+              if r.get("rtype") == "MARRIAGE_BRIDE" and (r.get("payload") or {}).get("bride_name_after")]
     latin = sorted([c for c in cands if not has_telugu(c[0])], key=lambda c: (_rank(surv["name"], c[1]), -len(c[0])))
     tel = sorted([c for c in cands if has_telugu(c[0])], key=lambda c: _rank(surv["name"], c[1]))
     best = latin[0] if latin else (tel[0] if tel else ("", ""))

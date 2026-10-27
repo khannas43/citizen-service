@@ -5,10 +5,12 @@ import Person360 from './Person360'
 import ReviewQueue from './ReviewQueue'
 import DataQuality from './DataQuality'
 import RulesAudit from './RulesAudit'
+import UseCases from './UseCases'
 import './mdm.css'
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
+  { id: 'usecases', label: 'Use cases' },
   { id: 'people', label: 'People' },
   { id: 'review', label: 'Review queue' },
   { id: 'quality', label: 'Data quality' },
@@ -33,6 +35,7 @@ export default function MdmHub() {
       </nav>
       <div role="tabpanel" className="mdm-panel">
         {tab === 'overview' && <Overview goto={go} />}
+        {tab === 'usecases' && <UseCases goto={go} openPerson={openPerson} />}
         {tab === 'people' && (person ? <Person360 key={person} id={person} back={() => go('people')} openPerson={openPerson} /> : <Persons openPerson={openPerson} />)}
         {tab === 'review' && <ReviewQueue key={params.get('source') || 'all'} initialSource={params.get('source') || ''} />}
         {tab === 'quality' && <DataQuality key={`${params.get('code')}${params.get('source')}`} initial={{ code: params.get('code') || '', source: params.get('source') || '' }} openPerson={openPerson} />}

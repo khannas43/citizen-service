@@ -7,12 +7,12 @@ from typing import Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query
 from pydantic import BaseModel
 
-from . import audit, auth, store, stewardship
+from . import audit, auth, events, store, stewardship
 from .db import connect, STATE
 from .matching import MatchConfig, cluster_records
 from .model import Rec
 from .sources import SOURCE_INFO, SOURCE_ORDER
-from .survivorship import DEFAULT_SURVIVORSHIP, RULE_TEXT
+from .survivorship import DEFAULT_SURVIVORSHIP, RULE_TEXT, REF_DATE
 
 BASE = os.getenv("MDM_BASE", "/mdm-service")      # context path, like the other services
 app = FastAPI(title="Master Data Management service", docs_url=f"{BASE}/docs", openapi_url=f"{BASE}/openapi.json")
@@ -285,15 +285,7 @@ class Preview(BaseModel):
 
 def _recs_from_db(cur) -> list[Rec]:
     cur.execute("SELECT * FROM mdm.source_record ORDER BY id")
-    out = []
-    for i, r in enumerate(cur.fetchall()):
-        rec = Rec(pk=i, source=r["source"], rid=r["source_rid"], rtype=r["rtype"], name=r["name"] or "", gender=r["gender"], dob=r["dob"],
-                  age=r["age"], byear=r["birth_year"], district=r["district"], mandal=r["mandal"], village=r["village"], address=r["address"],
-                  ration_card=r["ration_card"], household_id=r["household_id"], relation=r["relation"], parents=r["parents"] or [],
-                  as_of=r["as_of"], raw=r["payload"] or {})
-        rec.db_status = r["link_status"]
-        out.append(rec)
-    return out
+    return [store.rec_from_row(r, i) for i, r in enumerate(cur.fetchall())]
 
 
 def _check_match(m: dict) -> MatchConfig:
@@ -369,4 +361,174 @@ def sources(cur=Depends(cur_dep), _=Depends(auth.can_read)):
     return [{"source": s, "name": SOURCE_INFO[s][0], "interface": SOURCE_INFO[s][1], "freshness_hours": SOURCE_INFO[s][2]} for s in SOURCE_ORDER]
 
 
+# ---------------------------------------------------------------- use cases: events, proposals, worklists
+UC_INFO = {
+    "UC1": ("Identity linkage", "Is this the same person across departments?"),
+    "UC2": ("Birth", "A child is born. Who are the parents, which household, which departments should know?"),
+    "UC3": ("Death", "A death is registered. Which benefits and records are affected, and who is told?"),
+    "UC4": ("Turning 18 and higher education", "Who is about to become an adult, and what do they need to claim what they are entitled to?"),
+    "UC5": ("Household benefits and duplicates", "Is one household or person receiving the same benefit twice, or sitting on two cards?"),
+    "UC6": ("Marriage", "A marriage is registered. Who are the spouses, what changes in each household and record?"),
+}
+
+
+@router.get("/api/usecases")
+def usecases(cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    cur.execute("SELECT uc, status, count(*) AS n FROM mdm.event WHERE uc IS NOT NULL GROUP BY 1,2")
+    ev = {}
+    for r in cur.fetchall():
+        ev.setdefault(r["uc"], {})[r["status"]] = r["n"]
+    cur.execute("SELECT uc, status, count(*) AS n FROM mdm.proposal WHERE uc IS NOT NULL GROUP BY 1,2")
+    pr = {}
+    for r in cur.fetchall():
+        pr.setdefault(r["uc"], {})[r["status"]] = r["n"]
+    cur.execute("SELECT count(*) AS n FROM mdm.review_task WHERE status='OPEN'")
+    reviews = cur.fetchone()["n"]
+    cur.execute("SELECT count(*) AS n FROM mdm.person WHERE dob > %s AND dob <= %s", (REF_DATE.replace(year=REF_DATE.year - 19), REF_DATE.replace(year=REF_DATE.year - 17)))
+    t18 = cur.fetchone()["n"]
+    cur.execute("SELECT code, count(*) AS n FROM mdm.dq_issue WHERE status='OPEN' AND code IN ('ON_MULTIPLE_RATION_CARDS','DEAD_ACTIVE_ON_RATION_CARD') GROUP BY 1")
+    hh = {r["code"]: r["n"] for r in cur.fetchall()}
+    out = []
+    for uc, (title, question) in UC_INFO.items():
+        e, p = ev.get(uc, {}), pr.get(uc, {})
+        out.append({"id": uc, "title": title, "question": question, "events": sum(e.values()), "event_status": e, "open_proposals": p.get("PROPOSED", 0),
+                    "decided": p.get("APPROVED", 0) + p.get("REJECTED", 0),
+                    "extra": {"UC1": f"{reviews} doubtful matches waiting for a steward", "UC4": f"{t18} people aged 17 to 19",
+                              "UC5": f"{hh.get('ON_MULTIPLE_RATION_CARDS', 0)} on more than one card, {hh.get('DEAD_ACTIVE_ON_RATION_CARD', 0)} deceased but still active"}.get(uc)})
+    return out
+
+
+@router.get("/api/events")
+def event_feed(uc: Optional[str] = None, status: Optional[str] = None, limit: int = Query(50, le=200), offset: int = 0,
+               cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    where, params = ["1=1"], []
+    if uc:
+        where.append("e.uc=%s"); params.append(uc)
+    if status:
+        where.append("e.status=%s"); params.append(status)
+    return page(cur, "mdm.event e WHERE " + " AND ".join(where), params,
+                "e.id, e.seq, e.event_key, e.event_type, e.uc, e.case_kind, e.status, e.note, e.person_id, e.payload, "
+                "(SELECT count(*) FROM mdm.proposal p WHERE p.event_id=e.id AND p.status='PROPOSED') AS open_proposals, "
+                "(SELECT count(*) FROM mdm.proposal p WHERE p.event_id=e.id) AS proposals", "e.seq NULLS LAST, e.id", limit, offset)
+
+
+@router.get("/api/events/{eid}")
+def event_detail(eid: int, cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    cur.execute("SELECT * FROM mdm.event WHERE id=%s", (eid,))
+    e = cur.fetchone()
+    if not e:
+        raise HTTPException(404, "Event not found")
+    cur.execute("SELECT * FROM mdm.proposal WHERE event_id=%s ORDER BY (parent_id IS NOT NULL), id", (eid,))
+    e["proposals"] = cur.fetchall()
+    e["person"] = events.person_card(cur, e["person_id"]) if e["person_id"] else None
+    return e
+
+
+@router.get("/api/proposals")
+def proposals(status: str = "PROPOSED", uc: Optional[str] = None, limit: int = Query(50, le=200), offset: int = 0,
+              cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    where, params = ["p.status=%s"], [status]
+    if uc:
+        where.append("p.uc=%s"); params.append(uc)
+    return page(cur, "mdm.proposal p LEFT JOIN mdm.person pe ON pe.id=p.person_id WHERE " + " AND ".join(where), params,
+                "p.id, p.event_id, p.uc, p.kind, p.system, p.summary, p.status, p.decided_by, p.decided_at, p.note, pe.name AS person_name, p.person_id",
+                "p.id", limit, offset)
+
+
+class ProposalDecision(BaseModel):
+    decision: str
+    person_id: Optional[int] = None
+    groom_id: Optional[int] = None
+    bride_id: Optional[int] = None
+    note: Optional[str] = None
+
+
+@router.post("/api/proposals/{pid}/decision")
+def decide_proposal(pid: int, body: ProposalDecision, cur=Depends(cur_dep), u=Depends(auth.can_write)):
+    chosen = {k: v for k, v in (("person_id", body.person_id), ("groom_id", body.groom_id), ("bride_id", body.bride_id)) if v}
+    return run(events.decide_proposal, cur, pid, body.decision, chosen, u["actor"], body.note)
+
+
+class EventIn(BaseModel):
+    event_type: str
+    payload: dict
+    use_case: Optional[str] = None
+    order: Optional[int] = None
+    scenario: Optional[str] = None
+    case_kind: Optional[str] = None
+
+
+@router.post("/api/events")
+def post_event(body: EventIn, cur=Depends(cur_dep), u=Depends(auth.can_write)):
+    return events.ingest(cur, body.model_dump(), u["actor"])
+
+
+@router.post("/api/events/replay")
+def replay_events(cur=Depends(cur_dep), u=Depends(auth.can_write)):
+    path = os.getenv("MDM_EVENTS_FILE", "/tmp/extracts/live_events.jsonl")
+    if not os.path.exists(path):
+        raise HTTPException(404, "The sample event feed is not on the server. Run the load script first.")
+    return events.replay(cur, path, u["actor"])
+
+
+@router.get("/api/worklists/turning-18")
+def turning_18(limit: int = Query(50, le=200), offset: int = 0, cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    lo, hi = REF_DATE.replace(year=REF_DATE.year - 19), REF_DATE.replace(year=REF_DATE.year - 17)
+    cur.execute("SELECT count(*) AS n FROM mdm.person WHERE dob > %s AND dob <= %s", (lo, hi))
+    total = cur.fetchone()["n"]
+    cur.execute("""
+      SELECT p.id, p.mdm_id, p.name, p.dob, p.district, (p.dob + interval '18 years')::date AS turns_18,
+        EXISTS (SELECT 1 FROM mdm.source_record r WHERE r.person_id=p.id AND r.source='identity_reference') AS has_identity,
+        EXISTS (SELECT 1 FROM mdm.source_record r WHERE r.person_id=p.id AND r.source='student_portal') AS on_scholarship_portal,
+        (SELECT r.payload->>'course' FROM mdm.source_record r WHERE r.person_id=p.id AND r.source='student_portal' LIMIT 1) AS course,
+        (SELECT r.payload->>'valid_until' FROM mdm.source_record r WHERE r.person_id=p.id AND r.rtype='INCOME' ORDER BY r.as_of DESC NULLS LAST LIMIT 1) AS income_valid_until,
+        EXISTS (SELECT 1 FROM mdm.source_record r WHERE r.person_id=p.id AND r.rtype='INCOME') AS has_income,
+        EXISTS (SELECT 1 FROM mdm.source_record r WHERE r.person_id=p.id AND r.rtype='CASTE') AS has_caste,
+        (SELECT r.ration_card FROM mdm.source_record r WHERE r.person_id=p.id AND r.source='pds_view' LIMIT 1) AS ration_card
+      FROM mdm.person p WHERE p.dob > %s AND p.dob <= %s ORDER BY p.dob LIMIT %s OFFSET %s""", (lo, hi, limit, offset))
+    items = cur.fetchall()
+    for r in items:
+        expired = bool(r["income_valid_until"]) and str(r["income_valid_until"])[:10] < REF_DATE.isoformat()
+        r["income_state"] = "none" if not r["has_income"] else ("expired" if expired else "valid")
+        r["already_adult"] = r["turns_18"] <= REF_DATE
+        todo = []
+        if not r["has_identity"]:
+            todo.append("Issue an identity reference")
+        if r["income_state"] == "none":
+            todo.append("Income certificate needed")
+        elif r["income_state"] == "expired":
+            todo.append("Renew the income certificate")
+        if not r["on_scholarship_portal"]:
+            todo.append("Not on the scholarship portal. Invite to apply")
+        r["next_steps"] = todo or ["Nothing outstanding"]
+    return {"total": total, "limit": limit, "offset": offset, "items": items, "as_of": REF_DATE.isoformat()}
+
+
+@router.get("/api/worklists/household")
+def household_worklist(cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    cur.execute("""SELECT a.source_rid AS first, b.source_rid AS second, a.payload->>'status' AS first_status, b.payload->>'status' AS second_status,
+                          a.person_id AS first_person, b.person_id AS second_person, pa.name AS first_name, pb.name AS second_name,
+                          (a.person_id = b.person_id) AS same_person
+                   FROM mdm.source_record a JOIN mdm.source_record b ON a.source='housing' AND b.source='housing' AND a.id < b.id
+                   JOIN mdm.person pa ON pa.id=a.person_id JOIN mdm.person pb ON pb.id=b.person_id
+                   WHERE a.person_id=b.person_id
+                      OR EXISTS (SELECT 1 FROM mdm.source_record x JOIN mdm.source_record y ON x.ration_card=y.ration_card
+                                 WHERE x.person_id=a.person_id AND y.person_id=b.person_id AND x.source='pds_view' AND y.source='pds_view')
+                      OR EXISTS (SELECT 1 FROM mdm.relationship r WHERE r.person_a=LEAST(a.person_id,b.person_id) AND r.person_b=GREATEST(a.person_id,b.person_id))
+                   ORDER BY a.id LIMIT 100""")
+    dup = cur.fetchall()
+    issues = {}
+    for code in ("ON_MULTIPLE_RATION_CARDS", "DEAD_ACTIVE_ON_RATION_CARD"):
+        cur.execute("SELECT count(*) AS n FROM mdm.dq_issue WHERE code=%s AND status='OPEN'", (code,))
+        total = cur.fetchone()["n"]
+        cur.execute("SELECT i.id, i.detail, i.person_id, p.name, p.mdm_id FROM mdm.dq_issue i JOIN mdm.person p ON p.id=i.person_id "
+                    "WHERE i.code=%s AND i.status='OPEN' ORDER BY i.id LIMIT 50", (code,))
+        issues[code] = {"total": total, "items": cur.fetchall()}
+    return {"duplicate_benefit": dup, "multi_card": issues["ON_MULTIPLE_RATION_CARDS"], "dead_active": issues["DEAD_ACTIVE_ON_RATION_CARD"]}
+
+
+from .exchange_api import router as exchange_router          # noqa: E402  (imports cur_dep from this module)
 app.include_router(router, prefix=BASE)
+app.include_router(exchange_router, prefix=BASE)
+from .ops_api import router as ops_router                      # noqa: E402
+app.include_router(ops_router, prefix=BASE)

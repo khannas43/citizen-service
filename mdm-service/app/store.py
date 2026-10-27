@@ -7,6 +7,16 @@ PERSON_COLS = ("name", "name_local", "gender", "dob", "birth_year", "district", 
                "life_status", "source_count", "record_count", "confidence")
 
 
+def rec_from_row(r: dict, pk: int):
+    from .model import Rec
+    rec = Rec(pk=pk, source=r["source"], rid=r["source_rid"], rtype=r["rtype"], name=r["name"] or "", gender=r["gender"], dob=r["dob"],
+              age=r["age"], byear=r["birth_year"], district=r["district"], mandal=r["mandal"], village=r["village"], address=r["address"],
+              ration_card=r["ration_card"], household_id=r.get("household_id"), relation=r["relation"], parents=r.get("parents") or [],
+              as_of=r["as_of"], raw=r["payload"] or {})
+    rec.db_status = r.get("link_status")
+    return rec
+
+
 def active_rules(cur) -> dict:
     cur.execute("SELECT config FROM mdm.rule_set WHERE active ORDER BY version DESC LIMIT 1")
     r = cur.fetchone()
@@ -84,6 +94,17 @@ def derive_relationships(cur, person_ids: list[int] | None = None):
       FROM mdm.source_record a JOIN mdm.source_record b
         ON a.ration_card = b.ration_card AND a.source = 'pds_view' AND b.source = 'pds_view'
        AND a.relation = 'Head' AND b.relation = 'Spouse'
+      WHERE a.person_id IS NOT NULL AND b.person_id IS NOT NULL AND a.person_id <> b.person_id
+        AND COALESCE(a.payload->>'tenant','N') <> 'Y' AND COALESCE(b.payload->>'tenant','N') <> 'Y' {scope}
+        AND NOT EXISTS (SELECT 1 FROM mdm.relationship r WHERE r.kind='SPOUSE'
+                        AND r.person_a = LEAST(a.person_id,b.person_id) AND r.person_b = GREATEST(a.person_id,b.person_id))""", p)
+    cur.execute(f"""
+      INSERT INTO mdm.relationship (person_a, person_b, kind, basis, source, ref)
+      SELECT DISTINCT LEAST(a.person_id,b.person_id), GREATEST(a.person_id,b.person_id), 'SPOUSE',
+             'Father and mother listed on the same ration card (inferred)', 'pds_view', a.ration_card
+      FROM mdm.source_record a JOIN mdm.source_record b
+        ON a.ration_card = b.ration_card AND a.source = 'pds_view' AND b.source = 'pds_view'
+       AND a.relation = 'Father' AND b.relation = 'Mother'
       WHERE a.person_id IS NOT NULL AND b.person_id IS NOT NULL AND a.person_id <> b.person_id
         AND COALESCE(a.payload->>'tenant','N') <> 'Y' AND COALESCE(b.payload->>'tenant','N') <> 'Y' {scope}
         AND NOT EXISTS (SELECT 1 FROM mdm.relationship r WHERE r.kind='SPOUSE'

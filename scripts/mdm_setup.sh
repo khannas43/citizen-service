@@ -6,8 +6,10 @@ source scripts/lib/guard.sh
 NS=citizen
 POD=$(kubectl get pod -n $NS -l app=postgres -o jsonpath='{.items[0].metadata.name}')
 echo "== database objects (schema mdm, state-scoped)"
-kubectl cp db/mdm/001_mdm.sql "$NS/$POD:/tmp/001_mdm.sql"
-kubectl exec -n $NS "$POD" -- psql -U postgres -d citizen_db -v ON_ERROR_STOP=1 -q -f /tmp/001_mdm.sql
+for f in 001_mdm.sql 002_exchange.sql 003_wave2.sql; do
+  kubectl cp "db/mdm/$f" "$NS/$POD:/tmp/$f"
+  kubectl exec -n $NS "$POD" -- psql -U postgres -d citizen_db -v ON_ERROR_STOP=1 -q -f "/tmp/$f"
+done
 echo "== image + deployment"
 docker build -q -t cs-mdm-service:dev mdm-service
 kubectl apply -f mdm-service/k8s-manifest.yaml

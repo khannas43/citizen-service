@@ -12,6 +12,21 @@ import MoneyOverview from './screens/MoneyOverview'
 import StoryMode from './screens/StoryMode'
 import DataHub from './screens/DataHub'
 import MdmHub from './screens/mdm/MdmHub'
+import DxEvents from './screens/dx/DxEvents'
+import DxApprovals from './screens/dx/DxApprovals'
+import DxVerify from './screens/dx/DxVerify'
+import DxConsent from './screens/dx/DxConsent'
+import DxPolicy from './screens/dx/DxPolicy'
+import DxControl from './screens/dx/DxControl'
+import DxDiscrepancies from './screens/dx/DxDiscrepancies'
+import DxHousehold from './screens/dx/DxHousehold'
+import DxQuery from './screens/dx/DxQuery'
+import DxLedger from './screens/dx/DxLedger'
+import DxCatalogue from './screens/dx/DxCatalogue'
+import DxStandards from './screens/dx/DxStandards'
+import DxAudit from './screens/dx/DxAudit'
+import DxRetention from './screens/dx/DxRetention'
+import { DxRegistry } from './screens/dx/DxCatalogue'
 import SchemeSimulator from './screens/SchemeSimulator'
 import OpsDashboard from './screens/OpsDashboard'
 import Reports from './screens/Reports'
@@ -137,7 +152,7 @@ function RoleRoute({ children }) {
   return children
 }
 
-const GROUP_ICONS = { Scheme: '🏛' }
+const GROUP_ICONS = { Scheme: '🏛', Operate: '🎛', 'Identity & Family': '🧬', Exchange: '🔄', Govern: '⚖️' }
 const GROUPS_KEY = 'officer_nav_groups'
 
 function NavItem({ item: l, sub = false }) {
@@ -309,6 +324,21 @@ function MainApp() {
             <Route path="/fraud-signals/legacy" element={<RoleRoute><FraudSignals /></RoleRoute>} />
             <Route path="/scheme-simulator" element={<RoleRoute><SchemeSimulator /></RoleRoute>} />
             <Route path="/mdm" element={<RoleRoute><MdmHub /></RoleRoute>} />
+            <Route path="/dx/events" element={<RoleRoute><DxEvents /></RoleRoute>} />
+            <Route path="/dx/approvals" element={<RoleRoute><DxApprovals /></RoleRoute>} />
+            <Route path="/dx/verify" element={<RoleRoute><DxVerify /></RoleRoute>} />
+            <Route path="/dx/consent" element={<RoleRoute><DxConsent /></RoleRoute>} />
+            <Route path="/dx/policy" element={<RoleRoute><DxPolicy /></RoleRoute>} />
+            <Route path="/dx/control" element={<RoleRoute><DxControl /></RoleRoute>} />
+            <Route path="/dx/discrepancies" element={<RoleRoute><DxDiscrepancies /></RoleRoute>} />
+            <Route path="/dx/household" element={<RoleRoute><DxHousehold /></RoleRoute>} />
+            <Route path="/dx/query" element={<RoleRoute><DxQuery /></RoleRoute>} />
+            <Route path="/dx/ledger" element={<RoleRoute><DxLedger /></RoleRoute>} />
+            <Route path="/dx/catalogue" element={<RoleRoute><DxCatalogue /></RoleRoute>} />
+            <Route path="/dx/standards" element={<RoleRoute><DxStandards /></RoleRoute>} />
+            <Route path="/dx/audit" element={<RoleRoute><DxAudit /></RoleRoute>} />
+            <Route path="/dx/retention" element={<RoleRoute><DxRetention /></RoleRoute>} />
+            <Route path="/dx/registry" element={<RoleRoute><DxRegistry /></RoleRoute>} />
             <Route path="/families" element={<RoleRoute><FamilyRegistry /></RoleRoute>} />
             <Route path="/reports" element={<RoleRoute><Reports /></RoleRoute>} />
             <Route path="/analytics" element={<RoleRoute><AnalyticsDashboard /></RoleRoute>} />
