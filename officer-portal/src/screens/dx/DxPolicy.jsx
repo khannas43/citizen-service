@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { mdm } from '../../mdmApi'
 import { useMdm, Status, Badge } from '../mdm/shared'
 import { fmtTime } from './dxShared'
+import { PageHeader, DataTable, Drawer, Banner } from './dxKit'
 
 const TITLES = {
   min_marriage_age: 'Minimum age at marriage', adult_age: 'Adult age', consent_expiry_days: 'How long a consent lasts (days)',
@@ -47,36 +48,35 @@ function Editor({ row, done }) {
   return (
     <div>
       {row.key === 'min_marriage_age' && (
-        <div className="mdm-filters">
-          <label className="mdm-field"><span>Men</span><input inputMode="numeric" value={draft.M} onChange={(e) => setDraft({ ...draft, M: e.target.value })} /></label>
-          <label className="mdm-field"><span>Women</span><input inputMode="numeric" value={draft.F} onChange={(e) => setDraft({ ...draft, F: e.target.value })} /></label>
+        <div className="dxk-form">
+          <label className="dxk-field"><span>Men</span><input inputMode="numeric" value={draft.M} onChange={(e) => setDraft({ ...draft, M: e.target.value })} /></label>
+          <label className="dxk-field"><span>Women</span><input inputMode="numeric" value={draft.F} onChange={(e) => setDraft({ ...draft, F: e.target.value })} /></label>
         </div>
       )}
-      {row.key === 'income_band_edges' && <label className="mdm-field"><span>Limits, separated by commas</span><input value={draft} onChange={(e) => setDraft(e.target.value)} /></label>}
+      {row.key === 'income_band_edges' && <label className="dxk-field"><span>Limits, separated by commas</span><input value={draft} onChange={(e) => setDraft(e.target.value)} /></label>}
       {row.key === 'rationale_required_kinds' && (
-        <div className="mdm-filters" role="group" aria-label="Actions that need a reason">
+        <div className="dxk-checks" role="group" aria-label="Actions that need a reason">
           {Object.entries(KIND_NAMES).map(([k, n]) => (
             <label key={k} className="mdm-check"><input type="checkbox" checked={draft.includes(k)} onChange={() => setDraft((d) => (d.includes(k) ? d.filter((x) => x !== k) : [...d, k]))} /> {n}</label>
           ))}
         </div>
       )}
       {!['min_marriage_age', 'income_band_edges', 'rationale_required_kinds'].includes(row.key) && (
-        <label className="mdm-field"><span>New value</span><input inputMode="numeric" value={draft} onChange={(e) => setDraft(e.target.value)} /></label>
+        <label className="dxk-field"><span>New value</span><input inputMode="numeric" value={draft} onChange={(e) => setDraft(e.target.value)} /></label>
       )}
-      <div className="mdm-actions">
-        <button type="button" className="btn-secondary small" onClick={preview}>Show what it would change</button>
+      <div className="dxk-actions" style={{ marginTop: "0.75rem" }}>
+        <button type="button" className="btn-secondary" onClick={preview}>Show what it would change</button>
       </div>
       {impact && (
-        <div className="dx-banner" role="status">
-          <strong>Before you apply:</strong>
-          <ul className="mdm-plain">{impact.lines.map((l, i) => <li key={i}>{l}</li>)}</ul>
-          <div className="mdm-actions">
-            <input className="mdm-note-input" placeholder="Why is this changing? (recorded)" value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} aria-label="Reason for the change" />
-            <button type="button" className="btn-primary small" disabled={busy} onClick={apply}>Apply the change</button>
-          </div>
+        <div style={{ marginTop: '0.75rem' }}>
+          <Banner tone="warn"><strong>Before you apply:</strong>
+            <ul className="mdm-plain">{impact.lines.map((l, i) => <li key={i}>{l}</li>)}</ul></Banner>
+          <label className="dxk-field" style={{ marginTop: '0.75rem' }}><span>Why is this changing? (recorded)</span>
+            <input placeholder="Reason" value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} aria-label="Reason for the change" /></label>
+          <div className="dxk-actions" style={{ marginTop: '0.75rem' }}><button type="button" className="btn-primary" disabled={busy} onClick={apply}>Apply the change</button></div>
         </div>
       )}
-      {err && <p className="mdm-error" role="alert">{err}</p>}
+      {err && <div style={{ marginTop: "0.75rem" }}><Banner tone="bad">{err}</Banner></div>}
     </div>
   )
 }
@@ -85,10 +85,14 @@ function History({ keyName }) {
   const { data, error, loading } = useMdm(`/x/policy/${keyName}/history`, undefined, [keyName])
   if (!data) return <Status loading={loading} error={error} />
   return (
-    <table className="mdm-table tight">
-      <thead><tr><th>Version</th><th>Value</th><th>Changed by</th><th>When</th><th>Why</th></tr></thead>
-      <tbody>{data.map((h) => <tr key={h.version}><td>{h.version}{h.active && <> <Badge tone="ok">in force</Badge></>}</td><td>{show(keyName, h.value)}</td><td>{h.changed_by}</td><td className="mdm-sub">{fmtTime(h.changed_at)}</td><td className="mdm-sub">{h.note}</td></tr>)}</tbody>
-    </table>
+    <DataTable rows={data} rowKey="version" dense pageSize={10} pageSizes={[10]}
+      columns={[
+        { key: 'version', label: 'Version', render: (h) => <>{h.version}{h.active && <> <Badge tone="ok">in force</Badge></>}</> },
+        { key: 'value', label: 'Value', render: (h) => show(keyName, h.value), sort: false },
+        { key: 'changed_by', label: 'Changed by' },
+        { key: 'changed_at', label: 'When', render: (h) => <span className="mdm-sub">{fmtTime(h.changed_at)}</span> },
+        { key: 'note', label: 'Why', render: (h) => <span className="mdm-sub">{h.note}</span> },
+      ]} />
   )
 }
 
@@ -97,39 +101,34 @@ export default function DxPolicy() {
   const [editing, setEditing] = useState(null)
   const [hist, setHist] = useState(null)
   const { data, error, loading } = useMdm('/x/policy', undefined, [tick])
+  const ed = data?.policies.find((p) => p.key === editing)
+  const hs = data?.policies.find((p) => p.key === hist)
   return (
     <div className="mdm-hub">
-      <h1 className="page-title">Policy</h1>
-      <p className="mdm-intro">The rules that decide what is allowed: ages, how long consent lasts, which actions need a reason. A change takes effect at once for new requests. Work already started keeps the version it began under, and every version is kept.</p>
+      <PageHeader icon="📏" title="Policy"
+        subtitle="The rules that decide what is allowed: ages, how long consent lasts, which actions need a reason. A change takes effect at once for new requests. Work already started keeps the version it began under, and every version is kept." />
       <Status loading={loading && !data} error={error} />
       {data && (
-        <section className="mdm-card flush">
-          <div className="mdm-table-wrap">
-            <table className="mdm-table">
-              <thead><tr><th>Rule</th><th>Value now</th><th>Version</th><th>Last changed</th><th /></tr></thead>
-              <tbody>
-                {data.policies.map((p) => (
-                  <tr key={p.key} className={`dx-policy-row${editing === p.key ? ' editing' : ''}`}>
-                    <td><strong>{TITLES[p.key] || p.key}</strong><div className="mdm-sub">{p.description}</div>
-                      {editing === p.key && <Editor row={p} done={() => { setEditing(null); setTick((n) => n + 1) }} />}
-                      {hist === p.key && <History keyName={p.key} />}
-                    </td>
-                    <td>{show(p.key, p.value)}</td>
-                    <td className="num">{p.version}</td>
-                    <td className="mdm-sub">{p.changed_by}<br />{fmtTime(p.changed_at)}</td>
-                    <td>
-                      <div className="mdm-actions">
-                        <button type="button" className="btn-secondary small" onClick={() => setEditing(editing === p.key ? null : p.key)}>{editing === p.key ? 'Cancel' : 'Change'}</button>
-                        {p.versions > 1 && <button type="button" className="mdm-link" onClick={() => setHist(hist === p.key ? null : p.key)}>History ({p.versions})</button>}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <DataTable rows={data.policies} rowKey="key" search={{ placeholder: 'Search rules', text: (p) => `${TITLES[p.key] || p.key} ${p.description} ${show(p.key, p.value)}` }}
+          csv={{ name: 'policy-rules' }} pageSize={20} pageSizes={[20]}
+          columns={[
+            { key: 'key', label: 'Rule', render: (p) => <><span className="dxk-main">{TITLES[p.key] || p.key}</span><div className="mdm-sub">{p.description}</div></>, csv: (p) => TITLES[p.key] || p.key },
+            { key: 'value', label: 'Value now', render: (p) => show(p.key, p.value), csv: (p) => show(p.key, p.value), sort: false },
+            { key: 'version', label: 'Version', align: 'num' },
+            { key: 'changed_at', label: 'Last changed', render: (p) => <span className="mdm-sub">{p.changed_by}<br />{fmtTime(p.changed_at)}</span>, csv: (p) => p.changed_at },
+            { key: 'go', label: '', render: (p) => (
+              <div className="dxk-actions">
+                <button type="button" className="btn-secondary small" onClick={() => setEditing(p.key)}>Change</button>
+                {p.versions > 1 && <button type="button" className="mdm-link" onClick={() => setHist(p.key)}>History ({p.versions})</button>}
+              </div>) },
+          ]} />
       )}
+      <Drawer open={!!ed} onClose={() => setEditing(null)} title={ed ? (TITLES[ed.key] || ed.key) : ''} subtitle={ed?.description}>
+        {ed && <Editor key={ed.key} row={ed} done={() => { setEditing(null); setTick((n) => n + 1) }} />}
+      </Drawer>
+      <Drawer open={!!hs} onClose={() => setHist(null)} title={hs ? `History: ${TITLES[hs.key] || hs.key}` : ''} wide>
+        {hs && <History keyName={hs.key} />}
+      </Drawer>
     </div>
   )
 }

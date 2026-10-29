@@ -147,14 +147,17 @@ def declare_marriage(cur, person_id: int, spouse_name: str, actor: str, channel:
     return {**row, "note": "Recorded as the citizen's own declaration. It is shown as unverified and is not a marriage record."}
 
 
-def list_discrepancies(cur, status=None, kind=None, person_id=None, limit=50, offset=0) -> dict:
+def list_discrepancies(cur, status=None, kind=None, person_id=None, limit=50, offset=0, q=None) -> dict:
     where, p = ["true"], []
     for col, v in (("d.status", status), ("d.kind", kind), ("d.person_id", person_id)):
         if v:
             where.append(f"{col}=%s")
             p.append(v)
+    if q and q.strip():
+        where.append("(d.attribute ILIKE %s OR coalesce(d.reported_value,'') ILIKE %s OR coalesce(d.current_value,'') ILIKE %s OR coalesce(pe.name,'') ILIKE %s OR coalesce(pe.mdm_id,'') ILIKE %s)")
+        p += [f"%{q.strip()}%"] * 5
     w = " AND ".join(where)
-    cur.execute(f"SELECT count(*) AS n FROM mdm.discrepancy d WHERE {w}", p)
+    cur.execute(f"SELECT count(*) AS n FROM mdm.discrepancy d LEFT JOIN mdm.person pe ON pe.id=d.person_id WHERE {w}", p)
     total = cur.fetchone()["n"]
     cur.execute(f"SELECT d.*, pe.name AS person_name, pe.mdm_id FROM mdm.discrepancy d LEFT JOIN mdm.person pe ON pe.id=d.person_id WHERE {w} ORDER BY d.id DESC LIMIT %s OFFSET %s", p + [limit, offset])
     items = cur.fetchall()
@@ -236,6 +239,9 @@ def run_query(cur, requester: str, purpose: str, elements: list[str], filters: d
     if requester != pu["system"]:
         out = ledger(cur, "QUERY", requester, actor, purpose, None, None, "population query", "DENIED_POLICY", {"reason": "requester not allowed for this purpose"})
         return {"outcome": "DENIED_POLICY", "message": f"Policy: only {SYSTEMS[pu['system']]} may use '{pu['name']}'.", "ledger_id": out}
+    if exchange.is_blocked(cur, actor):
+        lid = ledger(cur, "QUERY", requester, actor, purpose, None, None, "population query", "DENIED_POLICY", {"reason": "user blocked"})
+        return {"outcome": "DENIED_POLICY", "message": "This user's access is stopped pending review.", "ledger_id": lid}
     bad = [e for e in elements if e not in QUERYABLE or e not in pu["elements"]]
     if not elements or bad:
         raise Refused("Choose elements this purpose allows: " + ", ".join(e for e in QUERYABLE if e in pu["elements"]))

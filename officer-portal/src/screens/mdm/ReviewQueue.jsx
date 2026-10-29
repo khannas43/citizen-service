@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { mdm } from '../../mdmApi'
 import { useMdm, Status, Badge, Pager } from './shared'
 import { COMPONENT_LABELS } from './labels'
+import { DataTable, FilterSelect } from '../dx/dxKit'
 
 function EvidenceTable({ ev }) {
   if (!ev?.components) return null
@@ -80,38 +81,22 @@ export default function ReviewQueue({ initialSource }) {
   return (
     <div className="mdm-stack">
       <p className="mdm-intro">These records look like someone already known, but not certainly. Compare them and decide. Strongest matches come first.</p>
-      <div className="mdm-filters">
-        <label className="mdm-field"><span>System</span>
-          <select value={source} onChange={(e) => { setSource(e.target.value); setOffset(0) }}>
-            <option value="">All systems</option>
-            {(srcs || []).map((s) => <option key={s.source} value={s.source}>{s.name}</option>)}
-          </select>
-        </label>
-      </div>
       <Status loading={loading && !data} error={error} />
       {data && (
-        <section className="mdm-card flush">
-          <div className="mdm-table-wrap">
-            <table className="mdm-table">
-              <thead><tr><th>Record</th><th>System</th><th>Born / age</th><th>Place</th><th className="num">Best match</th><th className="num">Candidates</th><th /></tr></thead>
-              <tbody>
-                {data.items.map((r) => (
-                  <tr key={r.id}>
-                    <td><strong>{r.name}</strong><div className="mdm-sub">{r.source_rid}</div></td>
-                    <td>{r.source_name}</td>
-                    <td>{r.dob || (r.age != null ? `age ${r.age}` : '—')}</td>
-                    <td>{[r.mandal, r.district].filter(Boolean).join(', ') || '—'}</td>
-                    <td className="num">{Math.round(Number(r.score) * 100)}%</td>
-                    <td className="num">{r.candidate_count}</td>
-                    <td><button type="button" className="btn-primary small" onClick={() => setSel(r.id)}>Review</button></td>
-                  </tr>
-                ))}
-                {!data.items.length && <tr><td colSpan="7" className="mdm-empty">Nothing waiting. Every doubtful match has been settled.</td></tr>}
-              </tbody>
-            </table>
-          </div>
-          <Pager total={data.total} limit={limit} offset={offset} onChange={setOffset} />
-        </section>
+        <DataTable rows={data.items} server={{ total: data.total, limit, offset, onPage: setOffset }}
+          search={{ placeholder: 'Search this page by name or record number', text: (r) => `${r.name} ${r.source_rid} ${r.source_name} ${r.district || ''} ${r.mandal || ''}` }}
+          canClear={!!source} onClear={() => { setSource(''); setOffset(0) }}
+          filters={<FilterSelect label="System" value={source} onChange={(v) => { setSource(v); setOffset(0) }} options={(srcs || []).map((s) => [s.source, s.name])} all="All systems" />}
+          onRowClick={(r) => setSel(r.id)} empty="Nothing waiting. Every doubtful match has been settled."
+          columns={[
+            { key: 'name', label: 'Record', render: (r) => <><strong>{r.name}</strong><div className="mdm-sub">{r.source_rid}</div></> },
+            { key: 'source_name', label: 'System' },
+            { key: 'dob', label: 'Born / age', render: (r) => r.dob || (r.age != null ? `age ${r.age}` : '—') },
+            { key: 'district', label: 'Place', render: (r) => [r.mandal, r.district].filter(Boolean).join(', ') || '—' },
+            { key: 'score', label: 'Best match', align: 'num', render: (r) => `${Math.round(Number(r.score) * 100)}%` },
+            { key: 'candidate_count', label: 'Candidates', align: 'num' },
+            { key: 'go', label: '', sort: false, render: (r) => <button type="button" className="btn-primary small" onClick={(e) => { e.stopPropagation(); setSel(r.id) }}>Review</button> },
+          ]} />
       )}
     </div>
   )

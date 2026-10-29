@@ -6,7 +6,9 @@ import ReviewQueue from './ReviewQueue'
 import DataQuality from './DataQuality'
 import RulesAudit from './RulesAudit'
 import UseCases from './UseCases'
+import '../dx/dxKit.css'
 import './mdm.css'
+import { PageHeader, Tabs } from '../dx/dxKit'
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -27,12 +29,8 @@ export default function MdmHub() {
 
   return (
     <div className="mdm-hub">
-      <h1 className="page-title">Master Data</h1>
-      <nav className="mdm-tabs" role="tablist" aria-label="Master data">
-        {TABS.map((t) => (
-          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} className={tab === t.id ? 'active' : ''} onClick={() => go(t.id)}>{t.label}</button>
-        ))}
-      </nav>
+      <PageHeader icon="🧬" title="Master Data" subtitle="One view of each person across departments. Departments stay the source of truth." />
+      <Tabs label="Master data" value={tab} onChange={(id) => go(id)} tabs={TABS} />
       <div role="tabpanel" className="mdm-panel">
         {tab === 'overview' && <Overview goto={go} />}
         {tab === 'usecases' && <UseCases goto={go} openPerson={openPerson} />}

@@ -26,6 +26,7 @@ describe('Approvals', () => {
   it('will not approve a sensitive action without a reason of the required length', async () => {
     globalThis.fetch = route({ '/x/approvals': { total: 1, items: [proposal()], by_system: [{ system: 'Social security / pension MIS', n: 1 }], rationale_min_chars: 10 } })
     render(<MemoryRouter><DxApprovals /></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: 'Review' }))
     const approve = await screen.findByRole('button', { name: 'Approve' })
     expect(approve).toBeDisabled()
     expect(screen.getByText(/Reason \(required, at least 10 characters\)/)).toBeInTheDocument()
@@ -38,6 +39,7 @@ describe('Approvals', () => {
       gate: { purpose: 'BIRTH_PDS', purpose_name: "Add the child to the family's ration card", status: 'PENDING', consent_id: 4 } })
     globalThis.fetch = route({ '/x/approvals': { total: 1, items: [gated], by_system: [], rationale_min_chars: 10 } })
     render(<MemoryRouter><DxApprovals /></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: 'Review' }))
     expect(await screen.findByText(/Waiting for consent from the parent/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Approve' })).toBeDisabled()
   })
@@ -49,7 +51,8 @@ describe('Approvals', () => {
       '/proposals/7/decision': (u, init) => { calls.push(JSON.parse(init.body)); return json({ detail: 'Waiting for something' }, false, 409) },
     })
     render(<MemoryRouter><DxApprovals /></MemoryRouter>)
-    fireEvent.change(await screen.findByRole('textbox'), { target: { value: 'Death certificate seen' } })
+    fireEvent.click(await screen.findByRole('button', { name: 'Review' }))
+    fireEvent.change(await screen.findByLabelText(/Reason \(required/), { target: { value: 'Death certificate seen' } })
     fireEvent.click(screen.getByRole('button', { name: 'Approve' }))
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Waiting for something'))
     expect(calls[0]).toMatchObject({ decision: 'APPROVE', note: 'Death certificate seen' })

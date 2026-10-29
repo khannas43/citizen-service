@@ -113,9 +113,9 @@ def delivery_redeliver(did: int, cur=Depends(cur_dep), u=Depends(auth.can_write)
 
 
 @router.get("/api/x/discrepancies")
-def discrepancies(status: Optional[str] = None, kind: Optional[str] = None, person_id: Optional[int] = None,
+def discrepancies(status: Optional[str] = None, kind: Optional[str] = None, person_id: Optional[int] = None, q: Optional[str] = None,
                   limit: int = Query(50, le=200), offset: int = 0, cur=Depends(cur_dep), _=Depends(auth.can_read)):
-    return ops.list_discrepancies(cur, status, kind, person_id, limit, offset)
+    return ops.list_discrepancies(cur, status, kind, person_id, limit, offset, q)
 
 
 @router.post("/api/x/discrepancies")

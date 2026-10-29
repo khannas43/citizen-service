@@ -23,6 +23,7 @@ export const DISC = {
   ROUTED: ['Sent to the department', 'warn'], CORRECTED_AT_SOURCE: ['Corrected at the source', 'ok'], CONFIRMED_AS_IS: ['Department says it is right', 'neutral'],
   REJECTED: ['Not accepted', 'neutral'], DECLARED: ['Declared by the citizen (unverified)', 'info'],
 }
+export const CONNECTOR = { DRAFT: ['Draft', 'neutral'], TESTING: ['Tested, not live', 'info'], ACTIVE: ['Live', 'ok'], SUSPENDED: ['Suspended', 'bad'] }
 export const PROPOSAL = { PROPOSED: ['Waiting for a decision', 'warn'], APPROVED: ['Approved', 'ok'], REJECTED: ['Rejected', 'neutral'], WITHDRAWN: ['Cancelled', 'neutral'] }
 
 export function Tag({ map, value }) {
@@ -48,18 +49,20 @@ export function PersonPicker({ onPick, label = 'Find a person' }) {
   }
   return (
     <div className="dx-picker">
-      <form className="mdm-filters" onSubmit={search} role="search">
-        <label className="mdm-field grow"><span>{label}</span>
+      <form className="dxk-pickrow" onSubmit={search} role="search">
+        <label className="dxk-field"><span>{label}</span>
           <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, ration card or MDM id" /></label>
-        <button type="submit" className="btn-secondary small">Search</button>
+        <button type="submit" className="btn-secondary">Search</button>
       </form>
       {err && <p className="mdm-error" role="alert">{err}</p>}
       {rows && (rows.length ? (
-        <ul className="mdm-plain">
+        <ul className="dxk-picklist">
           {rows.map((p) => (
             <li key={p.id}>
-              <button type="button" className="mdm-link strong" onClick={() => { onPick(p); setRows(null) }}>{p.name}</button>{' '}
-              <span className="mdm-sub">{p.mdm_id} · born {p.dob || p.birth_year || 'unknown'} · {p.district}</span>
+              <button type="button" onClick={() => { onPick(p); setRows(null) }}>
+                <strong>{p.name}</strong>
+                <span className="mdm-sub">{p.mdm_id} · born {p.dob || p.birth_year || 'unknown'} · {p.district}</span>
+              </button>
             </li>
           ))}
         </ul>
@@ -147,7 +150,7 @@ export function ApprovalCard({ p, minChars = 10, reload, openPerson, openCase })
         <Tag map={PROPOSAL} value={p.status} />
       </div>
       {p.detail?.outside_state && <p className="mdm-note">Registered outside the state ({p.detail.place_of_death}). Check with that registrar before confirming.</p>}
-      {p.detail?.urgent && <p className="mdm-note"><Badge tone="bad">Urgent</Badge> A payment is due on {p.detail.next_payment_on}. It stays on hold until you decide.</p>}
+      {p.detail?.urgent && <p className="mdm-note"><Badge tone="bad">Urgent</Badge> A payment is due on {p.detail.next_payment_on}. The stop applies from that cycle; a payment already in flight is left as it is.</p>}
       {p.gate && p.gate.status !== 'GRANTED' && (
         <p className={`dx-banner ${waiting ? 'warn' : ''}`} role="status">
           {p.gate.status === 'NOT_REQUESTED'

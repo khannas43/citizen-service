@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { mdm } from '../../mdmApi'
 import { useMdm, Status, Badge, Pager } from './shared'
 import { fmtDate } from './labels'
+import { DataTable } from '../dx/dxKit'
 
 const FIELDS = [
   ['auto', 'Link automatically at or above', 'A record at or above this score is attached to the person without a human.'],
@@ -87,7 +88,7 @@ function Audit() {
   const { data, error, loading } = useMdm('/audit', { limit, offset }, [offset])
   const check = async () => { try { setVerify(await mdm('/audit/verify')) } catch (e) { setVerify({ error: e.message }) } }
   return (
-    <section className="mdm-card flush">
+    <section className="mdm-card">
       <div className="mdm-card-pad">
         <h3>Audit log</h3>
         <p className="mdm-note">Every load and every steward decision. Each entry carries a fingerprint of the one before it, so a changed or removed entry shows up.</p>
@@ -97,17 +98,15 @@ function Audit() {
       </div>
       <Status loading={loading && !data} error={error} />
       {data && (
-        <>
-          <div className="mdm-table-wrap">
-            <table className="mdm-table">
-              <thead><tr><th className="num">#</th><th>When</th><th>Who</th><th>What</th><th>About</th></tr></thead>
-              <tbody>{data.items.map((a) => (
-                <tr key={a.seq}><td className="num">{a.seq}</td><td>{fmtDate(a.ts)}</td><td>{a.actor}</td><td>{a.action.replace(/_/g, ' ').toLowerCase()}</td>
-                  <td className="mdm-sub">{a.subject}{a.detail?.note ? ` — ${a.detail.note}` : ''}</td></tr>))}</tbody>
-            </table>
-          </div>
-          <Pager total={data.total} limit={limit} offset={offset} onChange={setOffset} />
-        </>
+        <DataTable rows={data.items} rowKey="seq" server={{ total: data.total, limit, offset, onPage: setOffset }}
+          search={{ placeholder: 'Search this page', text: (a) => `${a.actor} ${a.action} ${a.subject}` }} dense
+          columns={[
+            { key: 'seq', label: '#', align: 'num' },
+            { key: 'ts', label: 'When', render: (a) => fmtDate(a.ts) },
+            { key: 'actor', label: 'Who' },
+            { key: 'action', label: 'What', render: (a) => a.action.replace(/_/g, ' ').toLowerCase() },
+            { key: 'subject', label: 'About', render: (a) => <span className="mdm-sub">{a.subject}{a.detail?.note ? ` — ${a.detail.note}` : ''}</span> },
+          ]} />
       )}
     </section>
   )

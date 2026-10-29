@@ -1,39 +1,58 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useMdm, Status, Pager } from '../mdm/shared'
-import { ApprovalCard, PROPOSAL } from './dxShared'
+import { useMdm, Status } from '../mdm/shared'
+import { ApprovalCard, PROPOSAL, Tag, fmtTime } from './dxShared'
+import { PageHeader, DataTable, Drawer, Segmented, FilterSelect } from './dxKit'
+
+const kindLabel = (k) => (k || '').toLowerCase().replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase())
 
 /** The departments' queue: every follow-up action waits here for a person to approve or reject it, with a reason on record. */
 export default function DxApprovals() {
   const nav = useNavigate()
   const [system, setSystem] = useState('')
+  const [uc, setUc] = useState('')
   const [status, setStatus] = useState('PROPOSED')
+  const [q, setQ] = useState('')
   const [offset, setOffset] = useState(0)
   const [tick, setTick] = useState(0)
-  const limit = 20
-  const { data, error, loading } = useMdm('/x/approvals', { system, status, limit, offset }, [system, status, offset, tick])
+  const [sel, setSel] = useState(null)
+  const limit = 15
+  const { data, error, loading } = useMdm('/x/approvals', { system, uc, status, q: q.trim(), limit, offset }, [system, uc, status, q, offset, tick])
+  const reset = () => { setSystem(''); setUc(''); setQ(''); setOffset(0) }
   return (
     <div className="mdm-hub">
-      <h1 className="page-title">Approvals</h1>
-      <p className="mdm-intro">Nothing that affects a person's benefits happens on its own. Each action waits in its department's queue until an authorised officer approves or rejects it, and the reason is kept with their name.</p>
-      <p className="mdm-note">Approving records the decision and marks the action ready for the department. This build does not change any department's system.</p>
-      <form className="mdm-filters" onSubmit={(e) => e.preventDefault()}>
-        <label className="mdm-field"><span>Department</span>
-          <select value={system} onChange={(e) => { setSystem(e.target.value); setOffset(0) }}>
-            <option value="">All departments</option>
-            {(data?.by_system || []).map((s) => <option key={s.system} value={s.system}>{s.system} ({s.n})</option>)}
-          </select></label>
-        <label className="mdm-field"><span>Status</span>
-          <select value={status} onChange={(e) => { setStatus(e.target.value); setOffset(0) }}>
-            {Object.entries(PROPOSAL).map(([k, [t]]) => <option key={k} value={k}>{t}</option>)}</select></label>
-      </form>
+      <PageHeader icon="✅" title="Approvals"
+        subtitle="Nothing that affects a person's benefits happens on its own. Each action waits here until an authorised officer approves or rejects it; the reason is kept with their name. Approving marks the action ready for the department; this build does not change any department's system." />
       <Status loading={loading && !data} error={error} />
-      {data && data.total === 0 && <p className="mdm-note">Nothing here.</p>}
-      {data && data.items.map((p) => (
-        <ApprovalCard key={p.id} p={p} minChars={data.rationale_min_chars} reload={() => setTick((n) => n + 1)}
-          openPerson={(id) => nav(`/mdm?tab=people&person=${id}`)} openCase={(id) => nav(`/dx/events?case=${id}`)} />
-      ))}
-      {data && <Pager total={data.total} limit={limit} offset={offset} onChange={setOffset} />}
+      <DataTable
+        rows={data?.items || []} server={data ? { total: data.total, limit, offset, onPage: setOffset } : { total: 0, limit, offset, onPage: setOffset }}
+        searchValue={q} onSearch={(v) => { setQ(v); setOffset(0) }} searchDelay={300} search={{ placeholder: 'Search action, person or MDM id' }}
+        canClear={!!(system || uc || q)} onClear={reset}
+        filters={<>
+          <div className="dxk-filter"><span>Status</span>
+            <Segmented label="Status" value={status} onChange={(v) => { setStatus(v); setOffset(0) }}
+              options={Object.entries(PROPOSAL).map(([k, [t]]) => ({ value: k, label: t }))} /></div>
+          <FilterSelect label="Department" value={system} all="All departments" onChange={(v) => { setSystem(v); setOffset(0) }}
+            options={(data?.by_system || []).map((s) => [s.system, `${s.system} (${s.n})`])} />
+          <FilterSelect label="Use case" value={uc} onChange={(v) => { setUc(v); setOffset(0) }} options={['UC1', 'UC2', 'UC3', 'UC4', 'UC5', 'UC6']} />
+        </>}
+        empty="No actions here" emptyHint={status === 'PROPOSED' ? 'Nothing is waiting for a decision.' : undefined}
+        onRowClick={setSel} rowKey="id"
+        columns={[
+          { key: 'created_at', label: 'Raised', render: (p) => <span className="dxk-muted">{fmtTime(p.created_at)}</span> },
+          { key: 'summary', label: 'Action', render: (p) => <><div className="dxk-main">{p.summary}</div><div className="dxk-muted">{kindLabel(p.kind)}{p.uc ? ` · ${p.uc}` : ''}</div></> },
+          { key: 'system', label: 'Department' },
+          { key: 'person_name', label: 'Person', render: (p) => p.person_name || '—' },
+          { key: 'status', label: 'Status', render: (p) => <Tag map={PROPOSAL} value={p.status} /> },
+          { key: 'go', label: '', render: (p) => <button type="button" className="btn-secondary small" onClick={(e) => { e.stopPropagation(); setSel(p) }}>{p.status === 'PROPOSED' ? 'Review' : 'View'}</button> },
+        ]}
+      />
+      <Drawer open={!!sel} onClose={() => setSel(null)} title={sel ? kindLabel(sel.kind) : ''} subtitle={sel ? `${sel.system}${sel.person_name ? ` · ${sel.person_name}` : ''}` : ''} wide>
+        {sel && (
+          <ApprovalCard p={sel} minChars={data?.rationale_min_chars} reload={() => { setSel(null); setTick((n) => n + 1) }}
+            openPerson={(id) => nav(`/mdm?tab=people&person=${id}`)} openCase={(id) => nav(`/dx/events?case=${id}`)} />
+        )}
+      </Drawer>
     </div>
   )
 }

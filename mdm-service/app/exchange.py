@@ -250,14 +250,17 @@ def ledger(cur, kind, requester, actor, purpose, person_id, consent_id, question
     return cur.fetchone()["id"]
 
 
-def list_ledger(cur, outcome=None, person_id=None, kind=None, limit=50, offset=0) -> dict:
+def list_ledger(cur, outcome=None, person_id=None, kind=None, limit=50, offset=0, q=None) -> dict:
     where, p = ["true"], []
     for col, v in (("e.outcome", outcome), ("e.person_id", person_id), ("e.kind", kind)):
         if v:
             where.append(f"{col}=%s")
             p.append(v)
+    if q and q.strip():
+        where.append("(coalesce(e.requester,'') ILIKE %s OR coalesce(e.purpose,'') ILIKE %s OR coalesce(e.question,'') ILIKE %s OR coalesce(pe.name,'') ILIKE %s OR coalesce(e.requester_actor,'') ILIKE %s)")
+        p += [f"%{q.strip()}%"] * 5
     w = " AND ".join(where)
-    cur.execute(f"SELECT count(*) AS n FROM mdm.exchange e WHERE {w}", p)
+    cur.execute(f"SELECT count(*) AS n FROM mdm.exchange e LEFT JOIN mdm.person pe ON pe.id=e.person_id WHERE {w}", p)
     total = cur.fetchone()["n"]
     cur.execute(f"SELECT e.*, pe.name AS person_name, pe.mdm_id FROM mdm.exchange e LEFT JOIN mdm.person pe ON pe.id=e.person_id WHERE {w} ORDER BY e.id DESC LIMIT %s OFFSET %s", p + [limit, offset])
     return {"total": total, "limit": limit, "offset": offset, "items": cur.fetchall()}
@@ -358,6 +361,8 @@ def respond(cur, cid: int, decision: str, actor: str, channel: str = "PORTAL", o
                 (status, _js(scope), now, expires, channel, operator, given_by if given_by and given_by != c["person_id"] else None, cid))
     _log(cur, cid, status, actor, channel, note, {"operator": operator, "elements": scope.get("elements"), "partial": scope.get("partial"), "given_by": given_by})
     released = 0
+    if status == "REFUSED":
+        cur.execute("UPDATE mdm.delivery SET status='BLOCKED_REFUSED', updated_at=now() WHERE consent_id=%s AND status='PENDING_CONSENT'", (cid,))
     if status == "GRANTED":
         cur.execute("SELECT id FROM mdm.delivery WHERE consent_id=%s AND status='PENDING_CONSENT' ORDER BY id", (cid,))
         for d in cur.fetchall():
@@ -515,6 +520,11 @@ def birth_consents(cur, event_id: int, child_id: int, father_id: int | None, mot
     return out
 
 
+def is_blocked(cur, actor: str) -> bool:
+    cur.execute("SELECT 1 FROM mdm.access_block WHERE actor=%s AND lifted_at IS NULL LIMIT 1", (actor,))
+    return cur.fetchone() is not None
+
+
 def is_available(cur, system: str) -> bool:
     cur.execute("SELECT available FROM mdm.subscriber WHERE system=%s", (system,))
     r = cur.fetchone()
@@ -665,14 +675,20 @@ def require_rationale(cur, pr: dict, note: str | None):
             raise Refused(f"This action needs a reason of at least {pol['rationale_min_chars']} characters, recorded against your name.")
 
 
-def approvals(cur, system=None, status="PROPOSED", limit=50, offset=0) -> dict:
+def approvals(cur, system=None, status="PROPOSED", limit=50, offset=0, q=None, uc=None) -> dict:
     pol = current(cur)
     where, p = ["pr.status=%s"], [status]
     if system:
         where.append("pr.system=%s")
         p.append(system)
+    if uc:
+        where.append("pr.uc=%s")
+        p.append(uc)
+    if q and q.strip():
+        where.append("(pr.summary ILIKE %s OR pr.kind ILIKE %s OR coalesce(pe.name,'') ILIKE %s OR coalesce(pe.mdm_id,'') ILIKE %s)")
+        p += [f"%{q.strip()}%"] * 4
     w = " AND ".join(where)
-    cur.execute(f"SELECT count(*) AS n FROM mdm.proposal pr WHERE {w}", p)
+    cur.execute(f"SELECT count(*) AS n FROM mdm.proposal pr LEFT JOIN mdm.person pe ON pe.id=pr.person_id WHERE {w}", p)
     total = cur.fetchone()["n"]
     cur.execute(f"""SELECT pr.*, pe.name AS person_name, pe.mdm_id FROM mdm.proposal pr LEFT JOIN mdm.person pe ON pe.id=pr.person_id
                     WHERE {w} ORDER BY pr.id DESC LIMIT %s OFFSET %s""", p + [limit, offset])
@@ -868,6 +884,8 @@ def verify(cur, requester: str, purpose: str, question: str, params: dict | None
         return finish("DENIED_POLICY", {"message": f"Policy: only {SYSTEMS.get(pu['system'])} may ask for the purpose '{pu['name']}'."})
     if qd["element"] not in pu["elements"]:
         return finish("DENIED_POLICY", {"message": f"Policy: '{pu['name']}' does not allow questions about {qd['element'].replace('_', ' ')}."})
+    if is_blocked(cur, actor):
+        return finish("DENIED_POLICY", {"message": "This user's access is stopped pending review. Nothing was looked up.", "alert": "BLOCKED"})
     pid = person_id
     if reference_token:
         cur.execute("SELECT person_id FROM mdm.source_record WHERE source='identity_reference' AND source_rid=%s", (reference_token,))
@@ -893,6 +911,8 @@ def verify(cur, requester: str, purpose: str, question: str, params: dict | None
         audit.write(cur, actor, "MISUSE_ALERT", f"person:{pid}", {"reason": "REPEATED_LOOKUP", "requester": requester, "purpose": purpose, "limit_per_hour": pol["max_lookups_per_hour"]})
         return finish("DENIED_POLICY", {"message": f"Not answered: this person has already been looked up {pol['max_lookups_per_hour']} times in the last hour by the same user. This is flagged for review.", "alert": "REPEATED_LOOKUP"}, pid, cid)
     outcome, ans = _evaluate(cur, pid, question, params, pol)
+    cur.execute("SELECT 1 FROM mdm.source_record WHERE person_id=%s AND source='identity_reference' LIMIT 1", (pid,))
+    ans["identity_basis"] = "Identity reference" if (reference_token or cur.fetchone()) else "Matched on name, date of birth and address: lower assurance"
     return finish(outcome, ans, pid, cid)
 
 
@@ -902,17 +922,21 @@ def person_exchange_summary(cur, pid: int) -> dict:
     for c in cons:
         c["purpose_name"] = PURPOSES.get(c["purpose"], {}).get("name", c["purpose"])
         c["system_name"] = SYSTEMS.get(c["system"], c["system"])
+    ident = identity_of(cur, pid)                   # runs its own query, so it must come before the one whose rows are fetched below
     cur.execute("SELECT id, ts, kind, requester, purpose, question, outcome FROM mdm.exchange WHERE person_id=%s ORDER BY id DESC LIMIT 25", (pid,))
-    return {"identity": identity_of(cur, pid), "consents": cons, "exchanges": cur.fetchall()}
+    return {"identity": ident, "consents": cons, "exchanges": cur.fetchall()}
 
 
-def event_stream(cur, uc=None, status=None, limit=50, offset=0) -> dict:
+def event_stream(cur, uc=None, status=None, limit=50, offset=0, q=None) -> dict:
     """The event feed with what happened for each subscribing department, one line per event."""
     where, p = ["true"], []
     for col, v in (("e.uc", uc), ("e.status", status)):
         if v:
             where.append(f"{col}=%s")
             p.append(v)
+    if q and q.strip():
+        where.append("(e.event_key ILIKE %s OR e.event_type ILIKE %s OR coalesce(e.note,'') ILIKE %s OR e.payload::text ILIKE %s)")
+        p += [f"%{q.strip()}%"] * 4
     w = " AND ".join(where)
     cur.execute(f"SELECT count(*) AS n FROM mdm.event e WHERE {w}", p)
     total = cur.fetchone()["n"]

@@ -144,9 +144,9 @@ def verify(body: VerifyIn, cur=Depends(cur_dep), u=Depends(auth.can_write)):
 
 
 @router.get("/api/x/ledger")
-def ledger(outcome: Optional[str] = None, person_id: Optional[int] = None, kind: Optional[str] = None,
+def ledger(outcome: Optional[str] = None, person_id: Optional[int] = None, kind: Optional[str] = None, q: Optional[str] = None,
            limit: int = Query(50, le=200), offset: int = 0, cur=Depends(cur_dep), _=Depends(auth.can_read)):
-    return exchange.list_ledger(cur, outcome, person_id, kind, limit, offset)
+    return exchange.list_ledger(cur, outcome, person_id, kind, limit, offset, q)
 
 
 @router.get("/api/x/deliveries")
@@ -155,9 +155,9 @@ def deliveries(status: Optional[str] = None, limit: int = Query(50, le=200), off
 
 
 @router.get("/api/x/events")
-def event_stream(uc: Optional[str] = None, status: Optional[str] = None, limit: int = Query(50, le=200), offset: int = 0,
+def event_stream(uc: Optional[str] = None, status: Optional[str] = None, q: Optional[str] = None, limit: int = Query(50, le=200), offset: int = 0,
                  cur=Depends(cur_dep), _=Depends(auth.can_read)):
-    return exchange.event_stream(cur, uc, status, limit, offset)
+    return exchange.event_stream(cur, uc, status, limit, offset, q)
 
 
 @router.get("/api/x/events/{eid}/flow")
@@ -166,9 +166,9 @@ def event_flow(eid: int, cur=Depends(cur_dep), _=Depends(auth.can_read)):
 
 
 @router.get("/api/x/approvals")
-def approvals(system: Optional[str] = None, status: str = "PROPOSED", limit: int = Query(50, le=200), offset: int = 0,
+def approvals(system: Optional[str] = None, status: str = "PROPOSED", q: Optional[str] = None, uc: Optional[str] = None, limit: int = Query(50, le=200), offset: int = 0,
               cur=Depends(cur_dep), _=Depends(auth.can_read)):
-    return exchange.approvals(cur, system, status, limit, offset)
+    return exchange.approvals(cur, system, status, limit, offset, q, uc)
 
 
 @router.get("/api/x/persons/{pid}/exchange")
