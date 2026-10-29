@@ -534,3 +534,5 @@ from .ops_api import router as ops_router                      # noqa: E402
 app.include_router(ops_router, prefix=BASE)
 from .wave3_api import router as wave3_router                  # noqa: E402
 app.include_router(wave3_router, prefix=BASE)
+from .demo_api import router as demo_router                    # noqa: E402
+app.include_router(demo_router, prefix=BASE)

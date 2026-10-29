@@ -197,7 +197,7 @@ def test_birth_waits_for_parent_consent_then_flows_and_revocation_is_told():
     for pu in ("BIRTH_CITIZEN_RECORD", "BIRTH_GIRL_SCHEME"):
         assert c.post(f"/api/x/consents/{by[pu]}/respond", json={"decision": "REFUSE"}).status_code == 200
     st = {d["purpose"]: d["status"] for d in c.get(f"/api/x/events/{eid}/flow").json()["deliveries"]}
-    assert st["BIRTH_PDS"] == st["BIRTH_HEALTH"] == "DELIVERED" and st["BIRTH_GIRL_SCHEME"] == "PENDING_CONSENT"
+    assert st["BIRTH_PDS"] == st["BIRTH_HEALTH"] == "DELIVERED" and st["BIRTH_GIRL_SCHEME"] == st["BIRTH_CITIZEN_RECORD"] == "BLOCKED_REFUSED"
     ok = c.post(f"/api/proposals/{prop['id']}/decision", json={"decision": "APPROVE", "note": "parent consented"})
     assert ok.status_code == 200, ok.text
     # the parent later withdraws the health consent: the health department is told

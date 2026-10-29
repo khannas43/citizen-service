@@ -123,7 +123,13 @@ def ingest(cur, ev: dict, actor: str) -> dict:
             eid = _new_event(cur, base, "HELD", "The child's name is not registered yet. Nothing is created until the name arrives.")
             return {"event_id": eid, "status": "HELD"}
         eid = _new_event(cur, base, "PROCESSED", None)
-        return {"event_id": eid, **_process_birth(cur, cfg, eid, base)}
+        res = _process_birth(cur, cfg, eid, base)
+        cur.execute("SELECT id, payload FROM mdm.event WHERE event_key=%s AND event_type='BIRTH_AMENDED' AND status='HELD' ORDER BY id", (key,))
+        for held in cur.fetchall():                       # a correction that arrived first is applied now, in the order it was sent
+            if held["payload"].get("child_name") and res.get("person_id"):
+                _amend_birth(cur, cfg, {**base, "event_type": "BIRTH_AMENDED", "payload": held["payload"]})
+                cur.execute("UPDATE mdm.event SET status='AMENDMENT', note=%s WHERE id=%s", ("Held until the registration arrived, then applied.", held["id"]))
+        return {"event_id": eid, **res}
     if et == "BIRTH_AMENDED":
         return _amend_birth(cur, cfg, base)
     if et == "BIRTH_WITHDRAWN":
@@ -299,8 +305,10 @@ def _death_followups(cur, person_id: int, event_id: int, parent_id: int, d: dict
             nominee = pl.get("nominee_name") or nominee
             due = _d(pl.get("next_payment_on"))
             urgent = bool(due and dod and due >= dod)
-            add("STOP_PENSION", SYS["pension"], f"Stop the {pl.get('scheme') or 'pension'} for {name}" + (f". A payment is due on {due}: hold it" if urgent else ""),
-                {"record_id": r["id"], "next_payment_on": str(due) if due else None, "urgent": urgent})
+            add("STOP_PENSION", SYS["pension"], f"Stop the {pl.get('scheme') or 'pension'} for {name}" +
+                (f" from the next payment cycle ({due}). A payment already in flight is left as it is; an officer decides whether to hold or recover it" if urgent else ""),
+                {"record_id": r["id"], "next_payment_on": str(due) if due else None, "urgent": urgent, "effective_from": str(due) if urgent else None,
+                 "in_flight_payment": "left untouched" if urgent else None})
         elif r["source"] == "pension_batch":
             nominee = (pl.get("nominee_name") or nominee)
         elif r["source"] == "revenue_land":
