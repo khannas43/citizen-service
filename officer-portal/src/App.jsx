@@ -1,3 +1,4 @@
+import { buildNav } from './navTree'
 import { useEffect, useState } from 'react'
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import TaskQueue from './screens/TaskQueue'
@@ -159,18 +160,38 @@ function RoleRoute({ children }) {
   return children
 }
 
-const GROUP_ICONS = { Scheme: '🏛', Operate: '🎛', 'Identity & Family': '🧬', Exchange: '🔄', Govern: '⚖️' }
 const GROUPS_KEY = 'officer_nav_groups'
 
-function NavItem({ item: l, sub = false }) {
+function useOpen(key, forced) {
+  const [open, setOpen] = useState(() => {
+    if (forced) return true
+    try { return JSON.parse(localStorage.getItem(GROUPS_KEY) || '{}')[key] !== false } catch { return true }
+  })
+  // Open only on the route change into the group; a later click on the heading can still close it.
+  useEffect(() => { if (forced) setOpen(true) }, [forced])
+  const toggle = () => {
+    const next = !open
+    setOpen(next)
+    try {
+      const saved = JSON.parse(localStorage.getItem(GROUPS_KEY) || '{}')
+      localStorage.setItem(GROUPS_KEY, JSON.stringify({ ...saved, [key]: next }))
+    } catch { /* ignore */ }
+  }
+  return [open, toggle]
+}
+
+const isHere = (pathname, i) => !!i.to && (pathname === i.to || pathname.startsWith(`${i.to}/`))
+
+/** A link. Links inside a menu show text only; a lone top-level link keeps its icon. */
+function NavItem({ item: l, sub = false, depth = 1 }) {
   const { icon, text } = navParts(l.label)
-  const content = (
+  const cls = sub ? `nav-link nav-sub${depth > 1 ? ' nav-sub-2' : ''}` : 'nav-link'
+  const content = sub ? <span className="nav-text">{text || l.label}</span> : (
     <>
       <span className="nav-icon" aria-hidden="true">{icon}</span>
       <span className="nav-text">{text}</span>
     </>
   )
-  const cls = sub ? 'nav-link nav-sub' : 'nav-link'
   return l.external ? (
     <a href={l.href} target="_blank" rel="noopener noreferrer" className={cls} title={text || l.label}>{content}</a>
   ) : (
@@ -180,33 +201,39 @@ function NavItem({ item: l, sub = false }) {
   )
 }
 
-/** A heading that opens and closes a list of related screens. It opens by itself when one of them is the current page. */
+/** A second-level heading inside a group. */
+function NavSubGroup({ groupName, sub, pathname }) {
+  const hasActive = sub.items.some((i) => isHere(pathname, i))
+  const [open, toggle] = useOpen(`${groupName}/${sub.name}`, hasActive)
+  const id = `nav-sub-${groupName}-${sub.name}`.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  return (
+    <div className="nav-subgroup">
+      <button type="button" className={`nav-link nav-sub nav-subgroup-head${hasActive ? ' has-active' : ''}`} onClick={toggle} aria-expanded={open} aria-controls={id}>
+        <span className="nav-text">{sub.name}</span>
+        <span className="nav-chevron" aria-hidden="true">{open ? '▾' : '▸'}</span>
+      </button>
+      {open && <div id={id} className="nav-sub-list nav-sub-list-2">{sub.items.map((i) => <NavItem key={i.to} item={i} sub depth={2} />)}</div>}
+    </div>
+  )
+}
+
+/** A heading that opens and closes a list of related screens and sub-groups. */
 function NavGroup({ entry, collapsed, pathname }) {
-  const hasActive = entry.items.some((i) => i.to && (pathname === i.to || pathname.startsWith(`${i.to}/`)))
-  const [open, setOpen] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(GROUPS_KEY) || '{}')[entry.group] !== false } catch { return true }
-  })
-  const toggle = () => {
-    const next = !open
-    setOpen(next)
-    try {
-      const saved = JSON.parse(localStorage.getItem(GROUPS_KEY) || '{}')
-      localStorage.setItem(GROUPS_KEY, JSON.stringify({ ...saved, [entry.group]: next }))
-    } catch { /* ignore */ }
-  }
-  if (collapsed) return entry.items.map((i) => <NavItem key={i.to} item={i} />)
-  const shown = open || hasActive
-  const id = `nav-group-${entry.group.toLowerCase()}`
+  const hasActive = entry.all.some((i) => isHere(pathname, i))
+  const [open, toggle] = useOpen(entry.group, hasActive)
+  if (collapsed) return entry.all.map((i) => <NavItem key={i.to} item={i} />)
+  const id = `nav-group-${entry.group.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
   return (
     <div className="nav-group">
-      <button type="button" className={`nav-link nav-group-head${hasActive ? ' has-active' : ''}`} onClick={toggle} aria-expanded={shown} aria-controls={id}>
+      <button type="button" className={`nav-link nav-group-head${hasActive ? ' has-active' : ''}`} onClick={toggle} aria-expanded={open} aria-controls={id}>
         <span className="nav-icon" aria-hidden="true">{entry.icon}</span>
         <span className="nav-text">{entry.group}</span>
-        <span className="nav-chevron" aria-hidden="true">{shown ? '▾' : '▸'}</span>
+        <span className="nav-chevron" aria-hidden="true">{open ? '▾' : '▸'}</span>
       </button>
-      {shown && (
+      {open && (
         <div id={id} className="nav-sub-list">
           {entry.items.map((i) => <NavItem key={i.to} item={i} sub />)}
+          {entry.subs.map((s) => <NavSubGroup key={s.name} groupName={entry.group} sub={s} pathname={pathname} />)}
         </div>
       )}
     </div>
@@ -227,15 +254,7 @@ function Sidebar({ mode, onSidebarToggle }) {
 
   if (mode === 'hidden') return null
 
-  // Items that share a group sit under one heading, at the position of the group's first item.
-  const entries = []
-  const seen = new Set()
-  links.forEach((l) => {
-    if (!l.group) return entries.push({ item: l })
-    if (seen.has(l.group)) return
-    seen.add(l.group)
-    entries.push({ group: l.group, icon: GROUP_ICONS[l.group] ?? '📁', items: links.filter((x) => x.group === l.group) })
-  })
+  const entries = buildNav(links)
 
   return (
     <aside className={`sidebar${mode === 'collapsed' ? ' sidebar-collapsed' : ''}`}>
