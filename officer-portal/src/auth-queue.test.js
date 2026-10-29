@@ -152,11 +152,11 @@ describe('officerHasFeature', () => {
   it('keeps Data and Guided Story off the sidebar but gated by path for admins', () => {
     expect(officerNavItems('DEPT_ADMIN').map((i) => i.to)).toEqual([
       '/', '/tasks', '/grievances', '/schemes', '/scheme-content', '/beneficiaries', '/scheme-simulator',
-      '/money-overview', '/expenditure-integrity', '/fraud-signals/legacy', '/coverage', '/families', '/dx/control', '/dx/events', '/dx/approvals', '/dx/discrepancies', '/mdm', '/dx/household', '/dx/query', '/dx/verify', '/dx/ledger', '/dx/catalogue', '/dx/registry', '/dx/standards', '/dx/consent', '/dx/policy', '/dx/audit', '/dx/retention',
+      '/money-overview', '/expenditure-integrity', '/fraud-signals/legacy', '/coverage', '/families', '/dx/control', '/dx/events', '/dx/approvals', '/dx/discrepancies', '/mdm', '/dx/household', '/dx/query', '/dx/verify', '/dx/ledger', '/dx/catalogue', '/dx/registry', '/dx/standards', '/dx/consent', '/dx/policy', '/dx/audit', '/dx/retention', '/dx/connectors', '/dx/keys', '/dx/access', '/dx/api', '/dx/citizen', '/dx/citizen/consents', '/dx/citizen/report', '/dx/assisted', '/dx/scenarios', '/dx/inject', '/dx/evidence',
       '/analytics', '/reports',
     ])
     expect(officerNavItems('IT_ADMIN').map((i) => i.to)).toEqual([
-      '/', '/ops-dashboard', '/money-overview', '/expenditure-integrity', '/dx/control', '/dx/events', '/dx/approvals', '/dx/discrepancies', '/mdm', '/dx/household', '/dx/query', '/dx/verify', '/dx/ledger', '/dx/catalogue', '/dx/registry', '/dx/standards', '/dx/consent', '/dx/policy', '/dx/audit', '/dx/retention', '/analytics', '/reports',
+      '/', '/ops-dashboard', '/money-overview', '/expenditure-integrity', '/dx/control', '/dx/events', '/dx/approvals', '/dx/discrepancies', '/mdm', '/dx/household', '/dx/query', '/dx/verify', '/dx/ledger', '/dx/catalogue', '/dx/registry', '/dx/standards', '/dx/consent', '/dx/policy', '/dx/audit', '/dx/retention', '/dx/connectors', '/dx/keys', '/dx/access', '/dx/api', '/dx/citizen', '/dx/citizen/consents', '/dx/citizen/report', '/dx/assisted', '/dx/scenarios', '/dx/inject', '/dx/evidence', '/analytics', '/reports',
     ])
     expect(officerCanAccessPath('DEPT_ADMIN', '/story')).toBe(true)
     expect(officerCanAccessPath('SCHEME_DEPT', '/story')).toBe(true)

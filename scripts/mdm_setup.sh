@@ -6,7 +6,7 @@ source scripts/lib/guard.sh
 NS=citizen
 POD=$(kubectl get pod -n $NS -l app=postgres -o jsonpath='{.items[0].metadata.name}')
 echo "== database objects (schema mdm, state-scoped)"
-for f in 001_mdm.sql 002_exchange.sql 003_wave2.sql; do
+for f in 001_mdm.sql 002_exchange.sql 003_wave2.sql 004_wave3.sql 005_wave4.sql; do
   kubectl cp "db/mdm/$f" "$NS/$POD:/tmp/$f"
   kubectl exec -n $NS "$POD" -- psql -U postgres -d citizen_db -v ON_ERROR_STOP=1 -q -f "/tmp/$f"
 done

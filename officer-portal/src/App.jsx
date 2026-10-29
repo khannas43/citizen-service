@@ -27,6 +27,13 @@ import DxStandards from './screens/dx/DxStandards'
 import DxAudit from './screens/dx/DxAudit'
 import DxRetention from './screens/dx/DxRetention'
 import { DxRegistry } from './screens/dx/DxCatalogue'
+import DxConnectors from './screens/dx/DxConnectors'
+import DxKeys from './screens/dx/DxKeys'
+import DxAccess from './screens/dx/DxAccess'
+import DxApiExplorer from './screens/dx/DxApiExplorer'
+import DxMyData, { DxMyConsents, DxReportWrong } from './screens/dx/DxCitizen'
+import DxAssisted from './screens/dx/DxAssisted'
+import DxScenarios, { DxInjector, DxEvidence } from './screens/dx/DxDemo'
 import SchemeSimulator from './screens/SchemeSimulator'
 import OpsDashboard from './screens/OpsDashboard'
 import Reports from './screens/Reports'
@@ -339,6 +346,17 @@ function MainApp() {
             <Route path="/dx/audit" element={<RoleRoute><DxAudit /></RoleRoute>} />
             <Route path="/dx/retention" element={<RoleRoute><DxRetention /></RoleRoute>} />
             <Route path="/dx/registry" element={<RoleRoute><DxRegistry /></RoleRoute>} />
+            <Route path="/dx/connectors" element={<RoleRoute><DxConnectors /></RoleRoute>} />
+            <Route path="/dx/keys" element={<RoleRoute><DxKeys /></RoleRoute>} />
+            <Route path="/dx/access" element={<RoleRoute><DxAccess /></RoleRoute>} />
+            <Route path="/dx/api" element={<RoleRoute><DxApiExplorer /></RoleRoute>} />
+            <Route path="/dx/citizen" element={<RoleRoute><DxMyData /></RoleRoute>} />
+            <Route path="/dx/citizen/consents" element={<RoleRoute><DxMyConsents /></RoleRoute>} />
+            <Route path="/dx/citizen/report" element={<RoleRoute><DxReportWrong /></RoleRoute>} />
+            <Route path="/dx/assisted" element={<RoleRoute><DxAssisted /></RoleRoute>} />
+            <Route path="/dx/scenarios" element={<RoleRoute><DxScenarios /></RoleRoute>} />
+            <Route path="/dx/inject" element={<RoleRoute><DxInjector /></RoleRoute>} />
+            <Route path="/dx/evidence" element={<RoleRoute><DxEvidence /></RoleRoute>} />
             <Route path="/families" element={<RoleRoute><FamilyRegistry /></RoleRoute>} />
             <Route path="/reports" element={<RoleRoute><Reports /></RoleRoute>} />
             <Route path="/analytics" element={<RoleRoute><AnalyticsDashboard /></RoleRoute>} />
