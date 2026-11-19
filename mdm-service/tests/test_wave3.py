@@ -156,6 +156,14 @@ def test_assisted_session_needs_an_operator_and_records_what_was_done():
     cons = c.post("/api/x/consents", json={"person_id": pid, "purpose": "SCHOLARSHIP_ELIGIBILITY"}).json()
     if cons["status"] == "PENDING":
         assert c.post(f"/api/x/citizen/{token}/consents/{cons['id']}/respond", json={"decision": "REFUSE", "channel": "ASSISTED", "operator": "Operator 7"}).status_code == 200
+    # UC1: one open ROUTED discrepancy per person+attribute — clear a leftover so this demo step is not blocked.
+    from app.db import connect
+    with connect() as conn:
+        cur = conn.cursor()
+        cur.execute("""UPDATE mdm.discrepancy SET status='REJECTED', resolved_by='test', resolved_at=now(),
+                              resolution_note='cleared so the assisted-session test can raise a fresh report'
+                       WHERE person_id=%s AND attribute='name' AND kind='DISCREPANCY' AND status='ROUTED'""", (pid,))
+        conn.commit()
     assert c.post(f"/api/x/citizen/{token}/report", json={"attribute": "name", "reported_value": "Spelling", "channel": "ASSISTED", "operator": "Operator 7"}).status_code == 200
     e = c.post(f"/api/x/sessions/{s['id']}/end").json()
     assert e["ended_at"] and e["summary"]["reports_raised"] >= 1

@@ -6,7 +6,8 @@ from datetime import date, datetime, timedelta, timezone
 
 from rapidfuzz import fuzz
 
-from . import audit, exchange, store
+from .sorting import order_by, date_range
+from . import audit, exchange, notify, store
 from .exchange import PURPOSES, SYSTEMS, REF_DATE, current, ledger, _js, _band, _band_label, _certs, household_ids
 from .matching import addr_norm
 from .names import name_key, skeleton, tokens, has_telugu, telugu_to_latin
@@ -30,6 +31,10 @@ ELEMENTS = {
     "electricity_link": ("Electricity connection linked", "electricity", "LOW"), "land_holding": ("Land held", "revenue", "HIGH"),
     "duplicate_benefit": ("Duplicate application flag", "housing", "MEDIUM"),
 }
+# the exact feed each element is taken from, so the catalogue can link an element to its source by name
+ELEMENT_SOURCE = {"age": "crs", "residence": "pds_view", "life_status": "crs", "income_band": "revenue_certificates", "category": "revenue_certificates",
+                  "household_benefit": "housing", "marital_status": "marriage_register", "electricity_link": "electricity",
+                  "land_holding": "revenue_land", "duplicate_benefit": "housing"}
 QUERYABLE = ["age", "residence", "income_band", "category", "life_status", "household_benefit", "marital_status", "electricity_link", "land_holding"]
 
 
@@ -84,9 +89,22 @@ def catalogue(cur) -> dict:
         s = stats.get(src, {})
         sys_ = SOURCE_SYSTEM.get(src)
         subs = sorted({k for k, v in PURPOSES.items() if v["system"] == sys_})
-        sources.append({"source": src, "name": nm, "interface": iface, "freshness_hours": fresh_h, "records": s.get("n", 0), "latest_as_of": s.get("latest"),
-                        "system": sys_, "owner": SYSTEMS.get(sys_, sys_), "purposes": subs})
-    els = [{"element": k, "name": v[0], "authoritative": SYSTEMS.get(v[1], v[1]), "sensitivity": v[2], "queryable": k in QUERYABLE,
+        latest = s.get("latest")
+        window = timedelta(hours=fresh_h) if fresh_h else timedelta(days=30)      # a continuous feed is judged over a month
+        if not s.get("n"):
+            state = "EMPTY"
+        elif not latest:
+            state = "UNDATED"          # records arrive without a date, so freshness cannot be judged
+        elif (REF_DATE - date.fromisoformat(str(latest)[:10])) <= window:
+            state = "CURRENT"
+        else:
+            state = "STALE"
+        sources.append({"source": src, "name": nm, "interface": iface, "freshness_hours": fresh_h, "records": s.get("n", 0), "latest_as_of": latest,
+                        "system": sys_, "owner": SYSTEMS.get(sys_, sys_), "purposes": subs, "state": state,
+                        "elements": [k for k, v in ELEMENT_SOURCE.items() if v == src]})
+    names = {k: v[0] for k, v in SOURCE_INFO.items()}
+    els = [{"element": k, "name": v[0], "authoritative": names.get(ELEMENT_SOURCE.get(k), SYSTEMS.get(v[1], v[1])), "source": ELEMENT_SOURCE.get(k),
+            "sensitivity": v[2], "queryable": k in QUERYABLE,
             "purposes": sorted(p for p, pu in PURPOSES.items() if k in pu["elements"])} for k, v in ELEMENTS.items()]
     return {"elements": els, "sources": sources, "attribute_owners": {k: SYSTEMS.get(v, v) for k, v in ATTR_AUTH.items()}}
 
@@ -122,6 +140,11 @@ def raise_discrepancy(cur, person_id: int, attribute: str, current_value: str | 
     auth = authoritative_system or ATTR_AUTH.get(attribute)
     if auth not in SYSTEMS:
         raise Refused("Choose the department that owns this value")
+    # One open report per person and detail (also enforced by discrepancy_open_attr_ux).
+    cur.execute("SELECT id FROM mdm.discrepancy WHERE person_id=%s AND attribute=%s AND kind='DISCREPANCY' AND status='ROUTED' LIMIT 1",
+                (person_id, attribute))
+    if cur.fetchone():
+        raise Refused("A report about this detail is already with the department. You will be told when it is answered.", 409)
     cur.execute("INSERT INTO mdm.discrepancy (kind, person_id, attribute, current_value, reported_value, reason, authoritative_system, raised_by, channel, operator) "
                 "VALUES ('DISCREPANCY',%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *",
                 (person_id, attribute, current_value, reported_value.strip(), reason, auth, actor, channel, operator))
@@ -147,7 +170,11 @@ def declare_marriage(cur, person_id: int, spouse_name: str, actor: str, channel:
     return {**row, "note": "Recorded as the citizen's own declaration. It is shown as unverified and is not a marriage record."}
 
 
-def list_discrepancies(cur, status=None, kind=None, person_id=None, limit=50, offset=0, q=None) -> dict:
+DISC_SORT = {"person": "lower(pe.name)", "attribute": "d.attribute", "change": "lower(d.reported_value)", "authoritative_name": "d.authoritative_system",
+             "status": "d.status", "raised_at": "d.raised_at"}
+
+
+def list_discrepancies(cur, status=None, kind=None, person_id=None, limit=50, offset=0, q=None, date_from=None, date_to=None, sort=None, direction='desc') -> dict:
     where, p = ["true"], []
     for col, v in (("d.status", status), ("d.kind", kind), ("d.person_id", person_id)):
         if v:
@@ -156,16 +183,22 @@ def list_discrepancies(cur, status=None, kind=None, person_id=None, limit=50, of
     if q and q.strip():
         where.append("(d.attribute ILIKE %s OR coalesce(d.reported_value,'') ILIKE %s OR coalesce(d.current_value,'') ILIKE %s OR coalesce(pe.name,'') ILIKE %s OR coalesce(pe.mdm_id,'') ILIKE %s)")
         p += [f"%{q.strip()}%"] * 5
+    date_range(where, p, "d.raised_at", date_from, date_to)
     w = " AND ".join(where)
     cur.execute(f"SELECT count(*) AS n FROM mdm.discrepancy d LEFT JOIN mdm.person pe ON pe.id=d.person_id WHERE {w}", p)
     total = cur.fetchone()["n"]
-    cur.execute(f"SELECT d.*, pe.name AS person_name, pe.mdm_id FROM mdm.discrepancy d LEFT JOIN mdm.person pe ON pe.id=d.person_id WHERE {w} ORDER BY d.id DESC LIMIT %s OFFSET %s", p + [limit, offset])
+    cur.execute(f"SELECT d.*, pe.name AS person_name, pe.mdm_id FROM mdm.discrepancy d LEFT JOIN mdm.person pe ON pe.id=d.person_id WHERE {w} ORDER BY {order_by(DISC_SORT, sort, direction, 'd.id DESC', 'd.id DESC')} LIMIT %s OFFSET %s", p + [limit, offset])
     items = cur.fetchall()
     for i in items:
         i["authoritative_name"] = SYSTEMS.get(i["authoritative_system"], i["authoritative_system"])
         i["age_days"] = (datetime.now(timezone.utc) - i["raised_at"]).days
     cur.execute("SELECT status, count(*) AS n FROM mdm.discrepancy GROUP BY 1")
     return {"total": total, "limit": limit, "offset": offset, "items": items, "by_status": {r["status"]: r["n"] for r in cur.fetchall()}}
+
+
+DISC_NOTICE_TITLE = "మీ నివేదికపై శాఖ స్పందించింది / The department has answered your report"
+DISC_NOTICE_BODY = ("మీరు పంపిన వివరాల సవరణ నివేదికపై శాఖ నిర్ణయం తీసుకుంది. పౌర పోర్టల్‌లో నా నివేదికలు తెరవండి. / "
+                    "The department has decided on the correction you reported. Open My reports in the citizen portal.")
 
 
 def resolve_discrepancy(cur, did: int, outcome: str, actor: str, note: str | None) -> dict:
@@ -192,6 +225,9 @@ def resolve_discrepancy(cur, did: int, outcome: str, actor: str, note: str | Non
                 (outcome, actor, note, _js(informed), did))
     row = cur.fetchone()
     audit.write(cur, actor, f"DISCREPANCY_{outcome}", f"discrepancy:{did}", {"informed": informed, "note": note})
+    # A report the citizen made on the portal: tell them once. The status check above (409 unless ROUTED) is what makes it once.
+    if d.get("channel") == "PORTAL" and d["person_id"]:
+        notify.send(cur, d["person_id"], DISC_NOTICE_TITLE, DISC_NOTICE_BODY, f"report-{did}")
     return {**row, "informed_names": [SYSTEMS.get(s, s) for s in informed],
             "note": "The master record was not edited here. It shows the corrected value after the next refresh from the source." if outcome == "CORRECTED_AT_SOURCE" else ""}
 
@@ -349,20 +385,46 @@ def withdraw_and_purge(cur, person_id: int, purpose: str, actor: str, channel: s
 
 
 # ------------------------------------------------------------------ audit explorer
-def list_audit(cur, actor=None, subject=None, action=None, q=None, limit=50, offset=0) -> dict:
+AUDIT_SORT = {"seq": "seq", "ts": "ts", "actor": "actor", "action": "action", "subject": "subject"}
+
+
+def list_audit(cur, actor=None, subject=None, action=None, q=None, limit=50, offset=0, actor_is=None, action_is=None,
+               date_from=None, date_to=None, sort="seq", direction="desc") -> dict:
     where, p = ["true"], []
     for col, v in (("actor", actor), ("subject", subject), ("action", action)):
         if v:
             where.append(f"{col} ILIKE %s")
             p.append(f"%{v}%")
+    for col, v in (("actor", actor_is), ("action", action_is)):       # chosen from a list, so an exact match
+        if v:
+            where.append(f"{col} = %s")
+            p.append(v)
+    if date_from:
+        where.append("ts >= %s::date")
+        p.append(date_from)
+    if date_to:
+        where.append("ts < (%s::date + 1)")
+        p.append(date_to)
     if q:
         where.append("(detail::text ILIKE %s OR subject ILIKE %s OR action ILIKE %s)")
         p += [f"%{q}%"] * 3
     w = " AND ".join(where)
+    order = f"{AUDIT_SORT.get(sort, 'seq')} {'ASC' if str(direction).lower() == 'asc' else 'DESC'}, seq DESC"
     cur.execute(f"SELECT count(*) AS n FROM mdm.audit WHERE {w}", p)
     total = cur.fetchone()["n"]
-    cur.execute(f"SELECT seq, ts, actor, action, subject, detail, left(hash,12) AS hash FROM mdm.audit WHERE {w} ORDER BY seq DESC LIMIT %s OFFSET %s", p + [limit, offset])
+    cur.execute(f"SELECT seq, ts, actor, action, subject, detail, left(hash,12) AS hash FROM mdm.audit WHERE {w} ORDER BY {order} LIMIT %s OFFSET %s", p + [limit, offset])
     return {"total": total, "limit": limit, "offset": offset, "items": cur.fetchall()}
+
+
+def audit_facets(cur) -> dict:
+    """Who has acted and which actions exist, with counts, for the filter lists."""
+    out = {}
+    for key, col in (("actors", "actor"), ("actions", "action")):
+        cur.execute(f"SELECT {col} AS value, count(*) AS n FROM mdm.audit GROUP BY 1 ORDER BY 1")
+        out[key] = cur.fetchall()
+    cur.execute("SELECT min(ts) AS first, max(ts) AS last FROM mdm.audit")
+    out["range"] = cur.fetchone()
+    return out
 
 
 def tamper_demo(cur, actor: str) -> dict:

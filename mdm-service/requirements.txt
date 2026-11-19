@@ -4,3 +4,5 @@ psycopg[binary]>=3.1,<4
 PyJWT[crypto]>=2.8,<3
 rapidfuzz>=3.6,<4
 pydantic>=2.6,<3
+great_expectations==1.24.1
+pandas>=2.1,<3

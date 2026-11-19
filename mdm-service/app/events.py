@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 from datetime import date, timedelta
 
-from . import audit, exchange, store
+from . import feed, audit, exchange, store
 from .matching import MatchConfig, prepare, score_cluster
 from .model import Rec
 from .names import tokens
@@ -43,9 +43,13 @@ def _new_event(cur, base: dict, status: str, note: str | None, person_id=None, r
 
 
 def _propose(cur, event_id, uc, kind, system, person_id, summary, detail=None, options=None, parent_id=None) -> int:
-    cur.execute("INSERT INTO mdm.proposal (event_id, parent_id, uc, kind, system, person_id, summary, detail, options) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb) RETURNING id",
-                (event_id, parent_id, uc, kind, system, person_id, summary, _js(detail or {}), _js(options or [])))
+    from . import workqueue
+    row = {"kind": kind, "uc": uc, "detail": detail or {}, "options": options or []}
+    reason_code, risk_class = workqueue.classify(row, parent_minor=workqueue._parent_is_minor(cur, row))
+    code = exchange.system_code(system)
+    cur.execute("INSERT INTO mdm.proposal (event_id, parent_id, uc, kind, system, system_code, person_id, summary, detail, options, reason_code, risk_class) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s,%s) RETURNING id",
+                (event_id, parent_id, uc, kind, system, code, person_id, summary, _js(detail or {}), _js(options or []), reason_code, risk_class))
     return cur.fetchone()["id"]
 
 
@@ -177,6 +181,7 @@ def _process_birth(cur, cfg, eid: int, base: dict) -> dict:
 
     father = mother = card = None
     best = None
+    couple_linked = False
     for f in fcs[:3]:
         for m in mcs[:3]:
             shared = cards[f["person_id"]] & cards[m["person_id"]]
@@ -184,8 +189,34 @@ def _process_birth(cur, cfg, eid: int, base: dict) -> dict:
             key = (linked, f["score"] + m["score"])
             if linked and (best is None or key > best):
                 best, father, mother, card = key, f, m, (sorted(shared)[0] if shared else None)
+                couple_linked = True
     if not father:
         father, mother = unique(fcs, cfg), unique(mcs, cfg)
+        couple_linked = False
+
+    def spouse_named(known, name):
+        """The registered parent is already known as the husband or wife of the other parent, so the name settles which person it is."""
+        if not known or not name:
+            return None
+        kid = known["person_id"]
+        cur.execute("SELECT o.id, o.name FROM mdm.relationship r JOIN mdm.person o ON o.id=CASE WHEN r.person_a=%s THEN r.person_b ELSE r.person_a END "
+                    "WHERE r.kind='SPOUSE' AND (r.person_a=%s OR r.person_b=%s)", (kid, kid, kid))
+        want = sorted(tokens(name))
+        hits = [r["id"] for r in cur.fetchall() if want and sorted(tokens(r["name"])) == want]
+        return {"person_id": hits[0], "score": 1.0} if len(hits) == 1 else None
+    if father and not mother:
+        mother = spouse_named(father, p.get("mother_name"))
+        if mother:
+            couple_linked = True
+    elif mother and not father:
+        father = spouse_named(mother, p.get("father_name"))
+        if father:
+            couple_linked = True
+    if father and mother and not couple_linked:
+        shared = cards.get(father["person_id"], set()) & cards.get(mother["person_id"], set())
+        couple_linked = bool(shared) or partners(father["person_id"], mother["person_id"])
+        if shared and not card:
+            card = sorted(shared)[0]
     if not card:
         for par in (father, mother):
             if par and cards.get(par["person_id"]):
@@ -194,16 +225,27 @@ def _process_birth(cur, cfg, eid: int, base: dict) -> dict:
     child = p["child_name"]
     found = {"father": {"name": p.get("father_name"), "person_id": father and father["person_id"], "score": father and father["score"]},
              "mother": {"name": p.get("mother_name"), "person_id": mother and mother["person_id"], "score": mother and mother["score"]}}
+    bar, require_couple = exchange.parent_confirm_settings(cur)
+    found = exchange.enrich_parents_confidence(found, bar, require_couple, couple_linked)
     names = " and ".join(x["name"] for x in (found["father"], found["mother"]) if x["person_id"])
+    parent_candidates = {"father": [_opt(cur, c) for c in fcs[:3]], "mother": [_opt(cur, c) for c in mcs[:3]]}
     if card:
         _propose(cur, eid, "UC2", "ADD_TO_RATION_CARD", SYS["pds"], pid, f"Add {child} to ration card {card} (household of {names})",
                  {"ration_card": card, "parents": found, "late_registration": bool(late)})
-    missing = [k for k, v in found.items() if v["name"] and not v["person_id"]]
-    if missing or not card:
-        who = " and ".join(found[k]["name"] for k in missing) if missing else "either parent"
-        _propose(cur, eid, "UC2", "REVIEW_PARENTS", SYS["mdm"], pid,
-                 f"Could not identify {who} among known people. Check the registration before attaching {child} to a household",
-                 {"parents": found, "candidates": {"father": [_opt(cur, c) for c in fcs[:3]], "mother": [_opt(cur, c) for c in mcs[:3]]}})
+    missing = [k for k, v in found.items() if k in ("mother", "father") and v.get("name") and not v.get("person_id")]
+    # One REVIEW_PARENTS per event when any parent is not confident (unmatched, below bar, or not a couple).
+    if missing or not card or not found.get("confident"):
+        reasons = exchange.parent_hold_reasons(found, bar, require_couple)
+        if missing and not reasons:
+            who = " and ".join(found[k]["name"] for k in missing)
+            summary = f"Could not identify {who} among known people. Check the registration before attaching {child} to a household"
+        elif reasons:
+            why = "; ".join(reasons)
+            summary = f"Confirm the parent match ({why}) before asking them to approve"
+        else:
+            summary = f"Confirm the parents before attaching {child} to a household"
+        _propose(cur, eid, "UC2", "REVIEW_PARENTS", SYS["mdm"], pid, summary,
+                 {"parents": found, "candidates": parent_candidates})
     _propose(cur, eid, "UC2", "REQUEST_IDENTITY_REFERENCE", SYS["idref"], pid, f"Issue an identity reference for {child}", {"born": str(dob)})
     note = f"New person {child} created from the birth registration."
     if late:
@@ -371,7 +413,24 @@ def _marriage_followups(cur, g_id: int, b_id: int, event_id: int, parent_id: int
 
 
 # ------------------------------------------------------------------ steward decisions on proposals
-def decide_proposal(cur, prop_id: int, decision: str, chosen: dict, actor: str, note: str | None) -> dict:
+def _record_parents(cur, pr: dict, actor: str):
+    """Approving a birth's household action records who the parents are, on the child's birth record, so that master data shows
+    them (and keeps showing them whenever relationships are worked out again)."""
+    found = (pr["detail"].get("parents") or {})
+    ids = {k: v["person_id"] for k, v in found.items() if isinstance(v, dict) and v.get("person_id")}   # "parents" also carries flags such as confident
+    if not ids or not pr.get("person_id"):
+        return
+    cur.execute("SELECT event_key FROM mdm.event WHERE id=%s", (pr["event_id"],))
+    ek = cur.fetchone()
+    cur.execute("SELECT id FROM mdm.source_record WHERE source='crs' AND rtype='BIRTH' AND person_id=%s AND source_rid=%s ORDER BY id LIMIT 1", (pr["person_id"], ek and ek["event_key"]))
+    r = cur.fetchone()
+    if not r:
+        return
+    cur.execute("UPDATE mdm.source_record SET payload = payload || %s::jsonb WHERE id=%s", (_js({"approved_parents": ids, "approved_by": actor}), r["id"]))
+    store.derive_relationships(cur, [pr["person_id"], *ids.values()])
+
+
+def decide_proposal(cur, prop_id: int, decision: str, chosen: dict, actor: str, note: str | None, batch_id: int | None = None) -> dict:
     cur.execute("SELECT * FROM mdm.proposal WHERE id=%s FOR UPDATE", (prop_id,))
     pr = cur.fetchone()
     if not pr:
@@ -435,16 +494,56 @@ def decide_proposal(cur, prop_id: int, decision: str, chosen: dict, actor: str, 
                 out["consents"] = [c["id"] for c in exchange.marriage_consents(cur, pr["event_id"], gid, bid, actor)]
             chosen = {"groom_id": gid, "bride_id": bid}
             out["person_id"] = gid
+    if decision == "APPROVE" and pr["kind"] == "ADD_TO_RATION_CARD":
+        _record_parents(cur, pr, actor)
+    if decision == "APPROVE" and pr["kind"] in ("ADD_TO_RATION_CARD", "REVIEW_PARENTS"):
+        parents = (pr.get("detail") or {}).get("parents")
+        if parents:
+            exchange.notify_parents_confirmed(cur, pr["event_id"], parents)
     status = "APPROVED" if decision == "APPROVE" else "REJECTED"
     cur.execute("UPDATE mdm.proposal SET status=%s, chosen=%s::jsonb, note=%s, rationale=%s, decided_by=%s, decided_at=now() WHERE id=%s",
                 (status, _js(chosen), note, note, actor, prop_id))
-    exchange.ledger(cur, "PROPOSAL", pr["system"], actor, None, pr["person_id"], None, pr["kind"], "ANSWERED",
-                    {"decision": status, "rationale": note, "policy_versions": pr.get("policy_version")})
+    ledger_detail = {"decision": status, "rationale": note, "policy_versions": pr.get("policy_version")}
+    if batch_id is not None:
+        ledger_detail["batch_id"] = batch_id
+    exchange.ledger(cur, "PROPOSAL", pr["system"], actor, None, pr["person_id"], None, pr["kind"], "ANSWERED", ledger_detail)
     meaning = ""
-    if decision == "APPROVE" and pr["kind"] not in ("CONFIRM_DEATH", "CONFIRM_MARRIAGE"):
-        meaning = f"Ready for {pr['system']}. This build does not send it; the department acts on it."
-    audit.write(cur, actor, f"PROPOSAL_{status}", f"proposal:{prop_id}", {"kind": pr["kind"], "event": pr["event_id"], "person": pr["person_id"], "note": note, "meaning": meaning})
+    if decision == "APPROVE" and pr["kind"] == "REVIEW_DEPARTMENT_REJECTION":
+        meaning = f"The notice is sent to {(pr['detail'] or {}).get('department', 'the department')} again, for it to answer."
+    elif decision == "APPROVE" and pr["kind"] not in ("CONFIRM_DEATH", "CONFIRM_MARRIAGE"):
+        meaning = f"A notice for {pr['system']} is now in its feed. The department answers it and its answer is recorded here."
+    audit_detail = {"kind": pr["kind"], "event": pr["event_id"], "person": pr["person_id"], "note": note, "meaning": meaning}
+    if batch_id is not None:
+        audit_detail["batch_id"] = batch_id
+    audit.write(cur, actor, f"PROPOSAL_{status}", f"proposal:{prop_id}", audit_detail)
     out["status"] = status
+    if decision == "APPROVE" and pr["kind"] in ("CONFIRM_DEATH", "STOP_PENSION", "NOTIFY_SPOUSE"):
+        from . import demo_uc3_story                         # UC3: tell the surviving spouse (read-only notice) and keep the beneficiary note in step; never raises
+        demo_uc3_story.after_decision(cur, dict(pr, person_id=out.get("person_id") or pr.get("person_id")), actor)
+    if decision == "APPROVE" and pr["kind"] == "RENEW_CERTIFICATE":
+        from . import uc4                                    # UC4: one notice to the citizen, one delivery to revenue; no certificate is edited
+        out["follow_up"] = uc4.on_approve_renew_certificate(cur, pr, actor)
+    elif decision == "APPROVE" and pr["kind"] == "SETTLE_SOURCE_CONFLICT":
+        from . import uc4                                    # UC4: the officer's reason goes to the issuing office; no value is chosen
+        out["follow_up"] = uc4.on_approve_settle_conflict(cur, pr, actor, note)
+    elif decision == "APPROVE" and pr["kind"] in ("REVIEW_DUPLICATE_BENEFIT", "REVIEW_CARD_MEMBER", "SETTLE_HOUSEHOLD_CONFLICT", "HOUSEHOLD_NOT_FOUND"):
+        from . import uc5                                    # UC5: one delivery to the owning department (and one notice when no household was found); no record is edited
+        out["follow_up"] = uc5.on_approve(cur, pr, actor, note)
+    if decision == "REJECT" and pr["kind"] == "REVIEW_DEPARTMENT_REJECTION":
+        # accepting the department's decision closes the action it refused, if that action is still waiting
+        reason = ((pr.get("dept_return") or {}).get("reason")) or "the department declined"
+        cur.execute("SELECT id FROM mdm.proposal WHERE event_id=%s AND status='PROPOSED' AND kind = ANY(%s) AND uc=%s FOR UPDATE", (pr["event_id"], list(exchange.GATED), pr["uc"]))
+        for r in cur.fetchall():
+            cur.execute("UPDATE mdm.proposal SET status='REJECTED', note=%s, rationale=%s, decided_by=%s, decided_at=now() WHERE id=%s",
+                        (f"Not applied: the department declined ({reason})", f"Not applied: the department declined ({reason})", actor, r["id"]))
+            audit.write(cur, actor, "PROPOSAL_REJECTED", f"proposal:{r['id']}", {"event": pr["event_id"], "note": f"the department declined: {reason}", "closed_by_review": prop_id})
+    if decision == "APPROVE":
+        feed.open_for_proposal(cur, prop_id)                   # a department action becomes a notice the department must answer
+        if pr["kind"] == "REVIEW_DEPARTMENT_REJECTION" and (pr["detail"] or {}).get("delivery"):
+            n = feed.open_for_delivery(cur, int(pr["detail"]["delivery"]))      # approving the review sends the notice to the department again
+            if n:
+                out["notice_reissued"] = n["id"]
+                audit.write(cur, actor, "NOTICE_REISSUED", f"notice:{n['id']}", {"after_rejection_by": (pr["detail"] or {}).get("department"), "proposal": prop_id, "note": note})
     return out
 
 

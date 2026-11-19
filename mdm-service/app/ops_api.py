@@ -1,5 +1,6 @@
 """Operations API under /api/x: control tower, discrepancies, query builder, catalogue, standards, retention, audit explorer, household."""
 from __future__ import annotations
+from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -104,18 +105,25 @@ def subscriber_set(system: str, body: SubIn, cur=Depends(cur_dep), u=Depends(aut
 
 @router.post("/api/x/deliveries/retry")
 def deliveries_retry(cur=Depends(cur_dep), u=Depends(auth.can_write)):
-    return exchange.retry_due(cur, u["actor"])
+    return exchange.retry_due(cur, u["actor"], system=auth.scope(u))
 
 
 @router.post("/api/x/deliveries/{did}/redeliver")
 def delivery_redeliver(did: int, cur=Depends(cur_dep), u=Depends(auth.can_write)):
+    dept = auth.scope(u)
+    if dept:
+        cur.execute("SELECT system FROM mdm.delivery WHERE id=%s", (did,))
+        row = cur.fetchone()
+        if not row or row["system"] != dept:
+            raise HTTPException(404, "Delivery not found")
     return run(exchange.redeliver, cur, did, u["actor"])
 
 
 @router.get("/api/x/discrepancies")
 def discrepancies(status: Optional[str] = None, kind: Optional[str] = None, person_id: Optional[int] = None, q: Optional[str] = None,
-                  limit: int = Query(50, le=200), offset: int = 0, cur=Depends(cur_dep), _=Depends(auth.can_read)):
-    return ops.list_discrepancies(cur, status, kind, person_id, limit, offset, q)
+                  limit: int = Query(50, le=200), offset: int = 0, date_from: Optional[date] = None, date_to: Optional[date] = None,
+                  sort: Optional[str] = None, dir: str = "desc", cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    return ops.list_discrepancies(cur, status, kind, person_id, limit, offset, q, date_from, date_to, sort, dir)
 
 
 @router.post("/api/x/discrepancies")
@@ -176,8 +184,15 @@ def retention_withdraw(body: WithdrawIn, cur=Depends(cur_dep), u=Depends(auth.ca
 
 @router.get("/api/x/audit")
 def audit_list(actor: Optional[str] = None, subject: Optional[str] = None, action: Optional[str] = None, q: Optional[str] = None,
-               limit: int = Query(50, le=200), offset: int = 0, cur=Depends(cur_dep), _=Depends(auth.can_read)):
-    return ops.list_audit(cur, actor, subject, action, q, limit, offset)
+               limit: int = Query(50, le=200), offset: int = 0, actor_is: Optional[str] = None, action_is: Optional[str] = None,
+               date_from: Optional[date] = None, date_to: Optional[date] = None, sort: str = "seq", dir: str = "desc",
+               cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    return ops.list_audit(cur, actor, subject, action, q, limit, offset, actor_is, action_is, date_from, date_to, sort, dir)
+
+
+@router.get("/api/x/audit/facets")
+def audit_facets(cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    return ops.audit_facets(cur)
 
 
 @router.post("/api/x/audit/tamper-demo")

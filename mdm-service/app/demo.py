@@ -9,7 +9,7 @@ from __future__ import annotations
 import json, time, uuid
 from datetime import date, datetime, timedelta, timezone
 
-from . import audit, events, exchange, ops, store, wave3
+from . import citizen, demo_uc1, demo_uc2_login, demo_uc3_story, demo_uc4_invite, demo_uc4_story, feed, audit, events, exchange, ops, store, wave3
 from .db import connect
 from .exchange import PURPOSES, REF_DATE, SYSTEMS, current
 from .matching import prepare
@@ -142,12 +142,13 @@ class Kit:
 def couple(k: Kit, married=True):
     """A man and a woman on the loaded data. married=True: existing spouses sharing a card. married=False: two unmarried adults of one district."""
     if married:
-        rows = k.q("""SELECT f.id AS fid, f.name AS fname, m.id AS mid, m.name AS mname, f.district AS district FROM mdm.relationship r
-                      JOIN mdm.person f ON f.id=r.person_a JOIN mdm.person m ON m.id=r.person_b
-                      WHERE r.kind='SPOUSE' AND f.gender='M' AND m.gender='F' AND f.district IS NOT NULL AND f.name ~ ' ' AND m.name ~ ' '
-                        AND (SELECT count(*) FROM mdm.person x WHERE x.name=f.name)=1 AND (SELECT count(*) FROM mdm.person x WHERE x.name=m.name)=1
-                        AND EXISTS (SELECT 1 FROM mdm.source_record s WHERE s.person_id=f.id AND s.source='pds_view')
-                      ORDER BY f.id LIMIT 40""")
+        base = """SELECT f.id AS fid, f.name AS fname, m.id AS mid, m.name AS mname, f.district AS district FROM mdm.relationship r
+                  JOIN mdm.person f ON f.id=r.person_a JOIN mdm.person m ON m.id=r.person_b
+                  WHERE r.kind='SPOUSE' AND f.gender='M' AND m.gender='F' AND f.district IS NOT NULL AND f.name ~ ' ' AND m.name ~ ' '
+                    AND (SELECT count(*) FROM mdm.person x WHERE x.name=f.name)=1 AND (SELECT count(*) FROM mdm.person x WHERE x.name=m.name)=1"""
+        pds = " AND EXISTS (SELECT 1 FROM mdm.source_record s WHERE s.person_id=f.id AND s.source='pds_view')"
+        rows = k.q(base + pds + " ORDER BY f.id LIMIT 400")                      # best: spouses who share a ration card
+        rows += [r for r in k.q(base + " ORDER BY f.id LIMIT 400") if r["fid"] not in {x["fid"] for x in rows}]     # then any spouses with unique names
     else:
         rows = k.q("""SELECT f.id AS fid, f.name AS fname, m.id AS mid, m.name AS mname, f.district AS district FROM mdm.person f
                       JOIN mdm.person m ON m.district=f.district AND m.gender='F' AND m.id<>f.id
@@ -160,13 +161,33 @@ def couple(k: Kit, married=True):
                         AND f.id NOT IN (SELECT COALESCE((payload->>'groom_person')::bigint,0) FROM mdm.event WHERE event_key LIKE 'DEMO-M-%%' AND payload ? 'groom_person')
                       ORDER BY f.id LIMIT 60""")
     used = {(r["payload"].get("groom_name"), r["payload"].get("bride_name")) for r in k.q("SELECT payload FROM mdm.event WHERE event_key LIKE 'DEMO-M-%%'")}
+    busy = {(r["payload"].get("father_name"), r["payload"].get("mother_name")) for r in k.q("SELECT payload FROM mdm.event WHERE event_key LIKE 'DEMO-B-%%'")}
     cfg = events.cfg_of(k.cur)
     for r in rows:
-        if (r["fname"], r["mname"]) in used:
+        if (r["fname"], r["mname"]) in used or (r["fname"], r["mname"]) in busy:     # one child per family: a couple with a demo birth already waiting is skipped
             continue
-        if married or _marriage_would_match(k, cfg, r):
+        if (_birth_would_match(k, cfg, r) if married else _marriage_would_match(k, cfg, r)):
             return r
+    if married and rows:                                      # every couple already has a demo birth waiting: the family with the oldest one gets a new child that replaces it
+        r = rows[0]
+        k.cur.execute("SELECT id, scenario FROM mdm.event WHERE event_key LIKE 'DEMO-B-%%' AND payload->>'father_name'=%s AND payload->>'mother_name'=%s ORDER BY id LIMIT 1", (r["fname"], r["mname"]))
+        old = k.cur.fetchone()
+        if old and old["scenario"]:
+            clear_events(k.cur, old["scenario"], "demo")
+        return r
     k.skip("no unused couple in the loaded data that the matcher resolves")
+
+
+def _birth_would_match(k: Kit, cfg, r) -> bool:
+    """Reads only: would a birth registration find both parents among its top three candidates, as the birth handler looks them up?"""
+    year = 2026
+    def top(name, gender, pid):
+        for place in (r["district"], None):
+            f = events.candidates(k.cur, cfg, Rec(pk=-1, source="crs", rid="p", rtype="PARENT", name=name, gender=gender, district=place), gender, year - 15)
+            if f:
+                return pid in [c["person_id"] for c in f[:3]]
+        return False
+    return top(r["fname"], "M", r["fid"]) and top(r["mname"], "F", r["mid"])
 
 
 def _marriage_would_match(k: Kit, cfg, r) -> bool:
@@ -202,6 +223,7 @@ def death_fixture(k: Kit, spouse: bool | None, urgent=False, same_name_pair=Fals
     if same_name_pair:
         rows = k.q("""SELECT a.id AS aid, a.name, COALESCE(a.dob, make_date(a.birth_year,6,1)) AS d FROM mdm.person a JOIN mdm.person b ON b.name=a.name AND b.id>a.id
                       WHERE a.life_status<>'DECEASED' AND b.life_status<>'DECEASED' AND a.name ~ ' '
+                        AND NOT EXISTS (SELECT 1 FROM mdm.source_record x WHERE x.person_id IN (a.id, b.id) AND x.source_rid LIKE 'DEMO-UC3-%%')
                         AND abs(COALESCE(a.birth_year, 0) - COALESCE(b.birth_year, 9999)) <= 3 AND COALESCE(a.birth_year,0) BETWEEN 1930 AND 1965
                       ORDER BY a.id LIMIT 30""")
         for r in rows:
@@ -214,7 +236,9 @@ def death_fixture(k: Kit, spouse: bool | None, urgent=False, same_name_pair=Fals
         k.skip("no two living people with one name and near ages")
     pens = k.q("""SELECT s.person_id, s.payload, p.name, COALESCE(p.dob, make_date(p.birth_year,6,1)) AS d FROM mdm.source_record s JOIN mdm.person p ON p.id=s.person_id
                   WHERE s.source='pension_batch' AND s.payload->>'status'='ACTIVE' AND p.life_status<>'DECEASED' AND p.name ~ ' '
-                    AND COALESCE(p.birth_year, 0) BETWEEN 1930 AND 1960 ORDER BY s.person_id LIMIT 400""")
+                    AND COALESCE(p.birth_year, 0) BETWEEN 1930 AND 1960
+                    AND NOT EXISTS (SELECT 1 FROM mdm.source_record x WHERE x.person_id=s.person_id AND x.source_rid LIKE 'DEMO-UC3-%%')
+                  ORDER BY s.person_id LIMIT 400""")
     for r in pens:
         pay = r["payload"] or {}
         if r["name"] in used:
@@ -257,7 +281,16 @@ def delivery_of(flow, purpose, kind="EVENT"):
 
 
 # ================================================================== UC1  Know the person
+def uc1_citizen_setup(k: Kit):
+    """The three demo citizens who see a "Please confirm" card (sign-ins 1001, 4001, 5001): tied to their people, each with one disagreement, starting fresh."""
+    out = demo_uc1.plant_all(k.cur, ACTOR)
+    for line in out["notes"].values():
+        k.info(line)
+    k.info("Citizen cards raised", scan=out["scan"])
+
+
 def s_1_1(k: Kit):
+    uc1_citizen_setup(k)
     rows = k.q("""SELECT person_id FROM mdm.source_record WHERE person_id IS NOT NULL GROUP BY 1 HAVING count(DISTINCT source)>=4 AND count(DISTINCT name)>=3
                   ORDER BY 1 LIMIT 1""")
     if not rows:
@@ -354,15 +387,47 @@ def _birth(k: Kit, pr=None, **kw):
     return pr, res
 
 
+# The family the demo always shows for scenario 2.1: a registered couple whose citizen sign-ins are kept between runs. A run makes a new child
+# for them and "Clear demo records" removes only that child, so the parents and their sign-ins stay.
+SHOWCASE_FATHER, SHOWCASE_MOTHER = "Rajender Pagidipalli", "Suma Pagidipalli"
+SHOWCASE_SIGNINS = (("XXXX-XXXX-2001", "fid"), ("XXXX-XXXX-3001", "mid"))   # the two demo citizen sign-ins that always belong to the couple
+
+
+def showcase_couple(k: Kit, clear=True):
+    """The fixed demo couple, or None (with a note on the scenario) if they are missing or their names are not unique, so a wrong match is never made."""
+    f = k.q("SELECT id, name, district FROM mdm.person WHERE name=%s", SHOWCASE_FATHER)
+    m = k.q("SELECT id, name FROM mdm.person WHERE name=%s", SHOWCASE_MOTHER)
+    if len(f) != 1 or len(m) != 1:
+        k.info(f"The showcase parents are not used: {SHOWCASE_FATHER} appears {len(f)} time(s) and {SHOWCASE_MOTHER} {len(m)} time(s) in master data (each must appear once). A different couple was used.")
+        return None
+    pr = {"fid": f[0]["id"], "fname": f[0]["name"], "mid": m[0]["id"], "mname": m[0]["name"], "district": f[0]["district"] or "Medak"}
+    for ref, who in SHOWCASE_SIGNINS:                             # sign-ins are tied to the couple on every run, so no manual linking is needed in the demo
+        citizen.link(k.cur, ref, pr[who], ACTOR)
+    k.info(f"Citizen sign-ins linked: {SHOWCASE_SIGNINS[0][0]} is {SHOWCASE_FATHER}, {SHOWCASE_SIGNINS[1][0]} is {SHOWCASE_MOTHER}.")
+    for note in demo_uc2_login.align(k.cur, pr["mid"], pr["fid"]):         # the registry shows the couple's own name and household when they sign in
+        k.info("Registry layer: " + note)
+    if clear:                                                     # scenario 2.1 starts the family's story afresh: the earlier demo children are replaced
+        k.cur.execute("SELECT scenario FROM mdm.event WHERE event_key LIKE 'DEMO-B-%%' AND payload->>'father_name'=%s AND payload->>'mother_name'=%s AND scenario IS NOT NULL", (pr["fname"], pr["mname"]))
+        for old in k.cur.fetchall():
+            clear_events(k.cur, old["scenario"], "demo")
+    return pr
+
+
 def s_2_1(k: Kit):
-    pr, res = _birth(k)
-    k.ok(res["status"] == "PROCESSED" and res.get("person_id"), "The birth creates the child and records it at once; civil registration is the authority")
+    pr = showcase_couple(k)
+    kw = {}
+    if pr:                                                        # the showcase family's child has a proper name: a given name and the father's family name
+        given = ("Anvi", "Aarvi", "Navya", "Sahithi", "Tanvi", "Varsha")[int(k.tag, 16) % 6]      # Ishita and Karthik are kept for the live-step children (2.10 to 2.13)
+        kw["name"] = f"{given} {pr['fname'].split()[-1]}"
+    pr, res = _birth(k, pr, **kw)
+    k.ok(res["status"] == "PROCESSED" and res.get("person_id"), "The child birth record is created at once; civil registration is the authority")
     fl = k.flow(res["event_id"])
     purposes = sorted(c["purpose"] for c in fl["consents"])
     k.ok(len(purposes) >= 4, "Each subscribing department gets its own request, so four consents are asked of the parent", purposes=purposes)
     k.ok(all(d["status"] == "PENDING_CONSENT" for d in fl["deliveries"] if d["kind"] == "EVENT"), "Nothing is delivered before the parent answers (per-subscriber receipts show 'waiting')")
     subs = exchange.list_subscribers(k.cur)
     k.ok(len(subs) >= 4, "The subscription configuration is visible per department", subscribers=[s["system"] for s in subs])
+    k.ok(not k.one("SELECT 1 AS x FROM mdm.dept_response WHERE event_id=%s", res["event_id"]), "No department has a notice to answer until the parent agrees")
 
 
 def s_2_2(k: Kit):
@@ -370,13 +435,25 @@ def s_2_2(k: Kit):
     fl = k.flow(res["event_id"])
     seq = k.audit_head()
     pds, health = consent_of(fl, "BIRTH_PDS"), consent_of(fl, "BIRTH_HEALTH")
+    A = exchange.SYSTEMS.get(exchange.PURPOSES["BIRTH_PDS"]["system"])
+    B = exchange.SYSTEMS.get(exchange.PURPOSES["BIRTH_HEALTH"]["system"])
     exchange.respond(k.cur, pds["id"], "GRANT", ACTOR, note="demo")
     exchange.respond(k.cur, health["id"], "REFUSE", ACTOR, note="demo")
     fl = k.flow(res["event_id"])
-    k.ok(delivery_of(fl, "BIRTH_PDS")["status"] == "DELIVERED", "The department the parent agreed to receives the event")
-    k.ok(delivery_of(fl, "BIRTH_HEALTH")["status"] == "BLOCKED_REFUSED", "The department the parent refused receives nothing")
+    k.ok(delivery_of(fl, "BIRTH_PDS")["status"] == "DELIVERED", f"{A}: the parent allowed this use, so {A} is sent the birth data")
+    k.ok(delivery_of(fl, "BIRTH_HEALTH")["status"] == "BLOCKED_REFUSED", f"{B}: the parent refused this use, so {B} is sent nothing")
     subj = {f"consent:{pds['id']}", f"consent:{health['id']}"}
-    k.ok(subj <= {a["subject"] for a in k.audit_rows(since=seq)}, "Audit entries name both consent records")
+    k.ok(subj <= {a["subject"] for a in k.audit_rows(since=seq)}, f"The audit log records both consent decisions: the one allowed for {A} and the one refused for {B}")
+    eid = res["event_id"]
+    pa = k.flow(eid)["event"].get("parents") or []
+    k.ok(len(pa) == 2 and all(x["state"] in ("AWAITING", "NOT_MATCHED") for x in pa),
+         "The mother and father on the registration are named; a matched parent shows as awaiting approval until a person approves", parents={x["role"]: x["state_text"] for x in pa})
+    nt = k.one("SELECT id, rule, outcome FROM mdm.dept_response WHERE event_id=%s AND purpose='BIRTH_PDS'", eid)
+    k.ok(nt and nt["outcome"] is None and nt["rule"].get("key") == "BIRTH_REGISTERED",
+         f"{A} has a notice to answer, due within the time allowed for a birth registration", rule=nt and nt["rule"])
+    k.ok(not k.one("SELECT 1 AS x FROM mdm.dept_response WHERE event_id=%s AND purpose='BIRTH_HEALTH'", eid), f"{B} has no notice, because the parent refused")
+    back = feed.simulate(k.cur, nt["id"], "REJECTED", "Already on our register", None, ACTOR) if nt else {}
+    k.ok(bool(back.get("reopened_proposal")), f"If {A} rejects its notice, it goes back to a person for review, with the department's reason", proposal=back.get("reopened_proposal"))
 
 
 def s_2_3(k: Kit):
@@ -404,7 +481,9 @@ def s_2_4(k: Kit):
     first = k.event("BIRTH_REGISTERED", "UC2", birth_payload(k, pr, name=None, reg=reg), case_kind="NO_NAME")
     k.ok(first["status"] == "HELD", "A birth without a name is held: nothing is created yet")
     k.ok(not k.q("SELECT 1 FROM mdm.person p JOIN mdm.event e ON e.person_id=p.id WHERE e.id=%s", first["event_id"]), "No person exists for it")
-    am = k.event("BIRTH_AMENDED", "UC2", {"registration_no": reg, "child_name": f"Named Later {k.tag}"}, case_kind="AMENDMENT")
+    given = ("Aarvi", "Ishita", "Navya", "Sahithi", "Tanvi", "Harini", "Varsha", "Keerthi")[int(k.tag, 16) % 8]
+    surname = (pr["fname"] or "").split()[-1] if (pr.get("fname") or "").strip() else "Reddy"
+    am = k.event("BIRTH_AMENDED", "UC2", {"registration_no": reg, "child_name": f"{given} {surname}"}, case_kind="AMENDMENT")      # the name the family gives later: a given name and the father's family name
     k.ok(am.get("person_id") and am["event_id"] == first["event_id"], "The name arrives and is applied to the same subject (same event)", person_id=am.get("person_id"))
     ev = k.one("SELECT status FROM mdm.event WHERE id=%s", first["event_id"])
     k.ok(ev["status"] == "PROCESSED", "The held birth is now processed")
@@ -426,7 +505,7 @@ def s_2_6(k: Kit):
     res = k.event("BIRTH_REGISTERED", "UC2", {"registration_no": f"DEMO-B-{k.tag}", "child_name": f"Parent Check {k.tag}", "gender": "M", "date_of_birth": "2026-06-10",
                                               "father_name": f"Zxqv Unknown{k.tag}", "mother_name": f"Wplm Missing{k.tag}", "place": "Medak", "registration_date": "2026-06-11"}, case_kind="PARENT_MISMATCH")
     rv = k.proposals(res["event_id"], "REVIEW_PARENTS")
-    k.ok(len(rv) == 1 and "Could not identify" in rv[0]["summary"], "The parents cannot be matched, so a review task is raised with the ambiguity stated", summary=rv and rv[0]["summary"])
+    k.ok(len(rv) == 1 and ("Could not identify" in rv[0]["summary"] or "not found" in rv[0]["summary"]), "The parents cannot be matched, so a review task is raised with the ambiguity stated", summary=rv and rv[0]["summary"])
     fl = k.flow(res["event_id"])
     k.ok(fl["consents"] == [] and all(d["status"] == "BLOCKED_NO_PARENT" for d in fl["deliveries"] if d["kind"] == "EVENT"), "No consent can be asked, so every downstream notification is blocked")
     k.ok(not any(p["kind"] == "ADD_TO_RATION_CARD" for p in k.proposals(res["event_id"])), "No ration-card change is proposed")
@@ -446,16 +525,102 @@ def s_2_7(k: Kit):
         d = delivery_of(k.flow(res["event_id"]), "BIRTH_HEALTH")
         k.ok(d["status"] == "DEAD_LETTER", f"After {k.pol('max_delivery_attempts')} attempts it is set aside in the dead-letter list", attempts=d["attempts"])
         k.ok(bool([a for a in k.audit_rows("DELIVERY_DEAD_LETTER") if a["subject"] == f"delivery:{d['id']}"]), "The dead-letter entry is in the audit log")
+        k.ok(not k.one("SELECT 1 AS x FROM mdm.dept_response WHERE event_id=%s AND purpose='BIRTH_HEALTH'", res["event_id"]), "While the department is unreachable it has no notice to answer")
         exchange.set_subscriber(k.cur, "health", True, ACTOR, "demo: restart")
         r = exchange.redeliver(k.cur, d["id"], ACTOR)
         k.ok(r["status"] == "DELIVERED", "After the restart the set-aside item is replayed and delivered")
-        tok = k.token(pr["fid"]) or k.token(pr["mid"])
+        k.ok(bool(k.one("SELECT 1 AS x FROM mdm.dept_response WHERE event_id=%s AND purpose='BIRTH_HEALTH' AND outcome IS NULL", res["event_id"])), "After the replay the department has a notice to answer in its feed")
+        asked = [c["person_id"] for c in k.q("SELECT DISTINCT person_id FROM mdm.consent WHERE event_id=%s AND person_id IS NOT NULL", res["event_id"])]
+        tok = next((t for t in (k.token(x) for x in asked) if t), None)          # the view of the parent who was actually asked
         if tok:
             k.ok(bool(wave3.my_data(k.cur, tok)["consents"]), "The parent's own view shows the consents and what was asked")
         else:
             k.gap("The parent has no identity reference, so the citizen message could not be shown for this couple.")
     finally:
         exchange.set_subscriber(k.cur, "health", True, ACTOR, "demo: restored")
+
+
+# ---- UC2 live steps: one family, one story. Run these one at a time during the demo (scenario page, "Live demo steps").
+def _live_family(k):
+    pr = showcase_couple(k, clear=False)
+    if not pr:
+        k.skip("The demo couple (Rajender and Suma Pagidipalli) is not in master data. Run the UC2 group first.")
+    return pr
+
+
+def _health_trouble(k):
+    return k.q("SELECT id, status FROM mdm.delivery WHERE system='health' AND kind='EVENT' AND status IN ('RETRYING','DEAD_LETTER') ORDER BY id")
+
+
+def s_2_8(k: Kit):
+    """Live step: Health's system goes down before the parent answers. Whatever she approves for Health will wait, not be sent."""
+    _live_family(k)
+    exchange.set_subscriber(k.cur, "health", False, ACTOR, "Demo: the Health system goes down")
+    row = k.one("SELECT available FROM mdm.subscriber WHERE system='health'")
+    k.ok(row and not row["available"], "The Health system is now unreachable")
+    k.info("Next: Suma approves on the citizen portal. Health will show 'approved, not shared yet' while the other departments show 'shared'.")
+
+
+def s_2_9(k: Kit):
+    """Live step: Health's system comes back; the waiting and set-aside items are retried and delivered."""
+    _live_family(k)
+    exchange.set_subscriber(k.cur, "health", True, ACTOR, "Demo: the Health system is back")
+    exchange.retry_due(k.cur, ACTOR, "health")
+    for d in k.q("SELECT id FROM mdm.delivery WHERE system='health' AND kind='EVENT' AND status='DEAD_LETTER' ORDER BY id"):
+        exchange.redeliver(k.cur, d["id"], ACTOR)
+    left = _health_trouble(k)
+    k.ok(not left, "Nothing for Health is still waiting or set aside; every approved item was delivered", still_waiting=len(left))
+    k.info("Next: refresh Suma's approval. Health now reads 'shared'.")
+
+
+def s_2_10(k: Kit):
+    """Live step: a second child is registered months late and without a name. Nothing is created until the name arrives."""
+    pr = _live_family(k)
+    reg = k.reg("B")
+    res = k.event("BIRTH_REGISTERED", "UC2", birth_payload(k, pr, name=None, reg=reg, gender="M", date_of_birth="2025-12-01", registration_date="2026-06-12"), case_kind="NO_NAME")
+    k.ok(res["status"] == "HELD", "A birth without a name is held: no child record, no consent request, nothing sent to any department")
+    k.ok(not k.q("SELECT 1 FROM mdm.person p JOIN mdm.event e ON e.person_id=p.id WHERE e.id=%s", res["event_id"]), "No person exists for it, so there is nothing to duplicate or orphan downstream")
+    k.info("Next: run step 2.11, when the family gives the name.", registration=reg)
+
+
+def s_2_11(k: Kit):
+    """Live step: the name arrives for the held birth. The same child is created, flagged as a late registration."""
+    held = k.one("SELECT id, payload FROM mdm.event WHERE scenario='2.10' AND status='HELD' ORDER BY id DESC LIMIT 1")
+    if not held:
+        k.skip("Run step 2.10 first")
+    pl = held["payload"] if isinstance(held["payload"], dict) else json.loads(held["payload"])
+    am = k.event("BIRTH_AMENDED", "UC2", {"registration_no": pl["registration_no"], "child_name": f"Karthik {pl['father_name'].split()[-1]}"}, scenario="2.10", case_kind="AMENDMENT")
+    k.ok(bool(am.get("person_id")) and am["event_id"] == held["id"], "The name is applied to the same registration; one child, no duplicate", person_id=am.get("person_id"))
+    ev = k.one("SELECT status, note FROM mdm.event WHERE id=%s", held["id"])
+    k.ok(ev["status"] == "PROCESSED", "The held birth is now processed")
+    k.ok("days after birth" in (ev["note"] or "") or any(p["detail"].get("late_registration") for p in k.proposals(held["id"])), "It is recognised as a late registration, so what follows goes to a person for review", note=ev["note"])
+    k.ok(bool(k.flow(held["id"])["consents"]), "Consent is asked of the parent only now that the child exists")
+
+
+def s_2_12(k: Kit):
+    """Live step: a third child is registered. The parent will not answer."""
+    pr = _live_family(k)
+    res = k.event("BIRTH_REGISTERED", "UC2", birth_payload(k, pr, name=f"Ishita {pr['fname'].split()[-1]}", gender="F", date_of_birth="2026-06-14"), case_kind="NO_ANSWER")
+    k.ok(res["status"] == "PROCESSED", "The birth is processed and consent is asked of the parent")
+    k.ok(all(d["status"] == "PENDING_CONSENT" for d in k.flow(res["event_id"])["deliveries"] if d["kind"] == "EVENT"), "Nothing is sent while the parent has not answered")
+    k.info("Next: do not answer this one on the citizen portal. Run step 2.13 to let the time run out.")
+
+
+def s_2_13(k: Kit):
+    """Live step: the response time for the third child runs out. The requests expire and nothing is sent."""
+    ev = k.one("SELECT id FROM mdm.event WHERE scenario='2.12' ORDER BY id DESC LIMIT 1")
+    if not ev:
+        k.skip("Run step 2.12 first")
+    later = datetime.now(timezone.utc) + timedelta(days=k.pol("consent_response_days") + 1)
+    n = 0
+    for c in k.flow(ev["id"])["consents"]:
+        if c["status"] == "PENDING":
+            n += exchange._expire_if_due(k.cur, exchange._consent(k.cur, c["id"]), later)["status"] == "EXPIRED"
+    k.ok(n > 0, "With no answer the requests expire", expired=n)
+    fl = k.flow(ev["id"])
+    k.ok(not any(d["status"] == "DELIVERED" for d in fl["deliveries"] if d["kind"] == "EVENT"), "No data went out to any department")
+    k.ok(all(d["status"] == "BLOCKED_EXPIRED" for d in fl["deliveries"] if d["kind"] == "EVENT"), "Every waiting department stays blocked")
+    k.info("Next: refresh Suma's approvals. The card for this child reads 'Expired'.")
 
 
 # ================================================================== UC3  A death is registered
@@ -470,7 +635,36 @@ def _pension_status(k, pid):
     return r and r["s"]
 
 
+def _login_check(k: Kit, refs):
+    """After planting, says whether each demo sign-in has a registry person. 'Aadhaar / mobile not found in registry' at login means it has not."""
+    for ref in refs:
+        k.cur.execute("SAVEPOINT login_chk")
+        try:
+            k.cur.execute("SELECT name, mobile FROM family_registry.person WHERE aadhaar_ref=%s", (ref,))
+            rows = k.cur.fetchall()
+            k.cur.execute("RELEASE SAVEPOINT login_chk")
+        except Exception as e:  # noqa: BLE001
+            k.cur.execute("ROLLBACK TO SAVEPOINT login_chk")
+            k.info(f"Sign-in {ref}: could not check the registry ({type(e).__name__})")
+            continue
+        if rows:
+            k.info(f"Sign-in {ref} is ready: {rows[0]['name']} is in the registry")
+        else:
+            k.info(f"Sign-in {ref} will NOT work: no registry person holds it, so login says 'Aadhaar / mobile not found in registry'. See the registry notes above")
+
+
+def uc3_plant(k: Kit):
+    """Plants the UC3 story cast: Ramaiah Goud (pensioner, wife signs in as 2701), Narsimha Chary (no kin), two men named Gangadhar Rao."""
+    out = demo_uc3_story.plant(k.cur, ACTOR)
+    k.info("UC3 cast planted. Ramaiah Goud (pensioner, wife Sarojini signs in as XXXX-XXXX-2701), Narsimha Chary (no spouse or nominee), two men named Gangadhar Rao. "
+           "Next: run the live steps 3.6 to 3.10 one at a time and act on each in the officer portal", beneficiary_rows=out["beneficiary_rows"])
+    for note in out["notes"]:
+        k.info("Registry layer: " + note)
+    _login_check(k, ["XXXX-XXXX-2701"])
+
+
 def s_3_1(k: Kit):
+    uc3_plant(k)
     fx = death_fixture(k, spouse=True)
     res, cd = _death(k, fx)
     k.ok(len(cd) == 1 and cd[0]["status"] == "PROPOSED", "The death creates one proposal for a person to confirm, not a change", summary=cd and cd[0]["summary"])
@@ -499,7 +693,10 @@ def s_3_2(k: Kit):
     row = k.one("SELECT decided_by, rationale, policy_version FROM mdm.proposal WHERE id=%s", stop["id"])
     k.ok(row["decided_by"] == ACTOR and row["rationale"] == note, "The approver's name and the reason are stored on the proposal", by=row["decided_by"], reason=row["rationale"])
     a = [x for x in k.audit_rows("PROPOSAL_APPROVED", since=seq) if x["subject"] == f"proposal:{stop['id']}"]
-    k.ok(a and "Ready for" in (a[0]["detail"].get("meaning") or ""), "The audit entry says the stop instruction is ready for the pension department", meaning=a and a[0]["detail"].get("meaning"))
+    k.ok(a and "notice for" in (a[0]["detail"].get("meaning") or ""), "The audit entry says a notice for the pension department is now in its feed", meaning=a and a[0]["detail"].get("meaning"))
+    nt = k.one("SELECT statutory, rule, outcome FROM mdm.dept_response WHERE source='PROPOSAL' AND ref_id=%s", stop["id"])
+    k.ok(nt and nt["statutory"] and nt["outcome"] is None and nt["rule"].get("key") == "STOP_PENSION",
+         "The pension department has a notice to acknowledge, with the response time set for pension stops", rule=nt and nt["rule"])
     k.ok(_pension_status(k, fx["person_id"]) == "ACTIVE", "This build issues the instruction but does not edit the department's record; the department acts on it")
     from . import auth
     k.info("Approving is limited to these roles in the API", roles=sorted(auth.WRITE_ROLES))
@@ -548,13 +745,84 @@ def s_3_5(k: Kit):
     k.ok(len(k.q("SELECT 1 FROM mdm.proposal WHERE parent_id=%s AND kind='STOP_PENSION'", cd[0]["id"])) == 1, "It created no second proposal")
 
 
+def _live_death(k: Kit, key, **kw):
+    fx = demo_uc3_story.fixture(k.cur, key)
+    if not fx:
+        k.skip("Run the UC3 group first: it plants the people for these steps")
+    k.last_payload = death_payload(k, fx, **kw)
+    res = k.event("DEATH_REGISTERED", "UC3", k.last_payload, case_kind="LIVE")
+    return fx, res, k.proposals(res["event_id"], "CONFIRM_DEATH")
+
+
+def s_3_6(k: Kit):
+    """Live step: the death of Ramaiah Goud, a pensioner with a wife, a ration card, a land record and a payment due in four days."""
+    fx, res, cd = _live_death(k, "ramaiah")
+    k.ok(len(cd) == 1 and cd[0]["status"] == "PROPOSED", "The death is a proposal for an officer to confirm; nothing has changed")
+    k.ok(k.person(fx["person_id"])["life_status"] != "DECEASED", "Ramaiah is not marked deceased yet")
+    k.info("Next, as the officer: Decisions > Approvals (or Events), open the death, confirm it is Ramaiah with a reason. Then approve each follow-up: the pension stop (with a reason), "
+           "the ration card, the land record, and the contact with his wife. Sign in as XXXX-XXXX-2701 after approving the contact to see what Sarojini is told.")
+
+
+def s_3_7(k: Kit):
+    """Live step: the death of Narsimha Chary, who has no spouse and no nominee."""
+    fx, res, cd = _live_death(k, "narsimha")
+    k.ok(len(cd) == 1 and cd[0]["status"] == "PROPOSED", "The death is a proposal for an officer to confirm")
+    k.info("Next, as the officer: confirm it is Narsimha. No spouse or nominee exists on any record, so the follow-up is a task to trace the next of kin; the pension stop is still only proposed.")
+
+
+def s_3_8(k: Kit):
+    """Live step: a death is registered for a name that fits two living men."""
+    fx = demo_uc3_story.fixture(k.cur, "gangadhar1")
+    if not fx:
+        k.skip("Run the UC3 group first: it plants the people for these steps")
+    k.last_payload = death_payload(k, fx)
+    res = k.event("DEATH_REGISTERED", "UC3", k.last_payload, case_kind="LIVE")
+    cd = k.proposals(res["event_id"], "CONFIRM_DEATH")
+    k.ok(cd and cd[0]["detail"].get("ambiguous") is True and cd[0]["detail"].get("suggested") is None, "Two living men fit one death, so nobody is pre-selected")
+    k.ok(len(cd[0]["options"]) >= 2, "Both men are shown to the officer with their details")
+    k.info("Next, as the officer: the proposal cannot be approved until one man is chosen; no follow-up exists while it is unresolved. Reject it if the registration cannot be tied to either, or choose the right man with a reason.")
+
+
+def s_3_9(k: Kit):
+    """Live step: a death registered outside the state for someone the registry does not hold."""
+    ghost = {"name": f"Mohan Lal Verma {k.tag}", "age": 68}
+    res = k.event("DEATH_REGISTERED", "UC3", death_payload(k, ghost, place="Maharashtra"), case_kind="LIVE")
+    k.ok(res["status"] == "NO_MATCH" and not k.proposals(res["event_id"]), "Nobody matches, no proposal is raised, and nobody is marked deceased")
+    ev = k.one("SELECT note FROM mdm.event WHERE id=%s", res["event_id"])
+    k.ok("does not mean the person is alive" in (ev["note"] or ""), "The note says a missing record does not mean the person is alive", note=ev["note"])
+    k.info("Next: Events shows this registration with the note. A question about this person to the pension department answers 'no record', not 'no'.")
+
+
+def s_3_10(k: Kit):
+    """Live step: the registry sends Ramaiah's death a second time."""
+    prev = k.one("SELECT payload FROM mdm.event WHERE scenario='3.6' AND event_type='DEATH_REGISTERED' ORDER BY id DESC LIMIT 1")
+    if not prev:
+        k.skip("Run step 3.6 first")
+    pl = prev["payload"] if isinstance(prev["payload"], dict) else json.loads(prev["payload"])
+    again = k.event("DEATH_REGISTERED", "UC3", pl, case_kind="DUPLICATE_OF_PREVIOUS")
+    k.ok(again["status"] == "DUPLICATE", "A repeat of the same registration is ignored")
+    k.info("Next: Events shows the repeat as a duplicate; no second proposal was created.")
+
+
 # ================================================================== UC4  Eligibility without moving documents
 def _fresh_consent(k, pid, purpose="SCHOLARSHIP_ELIGIBILITY", elements=None):
     k.clear_consents(pid, purpose)
     return k.grant(pid, purpose, elements)
 
 
+def uc4_invite_student(k: Kit):
+    """Plants the UC4 story cohort: Kavya (login 2601, turns 18 soon), her mother Lakshmi (login 2602), her brother Sai, and four students for the
+    certificate cases. They also appear in the scheme simulator, the beneficiary list and the families view."""
+    out = demo_uc4_story.plant(k.cur, ACTOR)
+    k.info("Demo cohort planted. Kavya Muthyala (login XXXX-XXXX-2601, turns 18 in about 25 days, not yet invited) and her mother Lakshmi Muthyala (XXXX-XXXX-2602). "
+           "Next: invite Kavya, then run the live steps 4.7 and 4.8 when you are ready", cases=out["cases"], beneficiary_rows=out["beneficiary_rows"])
+    for note in out["notes"]:
+        k.info("Registry layer: " + note)
+    _login_check(k, ["XXXX-XXXX-2601", "XXXX-XXXX-2602"])
+
+
 def s_4_1(k: Kit):
+    uc4_invite_student(k)
     pid, token = cert_holder(k)
     k.clear_consents(pid, "SCHOLARSHIP_ELIGIBILITY")
     first = k.ask("education", "SCHOLARSHIP_ELIGIBILITY", "INCOME_AT_MOST", {"limit": 250000}, token=token)
@@ -639,6 +907,29 @@ def s_4_5(k: Kit):
     k.ok(bool(r.get("audit_seq")), "A purge receipt (audit sequence number) is issued", receipt=r.get("audit_seq"))
     after = k.ask("education", "SCHOLARSHIP_ELIGIBILITY", "INCOME_AT_MOST", {"limit": 250000}, token=token)
     k.ok(after["outcome"] == "DENIED_NO_CONSENT", "After: new queries are blocked at once", outcome=after["outcome"])
+
+
+def s_4_7(k: Kit):
+    """Live step: Kavya and Sai start an application, so the scholarship department asks for consent. Their mother is asked, not them."""
+    if not demo_uc4_invite._student(k.cur):
+        k.skip("Run the UC4 group first: it plants Kavya and her family")
+    out = demo_uc4_story.applies(k.cur, ACTOR)
+    k.ok(bool(out.get("kavya")) and bool(out.get("sai")), "Both applications ask for consent", **out)
+    ap = citizen.list_approvals(k.cur, "XXXX-XXXX-2602")
+    cards = [i for i in ap["items"] if i.get("kind") == "CONSENT_SINGLE" and i.get("status") == "PENDING"]
+    k.ok(len(cards) >= 2, "Lakshmi, signed in as XXXX-XXXX-2602, has a card for each child waiting for her answer", cards=len(cards))
+    kv = citizen.list_approvals(k.cur, "XXXX-XXXX-2601")
+    mine = [i for i in kv["items"] if i.get("kind") == "CONSENT_SINGLE"]
+    k.ok(bool(mine) and not any(i.get("can_answer") for i in mine), "Kavya sees hers read-only: it is waiting for her parent")
+
+
+def s_4_8(k: Kit):
+    """Live step: the clock does not move in this build, so Kavya's date of birth moves back by a few weeks. She is 18 from now on."""
+    if not demo_uc4_invite._student(k.cur):
+        k.skip("Run the UC4 group first: it plants Kavya and her family")
+    out = demo_uc4_story.turn_kavya_18(k.cur, ACTOR)
+    k.ok(out.get("changed") and out.get("age") == 18, "Kavya is now 18 on the system date", dob=out.get("dob"))
+    k.info("Next: Control Tower, Run daily checks now. That ends her mother's permission and asks Kavya for her own. Nothing is enrolled.")
 
 
 def s_4_6(k: Kit):
@@ -1088,14 +1379,14 @@ ORDER = [s[0] for s in _SC] + [s[0] for s in _CC]
 
 def catalogue(cur) -> dict:
     """Every scenario with its latest result (if it has ever run)."""
-    cur.execute("""SELECT DISTINCT ON (scenario) scenario, status, ms, ran_at, run_id, jsonb_array_length(checks) AS checks,
+    cur.execute("""SELECT DISTINCT ON (scenario) scenario, status, ms, ran_at, run_id, (SELECT count(*) FROM jsonb_array_elements(checks) c WHERE NOT COALESCE((c->>'info')::bool,false)) AS checks,
                           (SELECT count(*) FROM jsonb_array_elements(checks) c WHERE (c->>'ok')::bool AND NOT COALESCE((c->>'info')::bool,false)) AS passed,
                           jsonb_array_length(gaps) AS gaps
                    FROM mdm.demo_result ORDER BY scenario, id DESC""")
     last = {r["scenario"]: r for r in cur.fetchall()}
     items = []
     for sid, uc, sign, title, shows in _SC:
-        items.append({"id": sid, "uc": uc, "type": "positive" if sign == "+" else "negative", "title": title, "shows": shows, "last": last.get(sid)})
+        items.append({"id": sid, "uc": uc, "type": "positive" if sign == "+" else ("step" if sign == "=" else "negative"), "title": title, "shows": shows, "last": last.get(sid)})
     for sid, _, name, how, ev in _CC:
         items.append({"id": sid, "uc": "CC", "type": "cross-cutting", "title": name, "shows": ev, "how": how, "last": last.get(sid)})
     cur.execute("SELECT * FROM mdm.demo_run ORDER BY id DESC LIMIT 10")
@@ -1121,6 +1412,7 @@ def run_one(sid: str, actor: str = ACTOR) -> dict:
         cur = conn.cursor()
         k = Kit(cur, sid)
         try:
+            clear_events(cur, sid, actor)                     # this scenario's earlier events go first, so runs never pile up
             fn(k)
             res.update(status=_status(k), checks=k.checks, gaps=k.gaps)
             conn.commit()
@@ -1143,6 +1435,16 @@ def start_run(actor: str = ACTOR, kind: str = "ALL") -> int:
     return rid
 
 
+def scenario_events(cur, row: dict) -> list[dict]:
+    """The events a scenario run created. Events record the scenario that made them; the run's own time window picks out this run's."""
+    from .exchange import CITIZEN_SQL
+    cur.execute(f"""SELECT e.id, e.event_type, e.event_key, e.status, e.uc, {CITIZEN_SQL} AS citizen
+                    FROM mdm.event e LEFT JOIN mdm.person pp ON pp.id=e.person_id
+                    WHERE e.scenario=%s AND e.received_at BETWEEN %s - make_interval(secs => %s) AND %s ORDER BY e.id""",
+                (row["scenario"], row["ran_at"], (row.get("ms") or 0) / 1000.0 + 5, row["ran_at"]))
+    return cur.fetchall()
+
+
 def run_scenario(run_id: int, sid: str, actor: str = ACTOR) -> dict:
     if sid not in FUNCS:
         raise Refused("Unknown scenario", 404)
@@ -1155,6 +1457,8 @@ def run_scenario(run_id: int, sid: str, actor: str = ACTOR) -> dict:
         cur.execute("INSERT INTO mdm.demo_result (run_id, scenario, uc, title, status, checks, gaps, ms) VALUES (%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s)",
                     (run_id, r["scenario"], r["uc"], r["title"], r["status"],
                      _js(r["checks"] + ([{"ok": False, "text": r["error"]}] if r["error"] and r["status"] in ("ERROR",) else [])), _js(r["gaps"]), r["ms"]))
+        cur.execute("SELECT scenario, ran_at, ms FROM mdm.demo_result WHERE run_id=%s AND scenario=%s ORDER BY id DESC LIMIT 1", (run_id, sid))
+        r["events"] = scenario_events(cur, cur.fetchone())
         conn.commit()
     return r
 
@@ -1189,6 +1493,8 @@ def get_run(cur, run_id: int | None = None) -> dict:
         raise Refused("No run yet", 404)
     cur.execute("SELECT * FROM mdm.demo_result WHERE run_id=%s ORDER BY id", (run_id,))
     r["results"] = sorted(cur.fetchall(), key=lambda x: ORDER.index(x["scenario"]) if x["scenario"] in ORDER else 999)
+    for x in r["results"]:
+        x["events"] = scenario_events(cur, x)
     return r
 
 
@@ -1223,7 +1529,8 @@ def inject(cur, category: str, params: dict, actor: str) -> dict:
     if category not in INJECTIONS:
         raise Refused("Unknown injection")
     params = params or {}
-    k = Kit(cur, "INJECT")
+    k = Kit(cur, f"INJECT-{category}")
+    clear_events(cur, k.sid, actor)                           # an injection replaces the earlier one of the same kind
     obs: dict = {}
     seen = []
 
@@ -1401,6 +1708,40 @@ def evidence_markdown(p: dict) -> str:
 DEMO_ACTORS = ("demo-runner", "demo-misuser", "demo-loadtest", "demo-pension-clerk", "injected-misuser")
 
 
+def clear_events(cur, scenario: str, actor: str) -> dict:
+    """Removes the demonstration events an earlier run of this scenario (or an earlier injection of this category) left behind, with what they
+    created: proposals, consents, deliveries, notices, the new child's records and ledger rows. Run first, so one run never piles on another."""
+    cur.execute("SELECT id, event_key, record_id FROM mdm.event WHERE event_key LIKE 'DEMO-%%' AND scenario=%s", (scenario,))
+    evs = cur.fetchall()
+    if not evs:
+        return {}
+    ids, keys = [e["id"] for e in evs], [e["event_key"] for e in evs]
+    recs = [e["record_id"] for e in evs if e["record_id"]]
+    n = {}
+
+    def d(label, sql, *p):
+        cur.execute(sql, p)
+        n[label] = cur.rowcount
+
+    cur.execute("SELECT DISTINCT person_id FROM mdm.source_record WHERE person_id IS NOT NULL AND split_part(source_rid, ':', 1) = ANY(%s) AND (source_rid LIKE 'DEMO-D-%%' OR source_rid LIKE 'DEMO-M-%%')", (keys,))
+    touched = [r["person_id"] for r in cur.fetchall()]
+    cur.execute("SELECT DISTINCT person_id FROM mdm.source_record WHERE id = ANY(%s) AND person_id IS NOT NULL", (recs,))
+    born = [r["person_id"] for r in cur.fetchall()]
+    d("simulated_loads", "DELETE FROM mdm.source_record WHERE person_id = ANY(%s) AND payload->>'simulated_load'='true'", born)
+    d("notices", "DELETE FROM mdm.dept_response WHERE event_id = ANY(%s)", ids)
+    d("ledger_rows", "DELETE FROM mdm.exchange WHERE person_id = ANY(%s)", born)
+    d("consents", "DELETE FROM mdm.consent WHERE event_id = ANY(%s)", ids)
+    d("events", "DELETE FROM mdm.event WHERE id = ANY(%s)", ids)
+    d("records", "DELETE FROM mdm.source_record WHERE id = ANY(%s) OR split_part(source_rid, ':', 1) = ANY(%s) AND (source_rid LIKE 'DEMO-D-%%' OR source_rid LIKE 'DEMO-M-%%')", recs, keys)
+    for pid in dict.fromkeys(touched + born):
+        store.rebuild_person(cur, pid)
+    alive = [x for x in touched if x not in born]
+    if alive:
+        store.derive_relationships(cur, alive)
+    audit.write(cur, actor, "DEMO_EVENTS_CLEARED", f"scenario:{scenario}", n)
+    return n
+
+
 def reset(cur, actor: str) -> dict:
     """Removes what scenario runs and injections created (DEMO- registrations, demo consents, tickets, keys, connectors) and puts the
     data pack back as it was loaded. The audit log, run history and policy history are kept. Needs no database access beyond the app's own."""
@@ -1410,13 +1751,20 @@ def reset(cur, actor: str) -> dict:
         cur.execute(sql, p)
         n[label] = cur.rowcount
 
+    exchange.set_subscriber(cur, "health", True, actor, "Demo: cleared, Health system back")      # a live step may have left it down
     cur.execute("SELECT record_id FROM mdm.event WHERE event_key LIKE 'DEMO-B-%%' AND record_id IS NOT NULL")
     birth_recs = [r["record_id"] for r in cur.fetchall()]
     cur.execute("SELECT DISTINCT person_id FROM mdm.source_record WHERE person_id IS NOT NULL AND (source_rid LIKE 'DEMO-D-%%' OR source_rid LIKE 'DEMO-M-%%')")
     touched = [r["person_id"] for r in cur.fetchall()]
     cur.execute("SELECT DISTINCT person_id FROM mdm.source_record WHERE id = ANY(%s) AND person_id IS NOT NULL", (birth_recs,))
     born = [r["person_id"] for r in cur.fetchall()]
+    d("simulated_loads", "DELETE FROM mdm.source_record WHERE person_id = ANY(%s) AND payload->>'simulated_load'='true'", born)
+    n["uc1_citizen_demo"] = sum(demo_uc1.clear_all(cur).values())      # a count, like the other lines
+    n["uc4_story"] = demo_uc4_story.clear(cur).get("people", 0)
+    n["uc3_story"] = demo_uc3_story.clear(cur).get("people", 0)
+    demo_uc2_login.restore(cur)
     d("ledger_rows_for_new_children", "DELETE FROM mdm.exchange WHERE person_id = ANY(%s)", born)
+    d("notices", "DELETE FROM mdm.dept_response WHERE event_id IN (SELECT id FROM mdm.event WHERE event_key LIKE 'DEMO-%%')")
     d("consents_for_demo_events", "DELETE FROM mdm.consent WHERE event_id IN (SELECT id FROM mdm.event WHERE event_key LIKE 'DEMO-%%')")
     d("events", "DELETE FROM mdm.event WHERE event_key LIKE 'DEMO-%%'")
     d("records", "DELETE FROM mdm.source_record WHERE id = ANY(%s) OR source_rid LIKE 'DEMO-D-%%' OR source_rid LIKE 'DEMO-M-%%'", birth_recs)

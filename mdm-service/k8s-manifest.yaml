@@ -46,9 +46,20 @@ spec:
             - name: MDM_READ_ROLES
               value: "*"
             - name: MDM_WRITE_ROLES
-              value: "MDM_STEWARD,MDM_ADMIN,ADMIN,DEPT_ADMIN"
+              value: "MDM_STEWARD,MDM_ADMIN,ADMIN,DEPT_ADMIN,PDS_OFFICER,HEALTH_OFFICER"
             - name: MDM_ADMIN_ROLES
               value: "MDM_ADMIN,ADMIN,IT_ADMIN"
+            # Machine translation of department free text for the Telugu view. Off until the translation service is deployed.
+            - name: MT_ENABLED
+              value: "false"
+            - name: MT_URL
+              value: "http://translation-service.citizen.svc.cluster.local:8200"
+            # Citizen approval notices (birth consent / remind). Off until an operator turns it on for a demo or live use.
+            # scripts/mdm_setup.sh re-applies this manifest, so NOTIFY_ENABLED returns to false after each setup run.
+            - name: NOTIFY_ENABLED
+              value: "false"
+            - name: NOTIFICATIONS_URL
+              value: "http://notifications-service.citizen.svc.cluster.local:8080/notifications-service/v1/notifications"
           startupProbe:
             httpGet:
               path: /mdm-service/api/health

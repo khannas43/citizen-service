@@ -11,20 +11,33 @@ c = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def _lookup_limit_off():
+    from app import exchange
+    from app.db import connect
+
     cur = {x["key"]: x for x in c.get("/api/x/policy").json()["policies"]}["max_lookups_per_hour"]["value"]
     c.post("/api/x/policy", json={"key": "max_lookups_per_hour", "value": 1000, "note": "tests"})
+    # Live step 2.8 may leave Health unavailable in citizen_db_test; keep it on for scripted scenarios.
+    with connect() as conn:
+        exchange.set_subscriber(conn.cursor(), "health", True, "test", "wave4 setup: Health on")
+        conn.commit()
     yield
     c.post("/api/x/policy", json={"key": "max_lookups_per_hour", "value": cur, "note": "tests restored"})
+    with connect() as conn:
+        exchange.set_subscriber(conn.cursor(), "health", True, "test", "wave4 teardown: Health on")
+        conn.commit()
 
 
-def test_catalogue_lists_35_scripted_scenarios_and_9_cross_cutting_tests():
+def test_catalogue_lists_48_scripted_scenarios_and_9_cross_cutting_tests():
     cat = c.get("/api/x/demo/scenarios").json()
     ids = [i["id"] for i in cat["items"]]
-    assert len(ids) == 44 and ids[:2] == ["1.1", "1.2"] and ids[-1] == "CC9"
+    assert len(ids) == 57 and ids[:2] == ["1.1", "1.2"] and ids[-1] == "CC9"
     by_uc = {}
     for i in cat["items"]:
         by_uc[i["uc"]] = by_uc.get(i["uc"], 0) + 1
-    assert by_uc == {"UC1": 6, "UC2": 7, "UC3": 5, "UC4": 6, "UC5": 6, "UC6": 5, "CC": 9}
+    assert by_uc == {"UC1": 6, "UC2": 13, "UC3": 10, "UC4": 8, "UC5": 6, "UC6": 5, "CC": 9}
+    by_id = {i["id"]: i for i in cat["items"]}
+    for sid in ("2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "3.6", "3.7", "3.8", "3.9", "3.10", "4.7", "4.8"):
+        assert sid in ids and by_id[sid]["type"] == "step", sid
     assert all(i["title"] and i["shows"] for i in cat["items"])
 
 
@@ -114,7 +127,7 @@ def test_written_evidence_register_and_evidence_pack():
     ready_no_ref = c.put("/api/x/demo/documents/capacity", json={"status": "READY", "reference": ""})
     assert ready_no_ref.status_code == 400
     pack = c.get("/api/x/demo/evidence").json()
-    assert pack["scripted"]["total"] == 44 and pack["audit_chain"]["ok"] is True and len(pack["written_evidence"]) >= 6
+    assert pack["scripted"]["total"] == 57 and pack["audit_chain"]["ok"] is True and len(pack["written_evidence"]) >= 6
     md = c.get("/api/x/demo/evidence.md")
     assert md.status_code == 200 and "evidence pack" in md.text and "Written evidence" in md.text and "Audit chain: intact" in md.text
     assert "BIRTH_REGISTERED" not in md.text            # the pack states results, not raw payloads

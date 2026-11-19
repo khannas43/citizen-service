@@ -167,14 +167,9 @@ def test_minor_needs_a_guardian_and_handover_ends_guardian_consent():
 
 
 def test_birth_waits_for_parent_consent_then_flows_and_revocation_is_told():
-    pair = q("""SELECT f.id AS fid, f.name AS fname, m.id AS mid, m.name AS mname, f.district AS district FROM mdm.relationship r
-                JOIN mdm.person f ON f.id=r.person_a JOIN mdm.person m ON m.id=r.person_b
-                WHERE r.kind='SPOUSE' AND f.gender='M' AND m.gender='F' AND f.district IS NOT NULL AND f.name ~ ' ' AND m.name ~ ' '
-                  AND (SELECT count(*) FROM mdm.person x WHERE x.name=f.name)=1 AND (SELECT count(*) FROM mdm.person x WHERE x.name=m.name)=1
-                  AND EXISTS (SELECT 1 FROM mdm.source_record s WHERE s.person_id=f.id AND s.source='pds_view')
-                LIMIT 1""")
-    assert pair, "the data should hold a married couple with distinctive names"
-    pr = pair[0]
+    # Need a ration card so the birth raises ADD_TO_RATION_CARD (pds_view alone is not enough).
+    from tests.test_feed import couple
+    pr = couple()
     tag = uuid.uuid4().hex[:6]
     ev = {"event_type": "BIRTH_REGISTERED", "use_case": "UC2", "order": 1,
           "payload": {"registration_no": "T-BC-" + tag, "child_name": "Consent Child " + tag, "gender": "F", "date_of_birth": "2026-06-01",
@@ -218,7 +213,7 @@ def test_birth_with_unidentified_parents_sends_nothing():
 
 
 def test_sensitive_approvals_need_a_recorded_reason():
-    who = q("""SELECT p.id, p.name, p.birth_year FROM mdm.person p WHERE p.life_status<>'DECEASED' AND p.birth_year < 1960 AND p.name ~ ' '
+    who = q("""SELECT p.id, p.name, p.birth_year FROM mdm.person p WHERE p.life_status<>'DECEASED' AND p.birth_year < 1960 AND p.name ~ '^[A-Za-z]+( [A-Za-z]+)+$'   -- Latin-letter names: a name in Telugu letters cannot be matched against the English records
                AND (SELECT count(*) FROM mdm.person x WHERE x.name=p.name)=1 AND EXISTS (SELECT 1 FROM mdm.source_record s WHERE s.person_id=p.id AND s.source='pension_batch')
                LIMIT 1""")
     assert who, "the data should hold an older person with a pension and a distinctive name"

@@ -1,5 +1,6 @@
 """Wave 2: outage and dead-letter, discrepancies, query builder, marriage consent, misuse limiter, retention, audit tamper test."""
 import os, uuid
+from datetime import date
 os.environ.setdefault("MDM_AUTH_DISABLED", "true")
 os.environ["MDM_BASE"] = ""
 import pytest
@@ -35,14 +36,19 @@ def _lookup_limit_off():
 
 
 def couple():
-    rows = q("""SELECT f.id AS fid, f.name AS fname, m.id AS mid, m.name AS mname, f.district AS district FROM mdm.relationship r
-                JOIN mdm.person f ON f.id=r.person_a JOIN mdm.person m ON m.id=r.person_b
-                WHERE r.kind='SPOUSE' AND f.gender='M' AND m.gender='F' AND f.district IS NOT NULL AND f.name ~ ' ' AND m.name ~ ' '
-                  AND (SELECT count(*) FROM mdm.person x WHERE x.name=f.name)=1 AND (SELECT count(*) FROM mdm.person x WHERE x.name=m.name)=1
-                  AND EXISTS (SELECT 1 FROM mdm.source_record s WHERE s.person_id=f.id AND s.source='pds_view')
-                LIMIT 1""")
-    assert rows
-    return rows[0]
+    """Fresh Latin-name SPOUSE pair that passes _couple_match_ok; both must be 18+."""
+    from tests.test_feed import couple as feed_couple
+    pr = feed_couple()
+    ages = q("""SELECT id, birth_year, EXTRACT(YEAR FROM age(CURRENT_DATE, dob))::int AS age
+                FROM mdm.person WHERE id IN (%s,%s)""", pr["fid"], pr["mid"])
+    by = {r["id"]: r for r in ages}
+    for pid in (pr["fid"], pr["mid"]):
+        row = by.get(pid) or {}
+        age = row.get("age")
+        if age is None and row.get("birth_year"):
+            age = date.today().year - int(row["birth_year"])
+        assert age is None or age >= 18, (pid, age, pr)
+    return pr
 
 
 def birth(tag, pr):
@@ -157,24 +163,71 @@ def test_query_builder_refuses_broad_queries_and_shares_only_consented_people():
     assert c.get("/api/x/ledger", params={"kind": "QUERY", "limit": 3}).json()["total"] >= 3
 
 
+def _latin_adults_and_minors(tag: str):
+    """Insert a unique adult couple (18+) and an under-18 pair for the underage path.
+
+    Names must be letter-only and unique: matching tokens() strips digits, so a hex tag
+    collapses to short fragments and ILIKE '%wave%' + LIMIT 400 misses the new rows.
+    """
+    # Map hex → letters so each run keeps a ≥8-letter unique token that survives tokens().
+    uniq = "".join(chr(97 + int(c, 16) % 26) for c in (tag + "aa")[:8])
+    with connect() as conn:
+        cur = conn.cursor()
+        people = []
+        specs = [
+            (f"Marrygroom{uniq} Alphaman", "M", date(1990, 1, 15), 1990),
+            (f"Marrybride{uniq} Betawoman", "F", date(1992, 6, 20), 1992),
+            (f"Younggroom{uniq} Gammaman", "M", date(2010, 3, 1), 2010),
+            (f"Youngbride{uniq} Deltawoman", "F", date(2011, 8, 12), 2011),
+        ]
+        for name, gender, dob, by in specs:
+            cur.execute("SELECT nextval('mdm.person_id_seq') AS i")
+            pid = cur.fetchone()["i"]
+            cur.execute("""INSERT INTO mdm.person (id, mdm_id, name, dob, birth_year, gender, district, life_status)
+                           VALUES (%s,%s,%s,%s,%s,%s,'Medak','ALIVE')""",
+                        (pid, f"MDM-{pid:08d}", name, dob, by, gender))
+            cur.execute("""INSERT INTO mdm.source_record
+                           (person_id, source, source_rid, rtype, name, gender, dob, district, link_status, as_of, payload)
+                           VALUES (%s,'pds_view',%s,'PERSON',%s,%s,%s,'Medak','AUTO_LINKED',CURRENT_DATE,'{}'::jsonb)""",
+                        (pid, f"PDS-W2-{uniq}-{pid}", name, gender, dob))
+            people.append({"id": pid, "name": name, "gender": gender})
+        groom, bride, yg, yb = people
+        # Do not pre-link as SPOUSE: marriage matching prefers free (unmarried) people.
+        conn.commit()
+        return {
+            "adults": {"fid": groom["id"], "fname": groom["name"], "mid": bride["id"], "mname": bride["name"], "district": "Medak"},
+            "minors": {"fid": yg["id"], "fname": yg["name"], "mid": yb["id"], "mname": yb["name"], "district": "Medak"},
+        }
+
+
 def test_marriage_needs_both_consents_and_underage_goes_to_an_officer():
-    pr = couple()
+    """Matching requires adults (groom ≥21 / bride ≥18 at marriage). Build our own adult
+    couple, then raise min_marriage_age so they are underage under this policy version."""
     tag = uuid.uuid4().hex[:6]
+    pr = _latin_adults_and_minors(tag)["adults"]
     old = pol("min_marriage_age")
     try:
-        setpol("min_marriage_age", {"M": 40, "F": 40})                     # makes the real couple "underage" under this policy version
+        setpol("min_marriage_age", {"M": 40, "F": 40})
         ev = c.post("/api/events", json={"event_type": "MARRIAGE_REGISTERED", "use_case": "UC6", "order": 1,
-            "payload": {"registration_no": "W2-M-" + tag, "groom_name": pr["fname"], "bride_name": pr["mname"], "marriage_date": "2026-05-01", "bride_name_after": "Changed Surname " + tag}})
+            "payload": {"registration_no": "W2-M-" + tag, "groom_name": pr["fname"], "bride_name": pr["mname"],
+                        "marriage_date": "2026-05-01", "bride_name_after": "Changed Surname " + tag}})
         assert ev.status_code == 200, ev.text
+        assert ev.json().get("status") == "PROCESSED", ev.json()
         eid = ev.json()["event_id"]
         flow = c.get(f"/api/x/events/{eid}/flow").json()
-        conf = next(p for p in flow["proposals"] if p["kind"] == "CONFIRM_MARRIAGE")
-        ok = c.post(f"/api/proposals/{conf['id']}/decision", json={"decision": "APPROVE", "note": "register entry seen", "groom_id": conf["options"]["groom"][0]["person_id"], "bride_id": conf["options"]["bride"][0]["person_id"]})
+        conf = next((p for p in flow["proposals"] if p["kind"] == "CONFIRM_MARRIAGE"), None)
+        assert conf, flow
+        assert conf["options"]["groom"] and conf["options"]["bride"], conf
+        ok = c.post(f"/api/proposals/{conf['id']}/decision", json={
+            "decision": "APPROVE", "note": "register entry seen",
+            "groom_id": conf["options"]["groom"][0]["person_id"],
+            "bride_id": conf["options"]["bride"][0]["person_id"],
+        })
         assert ok.status_code == 200, ok.text
         kinds = [p["kind"] for p in c.get(f"/api/x/events/{eid}/flow").json()["proposals"]]
         assert "REFER_UNDERAGE" in kinds and "ADD_TO_RATION_CARD" not in kinds and "NOTE_NEW_NAME" not in kinds
         refer = next(p for p in c.get(f"/api/x/events/{eid}/flow").json()["proposals"] if p["kind"] == "REFER_UNDERAGE")
-        assert c.post(f"/api/proposals/{refer['id']}/decision", json={"decision": "APPROVE", "note": "x"}).status_code == 400    # a reason is always required
+        assert c.post(f"/api/proposals/{refer['id']}/decision", json={"decision": "APPROVE", "note": "x"}).status_code == 400
     finally:
         setpol("min_marriage_age", old)
 
@@ -229,6 +282,10 @@ def test_catalogue_standards_and_registry():
     cat = c.get("/api/x/catalogue").json()
     assert {e["element"] for e in cat["elements"]} >= {"age", "income_band", "land_holding"}
     assert any(s["source"] == "pds_view" and s["records"] > 0 for s in cat["sources"])
+    names = {s["source"]: s["name"] for s in cat["sources"]}
+    assert all(e["source"] in names and e["authoritative"] == names[e["source"]] for e in cat["elements"])      # the same name in both tables
+    assert all(s["state"] in ("CURRENT", "STALE", "EMPTY", "UNDATED") for s in cat["sources"])
+    assert next(s for s in cat["sources"] if s["source"] == "revenue_land")["elements"] == ["land_holding"]
     reg = c.get("/api/x/registry").json()
     assert any(p["purpose"] == "PENSION_ELIGIBILITY" and p["consent_required"] is False for p in reg["purposes"])
     a = c.post("/api/x/standards/test", json={"kind": "address", "text": "H.No 4-12, Gandhi Ngr Col.", "other": "4 gandhi nagar colony"}).json()
@@ -239,12 +296,19 @@ def test_catalogue_standards_and_registry():
 
 
 def test_marriage_follow_ups_wait_for_both_people_to_consent():
-    pr = couple()
+    # Restore a normal marriage age in case an earlier test left a high bar behind.
+    setpol("min_marriage_age", {"M": 21, "F": 18})
     tag = uuid.uuid4().hex[:6]
+    pr = _latin_adults_and_minors(tag)["adults"]  # both 18+
     ev = c.post("/api/events", json={"event_type": "MARRIAGE_REGISTERED", "use_case": "UC6", "order": 1,
         "payload": {"registration_no": "W2-N-" + tag, "groom_name": pr["fname"], "bride_name": pr["mname"], "marriage_date": "2026-05-01", "bride_name_after": "Newname " + tag}})
+    assert ev.status_code == 200, ev.text
+    assert ev.json().get("status") == "PROCESSED", ev.json()
     eid = ev.json()["event_id"]
-    conf = next(p for p in c.get(f"/api/x/events/{eid}/flow").json()["proposals"] if p["kind"] == "CONFIRM_MARRIAGE")
+    flow0 = c.get(f"/api/x/events/{eid}/flow").json()
+    conf = next((p for p in flow0["proposals"] if p["kind"] == "CONFIRM_MARRIAGE"), None)
+    assert conf, flow0
+    assert conf["options"]["groom"] and conf["options"]["bride"], conf
     g, b = conf["options"]["groom"][0]["person_id"], conf["options"]["bride"][0]["person_id"]
     r = c.post(f"/api/proposals/{conf['id']}/decision", json={"decision": "APPROVE", "note": "register entry seen", "groom_id": g, "bride_id": b})
     assert r.status_code == 200, r.text

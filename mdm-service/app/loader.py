@@ -97,6 +97,8 @@ def run_load(folder: str, state: str = STATE, actor: str = "loader", force: bool
                 cands = [{"person_id": pid_of[c], "score": round(s, 4), "evidence": ev} for c, s, ev in d.candidates if c != d.cluster]
                 reviews.append((rid_of[r.pk], _js(cands)))
         cur.executemany("INSERT INTO mdm.review_task (record_id, candidates) VALUES (%s, %s::jsonb)", reviews)
+        from . import workqueue
+        workqueue.apply_review_classification(cur)      # UC1: reason_code and risk_class for the new open review tasks
         surv = rules.get("survivorship")
         for c in cl_ids:
             store.write_person(cur, pid_of[c], mem_dicts[c], surv)

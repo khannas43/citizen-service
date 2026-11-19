@@ -119,6 +119,13 @@ def derive_relationships(cur, person_ids: list[int] | None = None):
        AND a.relation IN ('Head','Spouse') AND b.relation IN ('Son','Daughter')
       WHERE a.person_id IS NOT NULL AND b.person_id IS NOT NULL AND a.person_id <> b.person_id
         AND COALESCE(a.payload->>'tenant','N') <> 'Y' AND COALESCE(b.payload->>'tenant','N') <> 'Y' {scope}""", p)
+    scope_b = "" if person_ids is None else " AND (a.person_id = ANY(%(ids)s) OR kv.value::bigint = ANY(%(ids)s))"
+    cur.execute(f"""
+      INSERT INTO mdm.relationship (person_a, person_b, kind, basis, source, ref)
+      SELECT DISTINCT kv.value::bigint, a.person_id, 'PARENT_OF', 'Birth registration, parent matched and approved by a person', 'crs', a.source_rid
+      FROM mdm.source_record a, jsonb_each_text(a.payload->'approved_parents') kv
+      WHERE a.source = 'crs' AND a.rtype = 'BIRTH' AND a.payload ? 'approved_parents' AND a.person_id IS NOT NULL AND kv.value::bigint <> a.person_id {scope_b}
+        AND NOT EXISTS (SELECT 1 FROM mdm.relationship r WHERE r.kind='PARENT_OF' AND r.person_a = kv.value::bigint AND r.person_b = a.person_id)""", p)
     cur.execute(f"""
       INSERT INTO mdm.relationship (person_a, person_b, kind, basis, source, ref)
       SELECT DISTINCT b.person_id, a.person_id, 'PARENT_OF', 'Father/mother of the card head', 'pds_view', a.ration_card

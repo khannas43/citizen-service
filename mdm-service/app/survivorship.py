@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from datetime import date
 
-from .names import has_telugu
+from .names import has_telugu, name_key
 
 REF_DATE = date(2026, 6, 21)      # the date of the synthetic registry
 
@@ -120,6 +120,28 @@ def _age(dob: date, on: date) -> int:
     return on.year - dob.year - ((on.month, on.day) < (dob.month, dob.day))
 
 
+NAME_CONFLICT_SIMILARITY = 70      # rapidfuzz ratio (0-100) of two name keys below which they disagree
+
+
+def _names_disagree(named: dict[str, set[str]]) -> bool:
+    """True when some pair of sources has no pair of name keys that is close (equal, one inside the other, or similar)."""
+    from rapidfuzz import fuzz
+    srcs = list(named)
+    for i, a in enumerate(srcs):
+        for b in srcs[i + 1:]:
+            close = False
+            for ka in named[a]:
+                for kb in named[b]:
+                    if ka == kb or ka in kb or kb in ka or fuzz.ratio(ka, kb) >= NAME_CONFLICT_SIMILARITY:
+                        close = True
+                        break
+                if close:
+                    break
+            if not close:
+                return True
+    return False
+
+
 def derive_dq(person: dict, recs: list[dict]) -> list[dict]:
     """Issues are facts about the department records, each with the record it concerns (record_id may be None)."""
     out = []
@@ -145,6 +167,17 @@ def derive_dq(person: dict, recs: list[dict]) -> list[dict]:
     gs = {r["gender"] for r in recs if r.get("gender")}
     if len(gs) > 1:
         add("GENDER_CONFLICT", "MEDIUM", "Departments report different genders: " + ", ".join(sorted(gs)))
+    # NAME_CONFLICT: two different sources spell the name so differently that the phonetic keys are not close.
+    # Spelling variants, word order, initials and honorifics share a key (or nearly) and are not a conflict.
+    named = {}
+    for r in recs:
+        if r.get("name") and r.get("rtype") != "MARRIAGE_BRIDE":     # a bride's name may change after marriage
+            k = name_key(r["name"])
+            if k:
+                named.setdefault(r["source"], set()).add(k)
+    if len(named) > 1 and _names_disagree(named):
+        shown = sorted({clean_name(r["name"]) for r in recs if r.get("name") and r.get("rtype") != "MARRIAGE_BRIDE"})
+        add("NAME_CONFLICT", "MEDIUM", "Departments record the name differently: " + ", ".join(shown[:4]))
     for r in by_src.get("revenue_certificates", []):
         p = r.get("payload") or {}
         if p.get("valid_until") and str(p["valid_until"])[:10] < REF_DATE.isoformat():

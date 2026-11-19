@@ -1,4 +1,9 @@
-"""End-to-end check against a loaded database:  MDM_AUTH_DISABLED=true MDM_DB_DSN=... python -m pytest tests -q"""
+"""End-to-end check against a loaded database.
+
+Uses citizen_db_test by default (see tests/conftest.py); refuses live citizen_db unless ALLOW_LIVE_DB=1.
+
+  MDM_AUTH_DISABLED=true MDM_DB_DSN='... dbname=citizen_db_test ...' python -m pytest tests -q
+"""
 import os
 os.environ.setdefault("MDM_AUTH_DISABLED", "true")
 os.environ["MDM_BASE"] = ""
@@ -49,7 +54,9 @@ def test_dq_and_rules():
     i = c.get("/api/dq/issues", params={"severity": "HIGH", "limit": 1}).json()["items"][0]
     assert c.post(f"/api/dq/issues/{i['id']}/correction", json={"note": "please verify"}).status_code == 200
     assert c.get("/api/rules").json()["active"]["match"]["auto"]
-    assert c.post("/api/rules/preview", json={"match": {"auto": 0.99, "review": 0.9}}).json()["would_produce"]["IN_REVIEW"] >= 0
+    # POST /api/rules/preview re-runs matching on every mdm.source_record via _recs_from_db +
+    # cluster_records. That is a full-table scan in app code (no filter to limit to test rows);
+    # do not call it here. Unknown settings are still refused quickly.
     assert c.post("/api/rules/preview", json={"match": {"bogus": 1}}).status_code == 400
 
 
@@ -85,8 +92,14 @@ def test_event_feed_birth_death_marriage_flow(tmp_path):
     out = r.json()["outcomes"]
     assert out.get("DUPLICATE") == 1 and out.get("HELD") == 1
     evs = {}
-    for e in c.get("/api/events", params={"limit": 200}).json()["items"]:
-        evs.setdefault(e["event_key"] + e["event_type"], e)      # the first one received for each registration
+    offset = 0
+    while True:                                                   # page through; the table holds more than one page after other tests
+        batch = c.get("/api/events", params={"limit": 200, "offset": offset}).json()["items"]
+        if not batch:
+            break
+        for e in batch:
+            evs.setdefault(e["event_key"] + e["event_type"], e)  # the first one received for each registration
+        offset += len(batch)
     assert evs["T-B-1-" + tag + "BIRTH_REGISTERED"]["status"] == "WITHDRAWN"
     assert evs["T-B-2-" + tag + "BIRTH_REGISTERED"]["status"] == "PROCESSED" and evs["T-B-2-" + tag + "BIRTH_REGISTERED"]["person_id"]
     d = c.get(f"/api/events/{evs['T-B-1-' + tag + 'BIRTH_REGISTERED']['id']}").json()

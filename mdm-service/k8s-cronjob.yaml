@@ -1,0 +1,71 @@
+# The daily checks for turning 18 and scholarship eligibility (UC4).
+#
+# Calls POST /mdm-service/api/x/jobs/daily once a day: lapses old consent requests, hands over at 18, invites people about
+# to turn 18 (only those with a portal sign-in, and only when a notice actually went out), and reminds about income
+# certificates that are ending. It enrols nobody. It is safe to run twice: the second run finds nothing new.
+#
+# NOT APPLIED BY ANY SCRIPT. Review, create the Secret below, then apply it by hand:
+#     kubectl apply -f mdm-service/k8s-cronjob.yaml
+#
+# The route needs an admin role (MDM_ADMIN or ADMIN). The job signs in as a Keycloak service account that holds that
+# role, so create a confidential client for it in the citizen realm and put its id and secret in the Secret:
+#     kubectl -n citizen create secret generic mdm-daily-job \
+#       --from-literal=client_id=<service-account-client-id> \
+#       --from-literal=client_secret=<service-account-client-secret>
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mdm-daily-job
+  namespace: citizen
+  labels:
+    app: mdm-service
+    component: daily-job
+spec:
+  schedule: "30 20 * * *"          # 20:30 UTC = 02:00 India time
+  timeZone: "Etc/UTC"
+  concurrencyPolicy: Forbid        # never two runs at once
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 900
+      template:
+        metadata:
+          labels:
+            app: mdm-service
+            component: daily-job
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: daily
+              image: curlimages/curl:8.8.0
+              env:
+                - name: KEYCLOAK_TOKEN_URL
+                  value: "http://keycloak.citizen.svc.cluster.local:8080/realms/citizen/protocol/openid-connect/token"
+                - name: DAILY_URL
+                  value: "http://mdm-service.citizen.svc.cluster.local:8100/mdm-service/api/x/jobs/daily"
+                - name: CLIENT_ID
+                  valueFrom:
+                    secretKeyRef: { name: mdm-daily-job, key: client_id }
+                - name: CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef: { name: mdm-daily-job, key: client_secret }
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -eu
+                  token=$(curl -fsS -X POST "$KEYCLOAK_TOKEN_URL" \
+                    -d grant_type=client_credentials \
+                    -d "client_id=$CLIENT_ID" -d "client_secret=$CLIENT_SECRET" \
+                    | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')
+                  [ -n "$token" ] || { echo "could not get a token"; exit 1; }
+                  curl -fsS -X POST "$DAILY_URL" \
+                    -H "Authorization: Bearer $token" \
+                    -H "Content-Type: application/json" \
+                    -d '{}'
+                  echo
+              resources:
+                requests: { cpu: 10m, memory: 16Mi }
+                limits: { cpu: 100m, memory: 64Mi }
