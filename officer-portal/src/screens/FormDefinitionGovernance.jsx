@@ -549,8 +549,8 @@ export default function FormDefinitionGovernance({ adapter: adapterProp } = {}) 
       ) : (
         <div className="fdg-detail" aria-busy={detailStatus === 'loading' ? 'true' : 'false'}>
           <div className="fdg-toolbar">
-            <button type="button" className="fdg-btn fdg-btn-secondary" onClick={backToQueue}>
-              Back to Queue
+            <button type="button" className="fdg-back-link" onClick={backToQueue}>
+              ← Back to Queue
             </button>
             {selectedKey ? (
               <button

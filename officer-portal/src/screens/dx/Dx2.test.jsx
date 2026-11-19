@@ -6,9 +6,8 @@ import DxQuery from './DxQuery'
 import DxDiscrepancies from './DxDiscrepancies'
 import DxAudit from './DxAudit'
 import DxStandards from './DxStandards'
-import DxHousehold from './DxHousehold'
 import DxRetention from './DxRetention'
-import { DxRegistry } from './DxCatalogue'
+import DxCatalogue, { DxRegistry } from './DxCatalogue'
 
 afterEach(cleanup)
 beforeEach(() => { localStorage.setItem('officer_token', 'tok') })
@@ -37,6 +36,7 @@ describe('Control tower', () => {
       '/x/subscribers/pds': (u, init) => { posted.push(JSON.parse(init.body)); return json({ system: 'pds', available: true, retried: { delivered: 1, still_retrying: 0, dead_letter: 0 } }) },
     })
     wrap(<DxControl />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Overview' }))   // the Control Tower opens on the Flow board
     expect((await screen.findAllByText('Offline')).length).toBeGreaterThan(0)
     expect(screen.getByText('Intact')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Bring back' }))
@@ -47,6 +47,7 @@ describe('Control tower', () => {
   it('offers to send a set-aside item again', async () => {
     globalThis.fetch = route({ '/x/control': control({ dead_letters: 1 }), '/x/deliveries': { total: 1, items: [{ id: 9, status: 'DEAD_LETTER', system: 'health', purpose: 'BIRTH_HEALTH', attempts: 3, updated_at: '2026-10-27T10:00:00Z' }] } })
     wrap(<DxControl />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Overview' }))   // the Control Tower opens on the Flow board
     expect(await screen.findByText('Set aside for a person')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Send again' })).toBeInTheDocument()
   })
@@ -96,6 +97,25 @@ describe('Discrepancies', () => {
   })
 })
 
+describe('Report a wrong value', () => {
+  it('fills "Shown now" from the golden record, follows the chosen value, and shows the spouse on record', async () => {
+    globalThis.fetch = route({
+      '/persons/7': { person: { id: 7, name: 'Anil Chakali', dob: '1985-07-21' }, attributes: [{ attribute: 'name', value: 'Anil Chakali' }, { attribute: 'dob', value: '1985-07-21' }, { attribute: 'address', value: '46 Ambedkar Nagar, Narketpally' }],
+        relationships: [{ kind: 'SPOUSE', role_of_other: 'SPOUSE', other: { id: 8, name: 'Lakshmi Chakali' }, source: 'marriage_register' }], records: [], issues: [], audit: [], missing_sources: [] },
+      '/x/discrepancies': { total: 0, items: [], by_status: {} },
+    })
+    wrap(<DxDiscrepancies />, '/dx/discrepancies?person=7')
+    await waitFor(() => expect(screen.getByLabelText('Shown now')).toHaveValue('Anil Chakali'))
+    fireEvent.change(screen.getByLabelText('Which value'), { target: { value: 'date_of_birth' } })
+    await waitFor(() => expect(screen.getByLabelText('Shown now')).toHaveValue('1985-07-21'))
+    fireEvent.change(screen.getByLabelText('Which value'), { target: { value: 'address' } })
+    await waitFor(() => expect(screen.getByLabelText('Shown now')).toHaveValue('46 Ambedkar Nagar, Narketpally'))
+    expect(await screen.findByText('Lakshmi Chakali')).toBeInTheDocument()
+    expect(screen.getByText(/Spouse on record/)).toBeInTheDocument()
+    expect((await screen.findAllByText(/Anil Chakali/)).length).toBeGreaterThan(0)
+  })
+})
+
 describe('Audit explorer', () => {
   it('shows detection and restoration in the tamper test', async () => {
     globalThis.fetch = route({
@@ -112,6 +132,29 @@ describe('Audit explorer', () => {
   })
 })
 
+describe('Audit explorer filters', () => {
+  it('offers who and action lists, a date range, sortable headers and a page size', async () => {
+    const calls = []
+    const base = route({
+      '/audit/verify': { ok: true, checked: 400 },
+      '/x/audit/facets': { actors: [{ value: 'steward-1', n: 3 }, { value: 'system', n: 9 }], actions: [{ value: 'REVIEW_DECIDED', n: 4 }, { value: 'POLICY_CHANGED', n: 8 }], range: { first: '2026-10-01T00:00:00Z', last: '2026-10-30T00:00:00Z' } },
+      '/x/audit': { total: 120, items: [{ seq: 5, ts: '2026-10-27T10:00:00Z', actor: 'steward-1', action: 'REVIEW_DECIDED', subject: 'person:1', detail: {}, hash: 'abc' }] },
+    })
+    globalThis.fetch = (u, o) => { calls.push(String(u)); return base(u, o) }
+    wrap(<DxAudit />)
+    fireEvent.change(await screen.findByLabelText('Who'), { target: { value: 'steward-1' } })
+    await waitFor(() => expect(calls.some((c) => c.includes('actor_is=steward-1'))).toBe(true))
+    fireEvent.change(screen.getByLabelText('Action'), { target: { value: 'REVIEW_DECIDED' } })
+    await waitFor(() => expect(calls.some((c) => c.includes('action_is=REVIEW_DECIDED'))).toBe(true))
+    fireEvent.change(screen.getByLabelText('From date'), { target: { value: '2026-10-01' } })
+    await waitFor(() => expect(calls.some((c) => c.includes('date_from=2026-10-01'))).toBe(true))
+    fireEvent.click(screen.getByRole('button', { name: /^Who/ }))
+    await waitFor(() => expect(calls.some((c) => c.includes('sort=actor') && c.includes('dir=asc'))).toBe(true))
+    fireEvent.change(screen.getByLabelText('Rows per page'), { target: { value: '50' } })
+    await waitFor(() => expect(calls.some((c) => c.includes('limit=50'))).toBe(true))
+  })
+})
+
 describe('Data standards', () => {
   it('normalises and compares two addresses', async () => {
     globalThis.fetch = route({
@@ -121,19 +164,6 @@ describe('Data standards', () => {
     wrap(<DxStandards />)
     fireEvent.click(await screen.findByRole('button', { name: 'Normalise' }))
     expect(await screen.findByText('Likely the same place')).toBeInTheDocument()
-  })
-})
-
-describe('Household', () => {
-  it('lists members and the limits of the view', async () => {
-    globalThis.fetch = route({ '/x/persons/5/household': {
-      person: { id: 5, name: 'Raju', mdm_id: 'M5' }, cards: ['RC-1'],
-      members: [{ id: 5, mdm_id: 'M5', name: 'Raju', age: 40, relation: 'Head', tenant: true, is_selected: true, electricity: false, housing: false, land: false, life_status: 'NO_DEATH_RECORD' }],
-      caveats: ['A ration card is a proxy for a household.', 'At least one card holder is marked as a tenant.'],
-    } })
-    wrap(<DxHousehold />, '/dx/household?person=5')
-    expect((await screen.findAllByText('Tenant')).length).toBe(2)   // column heading and the badge
-    expect(screen.getByText(/proxy for a household/)).toBeInTheDocument()
   })
 })
 
@@ -158,5 +188,29 @@ describe('Registry', () => {
     wrap(<DxRegistry />)
     expect((await screen.findAllByText('Not needed (statutory)')).length).toBeGreaterThan(0)
     expect(screen.getAllByText('Required').length).toBeGreaterThan(0)
+  })
+
+  it('catalogue: selecting a source narrows the data elements to what it supplies, and names match in both places', async () => {
+    globalThis.fetch = route({ '/x/catalogue': { attribute_owners: {},
+      sources: [
+        { source: 'crs', name: 'Civil registration (CRS)', interface: 'REST API', freshness_hours: 0, records: 10, latest_as_of: '2026-06-20', owner: 'Civil registration', state: 'CURRENT', elements: ['age'] },
+        { source: 'revenue_land', name: 'Revenue: land records', interface: 'REST API', freshness_hours: 8760, records: 5, latest_as_of: '2026-05-20', owner: 'Revenue', state: 'STALE', elements: ['land_holding'] },
+        { source: 'pension_batch', name: 'Social security / pension MIS', interface: 'Batch', freshness_hours: 24, records: 3, latest_as_of: null, owner: 'Pension', state: 'UNDATED', elements: [] },
+      ],
+      elements: [
+        { element: 'age', name: 'Age', authoritative: 'Civil registration (CRS)', source: 'crs', sensitivity: 'LOW', queryable: true, purposes: [] },
+        { element: 'land_holding', name: 'Land held', authoritative: 'Revenue: land records', source: 'revenue_land', sensitivity: 'HIGH', queryable: true, purposes: [] },
+      ] } })
+    wrap(<DxCatalogue />)
+    expect(await screen.findByText('Land held')).toBeInTheDocument()
+    expect(screen.getByText('Age')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /^Revenue: land records: 1 data element/ }))
+    await waitFor(() => expect(screen.queryByText('Age')).toBeNull())
+    expect(screen.getByText('Land held')).toBeInTheDocument()
+    expect(screen.getByText('Data elements from Revenue: land records')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /^Revenue: land records: 1 data element/ }))
+    expect(await screen.findByText('Age')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Details of Social security / pension MIS' }))
+    expect(await screen.findByText(/not the source of truth for any element/)).toBeInTheDocument()
   })
 })

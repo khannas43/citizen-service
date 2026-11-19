@@ -362,7 +362,7 @@ function BeneficiaryTableRow({
     }
   }
 
-  const note = b.removalReason || b.overrideReason || (b.disbursementRef ? `Ref ${b.disbursementRef}` : '')
+  const note = b.removalReason || b.eligibilityReason || b.overrideReason || (b.disbursementRef ? `Ref ${b.disbursementRef}` : '')
 
   return (
     <>

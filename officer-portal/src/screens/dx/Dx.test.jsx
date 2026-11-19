@@ -29,6 +29,7 @@ describe('Approvals', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Review' }))
     const approve = await screen.findByRole('button', { name: 'Approve' })
     expect(approve).toBeDisabled()
+    expect(screen.getByTestId('why-not')).toHaveTextContent(/at least 10 characters/)          // says why Approve is unavailable
     expect(screen.getByText(/Reason \(required, at least 10 characters\)/)).toBeInTheDocument()
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Checked with the family' } })
     expect(approve).toBeEnabled()
@@ -42,6 +43,47 @@ describe('Approvals', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Review' }))
     expect(await screen.findByText(/Waiting for consent from the parent/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Approve' })).toBeDisabled()
+    expect(screen.getByTestId('why-not')).toHaveTextContent(/Approval is unavailable until the parent grants the consent/)
+    expect(screen.getByRole('button', { name: 'Reject' })).toBeEnabled()
+  })
+
+  it('explains what approving or rejecting a department rejection does', async () => {
+    globalThis.fetch = route({ '/x/approvals': { total: 1, by_system: [], rationale_min_chars: 10, items: [proposal({ kind: 'REVIEW_DEPARTMENT_REJECTION', needs_rationale: false, detail: { department: 'Civil supplies (PDS)' }, summary: 'Civil supplies (PDS) rejected the notice' })] } })
+    render(<MemoryRouter><DxApprovals /></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: 'Review' }))
+    expect(await screen.findByText(/sends the notice to Civil supplies \(PDS\) again/)).toBeInTheDocument()
+  })
+
+  it('shows the department answer on an approved ration card action that went through the consent', async () => {
+    globalThis.fetch = route({ '/x/approvals': { total: 1, by_system: [], rationale_min_chars: 10, items: [proposal({ status: 'APPROVED', kind: 'ADD_TO_RATION_CARD', needs_rationale: false,
+      dept: { department: null, consent_notice: { department: 'Civil supplies (PDS)', state: 'REJECTED', outcome: 'REJECTED', reason: 'Card is frozen', revision: 1 } } })] } })
+    render(<MemoryRouter><DxApprovals /></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: 'View' }))
+    expect(await screen.findByText(/answered: rejected \("Card is frozen"\)/)).toBeInTheDocument()
+    expect(screen.getByText(/back with a person for review/)).toBeInTheDocument()
+    expect(screen.getByText(/rejected by the department/)).toBeInTheDocument()          // the one status line says whose decision is whose
+  })
+
+  it('will not approve an action over a department rejection that a person has not yet decided', async () => {
+    const held = proposal({ kind: 'ADD_TO_RATION_CARD', needs_rationale: false, summary: 'Add Baby to ration card',
+      gate: { purpose: 'BIRTH_PDS', purpose_name: 'Ration card', status: 'GRANTED', held: 'Civil supplies (PDS) rejected the notice for this (Already on our register). Decide on the review item first; approving here is unavailable until then.' } })
+    globalThis.fetch = route({ '/x/approvals': { total: 1, items: [held], by_system: [], rationale_min_chars: 10 } })
+    render(<MemoryRouter><DxApprovals /></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: 'Review' }))
+    expect(await screen.findAllByText(/Decide on the review item first/)).not.toHaveLength(0)
+    expect(screen.getByRole('button', { name: 'Approve' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Reject' })).toBeEnabled()
+  })
+
+  it('says what happened after a rejection', async () => {
+    globalThis.fetch = route({
+      '/x/approvals': { total: 1, items: [proposal({ needs_rationale: false, summary: 'Add Baby to ration card' })], by_system: [], rationale_min_chars: 10 },
+      '/proposals/7/decision': () => json({ ok: true }),
+    })
+    render(<MemoryRouter><DxApprovals /></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: 'Review' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Reject' }))
+    expect(await screen.findByText(/Rejected: Add Baby to ration card/)).toBeInTheDocument()
   })
 
   it('sends the reason with the decision and shows an error from the service', async () => {
@@ -111,5 +153,41 @@ describe('Event stream', () => {
     expect(await screen.findByText('2 sent')).toBeInTheDocument()
     expect(screen.getByText('1 waiting for consent')).toBeInTheDocument()
     expect(screen.getByText('Waiting for consent')).toBeInTheDocument()
+  })
+
+  it('shows the citizen first, linked to the person page, one link per person for a marriage', async () => {
+    localStorage.setItem('officer_token', 'tok')
+    globalThis.fetch = route({
+      '/x/deliveries': { total: 0, items: [], by_status: {} },
+      '/x/events': { total: 2, limit: 15, offset: 0, by_status: {}, items: [
+        { id: 1, event_key: 'M-1', event_type: 'MARRIAGE_REGISTERED', status: 'PROCESSED', payload: {}, received_at: '2026-10-27T10:00:00Z', people: [{ role: 'BRIDE', name: 'Pooja Madavi', person_id: 7 }, { role: 'GROOM', name: 'Naresh Goud', person_id: null }] },
+        { id: 2, event_key: 'B-2', event_type: 'BIRTH_REGISTERED', status: 'PROCESSED', payload: {}, received_at: '2026-10-27T10:00:00Z', people: [] }] },
+    })
+    render(<MemoryRouter><DxEvents /></MemoryRouter>)
+    expect(await screen.findByRole('button', { name: 'Pooja Madavi' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Naresh Goud' })).toBeNull()
+    expect(screen.getByText('Naresh Goud')).toBeInTheDocument()
+    expect(screen.getByText('Not matched')).toBeInTheDocument()
+    expect(screen.getAllByRole('columnheader')[0]).toHaveTextContent('Citizen')
+  })
+
+  it('plays the sample feed by itself when the page opens, with no button, and filters by date', async () => {
+    localStorage.setItem('officer_token', 'tok')
+    const calls = []
+    const base = route({ '/events/replay': () => ({ ok: true, status: 200, json: async () => ({ events: 34, outcomes: {} }) }),
+      '/x/deliveries': { total: 0, items: [], by_status: {} }, '/x/events': { total: 1, limit: 15, offset: 0, items: [{ id: 1, event_key: 'K', event_type: 'BIRTH_REGISTERED', status: 'PROCESSED', received_at: '2026-10-30T10:00:00Z', payload: {} }] } })
+    globalThis.fetch = (u, o) => { calls.push(`${o?.method || 'GET'} ${u}`); return base(u, o) }
+    render(<MemoryRouter><DxEvents /></MemoryRouter>)
+    await screen.findByLabelText('From date')
+    expect(screen.queryByRole('button', { name: /sample feed/i })).toBeNull()
+    await waitFor(() => expect(calls.some((c) => c.startsWith('POST') && c.includes('/events/replay'))).toBe(true))
+    fireEvent.change(screen.getByLabelText('From date'), { target: { value: '2026-10-01' } })
+    fireEvent.change(screen.getByLabelText('To date'), { target: { value: '2026-10-31' } })
+    await waitFor(() => expect(calls.some((c) => c.includes('date_from=2026-10-01') && c.includes('date_to=2026-10-31'))).toBe(true))
+    cleanup()
+    globalThis.fetch = route({ '/events/replay': () => ({ ok: false, status: 404, json: async () => ({ detail: 'No sample feed is available on the server.' }) }),
+      '/x/deliveries': { total: 0, items: [], by_status: {} }, '/x/events': { total: 0, limit: 15, offset: 0, items: [] } })
+    render(<MemoryRouter><DxEvents /></MemoryRouter>)
+    expect(await screen.findByText('No sample feed is available on the server.')).toBeInTheDocument()
   })
 })

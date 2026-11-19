@@ -152,11 +152,11 @@ describe('officerHasFeature', () => {
   it('keeps Data and Guided Story off the sidebar but gated by path for admins', () => {
     expect(officerNavItems('DEPT_ADMIN').map((i) => i.to)).toEqual([
       '/', '/tasks', '/grievances', '/schemes', '/scheme-content', '/beneficiaries', '/scheme-simulator',
-      '/money-overview', '/expenditure-integrity', '/fraud-signals/legacy', '/coverage', '/families', '/dx/control', '/dx/events', '/dx/approvals', '/dx/discrepancies', '/mdm', '/dx/household', '/dx/query', '/dx/verify', '/dx/ledger', '/dx/catalogue', '/dx/registry', '/dx/standards', '/dx/consent', '/dx/policy', '/dx/audit', '/dx/retention', '/dx/connectors', '/dx/keys', '/dx/access', '/dx/api', '/dx/citizen', '/dx/citizen/consents', '/dx/citizen/report', '/dx/assisted', '/dx/scenarios', '/dx/inject', '/dx/evidence',
+      '/money-overview', '/expenditure-integrity', '/fraud-signals/legacy', '/coverage', '/families', '/dx/control', '/dx/events', '/dx/work', '/dx/approvals', '/dx/notices', '/dx/discrepancies', '/mdm', '/dx/lineage', '/dx/quality', '/dx/checks', '/dx/query', '/dx/verify', '/dx/ledger', '/dx/catalogue', '/dx/registry', '/dx/standards', '/dx/consent', '/dx/policy', '/dx/response-times', '/dx/audit', '/dx/retention', '/dx/connectors', '/dx/keys', '/dx/access', '/dx/api', '/dx/assisted', '/dx/story', '/dx/scenarios', '/dx/inject', '/dx/evidence',
       '/analytics', '/reports',
     ])
     expect(officerNavItems('IT_ADMIN').map((i) => i.to)).toEqual([
-      '/', '/ops-dashboard', '/money-overview', '/expenditure-integrity', '/dx/control', '/dx/events', '/dx/approvals', '/dx/discrepancies', '/mdm', '/dx/household', '/dx/query', '/dx/verify', '/dx/ledger', '/dx/catalogue', '/dx/registry', '/dx/standards', '/dx/consent', '/dx/policy', '/dx/audit', '/dx/retention', '/dx/connectors', '/dx/keys', '/dx/access', '/dx/api', '/dx/citizen', '/dx/citizen/consents', '/dx/citizen/report', '/dx/assisted', '/dx/scenarios', '/dx/inject', '/dx/evidence', '/analytics', '/reports',
+      '/', '/ops-dashboard', '/money-overview', '/expenditure-integrity', '/dx/control', '/dx/events', '/dx/work', '/dx/approvals', '/dx/notices', '/dx/discrepancies', '/mdm', '/dx/lineage', '/dx/quality', '/dx/checks', '/dx/query', '/dx/verify', '/dx/ledger', '/dx/catalogue', '/dx/registry', '/dx/standards', '/dx/consent', '/dx/policy', '/dx/response-times', '/dx/audit', '/dx/retention', '/dx/connectors', '/dx/keys', '/dx/access', '/dx/api', '/dx/assisted', '/dx/story', '/dx/scenarios', '/dx/inject', '/dx/evidence', '/analytics', '/reports',
     ])
     expect(officerCanAccessPath('DEPT_ADMIN', '/story')).toBe(true)
     expect(officerCanAccessPath('SCHEME_DEPT', '/story')).toBe(true)
@@ -205,6 +205,8 @@ describe('officerHasFeature', () => {
     expect(officerCanAccessPath('SENIOR_MGMT', '/tasks')).toBe(false)
     expect(officerLandingPath('SENIOR_MGMT')).toBe('/analytics')
     expect(officerLandingPath('TALATI')).toBe('/')
+    expect(officerLandingPath('PDS_OFFICER')).toBe('/dx/work')
+    expect(officerLandingPath('HEALTH_OFFICER')).toBe('/dx/control')
     expect(officerNavItems('SENIOR_MGMT').map((i) => i.to)).toEqual([
       '/money-overview', '/coverage', '/analytics', '/reports',
     ])
@@ -229,5 +231,15 @@ describe('districtForOfficer', () => {
     expect(matchesOfficerDistrict('ahmedabad', 'Ahmedabad')).toBe(true)
     expect(matchesOfficerDistrict('Surat', 'Ahmedabad')).toBe(false)
     expect(matchesOfficerDistrict('Surat', null)).toBe(true)
+  })
+})
+
+describe('master data administrator', () => {
+  it('is a known officer role that reaches the Data Exchange screens and the Control Tower', () => {
+    expect(normalizeOfficerRole('MDM_ADMIN')).toBe('MDM_ADMIN')
+    expect(extractOfficerRole({ realm_access: { roles: ['default-roles-citizen', 'MDM_ADMIN'] } })).toBe('MDM_ADMIN')
+    expect(officerCanAccessPath('MDM_ADMIN', '/dx/control')).toBe(true)
+    expect(officerCanAccessPath('MDM_ADMIN', '/dx/work')).toBe(true)
+    expect(officerNavItems('MDM_ADMIN').map((i) => i.to)).toContain('/dx/control')
   })
 })

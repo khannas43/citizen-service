@@ -1,0 +1,59 @@
+/* the review screens */
+.rv .dxk-hero-title { overflow-wrap: anywhere; }
+.rv .dxk-hero-text { max-width: 78ch; }
+.rv-score { margin-top: .9rem; font-size: .95rem; }
+.rv-scale { margin: .6rem 0 .2rem; max-width: 560px; }
+.rv-scale-bar { position: relative; height: 10px; border-radius: 6px; background: #e4e9f2; overflow: visible; }
+.rv-scale-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; background: linear-gradient(90deg, #2e5fb8, #1b3c74); }
+.rv-scale-bar i { position: absolute; top: -4px; width: 2px; height: 18px; background: #b45309; }
+.rv-scale-bar i.auto { background: #1a7a4a; }
+.rv-scale-key { display: flex; justify-content: space-between; margin-top: .35rem; font-size: .72rem; color: #667085; }
+.rv-meter { display: inline-flex; align-items: center; gap: .55rem; justify-content: flex-end; }
+.rv-meter-bar { width: 72px; height: 7px; border-radius: 4px; background: #e4e9f2; overflow: hidden; }
+.rv-meter-bar i { display: block; height: 100%; background: linear-gradient(90deg, #2e5fb8, #1b3c74); }
+.rv .dxk-collapse-head .btn-primary.small, .rv .dxk-collapse-head .btn-secondary.small { white-space: nowrap; }
+.rv .dxk-collapse { transition: box-shadow .15s; }
+.rv .dxk-collapse.open { box-shadow: 0 4px 16px rgba(27, 60, 116, .10); }
+.rv .dxk-card, .rv .dxk-collapse-body { overflow: visible; }
+
+/* Review open button in the queue table */
+.rv .dxk-table td .btn-secondary.small,
+.rv .btn-secondary.small.rv-open {
+  padding: 0.35rem 0.85rem;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Side by side: wrap long values; equal columns; no page-level horizontal scroll */
+.rv .cmp-table {
+  table-layout: fixed;
+  width: 100%;
+}
+.rv .cmp-table th,
+.rv .cmp-table td {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+.rv .cmp-table thead th {
+  white-space: normal;
+}
+.rv .cmp-table tbody th {
+  white-space: normal;
+  width: 9rem;
+}
+.rv .cmp-table th:nth-child(2),
+.rv .cmp-table td:nth-child(2) {
+  width: 5.5rem;
+}
+.rv #rv-compare-body .dxk-table-wrap {
+  max-height: none;
+  overflow-x: auto;
+}
+.rv .mdm-hub,
+.rv.mdm-stack {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+

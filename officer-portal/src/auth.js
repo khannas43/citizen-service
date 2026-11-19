@@ -8,10 +8,13 @@ export const OFFICER_ROLES = [
   'SCHEME_DEPT',
   'DEPT_ADMIN',
   'IT_ADMIN',
+  'MDM_ADMIN',
   'SENIOR_MGMT',
   'PAYROLL_REVIEWER',
   'FINANCE_OFFICER',
   'HR_OFFICER',
+  'PDS_OFFICER',
+  'HEALTH_OFFICER',
 ]
 
 /** Login / JWT aliases → canonical officer_role. */
@@ -29,6 +32,34 @@ const ROLE_ALIASES = {
   IT_ADMIN: 'IT_ADMIN',
   SENIOR_MGMT: 'SENIOR_MGMT',
   SENIOR_MANAGEMENT: 'SENIOR_MGMT',
+  PDS_OFFICER: 'PDS_OFFICER',
+  PDS: 'PDS_OFFICER',
+  HEALTH_OFFICER: 'HEALTH_OFFICER',
+  HEALTH: 'HEALTH_OFFICER',
+}
+
+/** Department code for a department-scoped officer role. */
+export const DEPT_ROLE_CODES = { PDS_OFFICER: 'pds', HEALTH_OFFICER: 'health' }
+export const DEPT_ROLE_LABELS = {
+  PDS_OFFICER: 'Civil supplies (PDS)',
+  HEALTH_OFFICER: 'Health',
+}
+
+export function departmentForRole(role) {
+  return DEPT_ROLE_CODES[normalizeOfficerRole(role)] || null
+}
+
+export function departmentLabel(role) {
+  return DEPT_ROLE_LABELS[normalizeOfficerRole(role)] || null
+}
+
+/** Roles that may run the daily checks. The service decides in the end; a role without access sees its refusal. */
+export function isAdminRole(role) {
+  return ['MDM_ADMIN', 'ADMIN', 'IT_ADMIN'].includes(String(role || '').trim().toUpperCase())
+}
+
+export function isDeptOfficerRole(role) {
+  return !!departmentForRole(role)
 }
 
 export function normalizeOfficerRole(role) {
@@ -74,6 +105,7 @@ export function logoutOfficer() {
   localStorage.removeItem('officer_token')
   localStorage.removeItem('officer_role')
   localStorage.removeItem('officer_name')
+  localStorage.removeItem('officer_username')
   localStorage.removeItem('officer_district')
   window.location.href = getCitizenLandingUrl()
 }
@@ -88,13 +120,41 @@ export function districtForOfficer(username, role) {
 
 export function persistOfficerSession({ token, role, name, username, district, sub }) {
   localStorage.setItem('officer_token', token)
+  try { localStorage.removeItem('officer_nav_groups') } catch { /* ignore */ }   // every sign-in starts with the menu closed
   localStorage.setItem('officer_role', role || 'UNKNOWN')
   localStorage.setItem('officer_name', name || 'Officer')
+  const user = String(username || '').trim()
+  if (user) localStorage.setItem('officer_username', user)
+  else localStorage.removeItem('officer_username')
   if (sub) localStorage.setItem('officer_sub', sub)
   else localStorage.removeItem('officer_sub')
   const scoped = district ?? districtForOfficer(username, role)
   if (scoped) localStorage.setItem('officer_district', scoped)
   else localStorage.removeItem('officer_district')
+}
+
+/** English label for the officer role shown in the header (translated via tr()). */
+export const ROLE_DISPLAY = {
+  PDS_OFFICER: 'Civil supplies officer',
+  HEALTH_OFFICER: 'Health officer',
+  TALATI: 'Talati',
+  DEPT_ADMIN: 'Department admin',
+  IT_ADMIN: 'IT admin',
+  MDM_STEWARD: 'MDM steward',
+  MDM_ADMIN: 'MDM admin',
+  SENIOR_MGMT: 'Senior management',
+  REVENUE_OFFICER: 'Revenue officer',
+  SCHEME_DEPT: 'Scheme department',
+  DATA_ENTRY_OFFICER: 'Data entry officer',
+}
+
+/** Header identity: role label once, username once (never duplicate the given name as the role). */
+export function headerIdentity(role, { name, username } = {}) {
+  const key = String(role || '').trim().toUpperCase().replace(/[\s.-]+/g, '_')
+  const normalized = normalizeOfficerRole(role)
+  const roleLabel = ROLE_DISPLAY[normalized] || ROLE_DISPLAY[key] || (normalized !== 'UNKNOWN' ? normalized : key) || 'Officer'
+  const who = String(username || '').trim() || String(name || '').trim() || 'Officer'
+  return { roleLabel, username: who }
 }
 
 export function getOfficerDistrictScope() {
@@ -195,17 +255,25 @@ const ROLE_FEATURES = {
     'fraud', 'expenditureIntegrity', 'dataImport', 'moneyOverview', 'story', 'coverage', 'families', 'reports', 'analytics', 'mdm',
   ],
   IT_ADMIN: ['home', 'ops', 'reports', 'analytics', 'expenditureIntegrity', 'dataImport', 'moneyOverview', 'mdm'],
+  // master data administrator: every Data Exchange screen, the daily checks and the reports (the service still decides what each call may do)
+  MDM_ADMIN: ['home', 'tasks', 'reports', 'analytics', 'mdm', 'mdmDept'],
   SENIOR_MGMT: ['moneyOverview', 'coverage', 'analytics', 'reports'],
   // payroll and finance roles work in Expenditure Integrity only (Keycloak roles to be created; the screen and service already honour them)
   PAYROLL_REVIEWER: ['home', 'expenditureIntegrity'],
   FINANCE_OFFICER: ['home', 'expenditureIntegrity'],
   HR_OFFICER: ['home', 'expenditureIntegrity'],
+  PDS_OFFICER: ['home', 'mdmDept'],
+  HEALTH_OFFICER: ['home', 'mdmDept'],
   UNKNOWN: ['home', 'tasks'],
 }
 
 /** First screen after login. Senior management goes straight to analytics. */
 export function officerLandingPath(role) {
-  return normalizeOfficerRole(role) === 'SENIOR_MGMT' ? '/analytics' : '/'
+  const normalized = normalizeOfficerRole(role)
+  if (normalized === 'SENIOR_MGMT') return '/analytics'
+  if (normalized === 'PDS_OFFICER') return '/dx/work'
+  if (normalized === 'HEALTH_OFFICER') return '/dx/control'
+  return '/'
 }
 
 export const OFFICER_NAV_CATALOG = [
@@ -222,30 +290,33 @@ export const OFFICER_NAV_CATALOG = [
   { to: '/fraud-signals/legacy', label: '🚨 Scheme Overlapping', feature: 'fraud' },
   { to: '/coverage', label: '📊 Scheme Coverage', feature: 'coverage' },
   { to: '/families', label: '🔍 Family Registry', feature: 'families' },
-  { to: '/dx/control', label: '🗼 Control Tower', feature: 'mdm' },
+  { to: '/dx/control', label: '🗼 Control Tower', feature: 'mdmDept', also: 'mdm' },
   { to: '/dx/events', label: '📡 Event Stream', feature: 'mdm' },
-  { to: '/dx/approvals', label: '✅ Approvals', feature: 'mdm' },
+  { to: '/dx/work', label: '✅ Work queue', feature: 'mdmDept', also: 'mdm' },
+  { to: '/dx/approvals', label: '✅ Approvals', feature: 'mdmDept', also: 'mdm' },
+  { to: '/dx/notices', label: '📨 Department Notices', feature: 'mdmDept', also: 'mdm' },
   { to: '/dx/discrepancies', label: '⚠️ Discrepancies', feature: 'mdm' },
   { to: '/mdm', label: '🧬 Master Data', feature: 'mdm' },
-  { to: '/dx/household', label: '🏠 Household', feature: 'mdm' },
+  { to: '/dx/lineage', label: '🧬 Data Lineage', feature: 'mdm' },
+  { to: '/dx/quality', label: '✅ Feed Quality', feature: 'mdm' },
+  { to: '/dx/checks', label: '🧮 Eligibility Checks', feature: 'mdm' },
   { to: '/dx/query', label: '🧮 Query Builder', feature: 'mdm' },
   { to: '/dx/verify', label: '🔎 Verification Queries', feature: 'mdm' },
   { to: '/dx/ledger', label: '🧾 Clearing House', feature: 'mdm' },
   { to: '/dx/catalogue', label: '📚 Catalogue', feature: 'mdm' },
   { to: '/dx/registry', label: '🗂 Registry', feature: 'mdm' },
   { to: '/dx/standards', label: '📐 Data Standards', feature: 'mdm' },
-  { to: '/dx/consent', label: '🤝 Consent', feature: 'mdm' },
+  { to: '/dx/consent', label: '🤝 Consent', feature: 'mdmDept', also: 'mdm' },
   { to: '/dx/policy', label: '📜 Policy', feature: 'mdm' },
+  { to: '/dx/response-times', label: '⏱ Response Times', feature: 'mdm' },
   { to: '/dx/audit', label: '🔐 Audit', feature: 'mdm' },
   { to: '/dx/retention', label: '🧹 Retention & Purge', feature: 'mdm' },
   { to: '/dx/connectors', label: '🔌 Connectors', feature: 'mdm' },
   { to: '/dx/keys', label: '🔑 Security & Keys', feature: 'mdm' },
   { to: '/dx/access', label: '🛡 Access & Misuse', feature: 'mdm' },
   { to: '/dx/api', label: '🧪 API Explorer', feature: 'mdm' },
-  { to: '/dx/citizen', label: '👤 My Data', feature: 'mdm' },
-  { to: '/dx/citizen/consents', label: '🤝 My Consents', feature: 'mdm' },
-  { to: '/dx/citizen/report', label: '✏️ Report Wrong Data', feature: 'mdm' },
   { to: '/dx/assisted', label: '🧑‍💼 Assisted Channel', feature: 'mdm' },
+  { to: '/dx/story', label: '🗺 How the Pieces Fit', feature: 'mdm' },
   { to: '/dx/scenarios', label: '🎬 Scenario Runner', feature: 'mdm' },
   { to: '/dx/inject', label: '⚡ Unscripted Events', feature: 'mdm' },
   { to: '/dx/evidence', label: '📦 Evidence Pack', feature: 'mdm' },
@@ -264,13 +335,36 @@ export function officerHasFeature(role, feature) {
   return (ROLE_FEATURES[normalized] ?? ROLE_FEATURES.UNKNOWN).includes(feature)
 }
 
+function itemVisibleTo(role, item) {
+  if (officerHasFeature(role, item.feature)) return true
+  if (item.also && officerHasFeature(role, item.also)) return true
+  return false
+}
+
 export function officerCanAccessPath(role, pathname) {
-  const path = String(pathname || '').split('?')[0]
-  const feature = PATH_FEATURES[path]
+  const raw = String(pathname || '')
+  const path = raw.split('?')[0]
+  const qs = raw.includes('?') ? new URLSearchParams(raw.slice(raw.indexOf('?') + 1)) : null
+  const normalized = normalizeOfficerRole(role)
+  const deptOnly = isDeptOfficerRole(normalized)
+  if (deptOnly && path === '/dx/control' && qs?.get('tab') === 'overview') return false
+  // A group page /dx/work/<REASON> is part of the Work queue (batch approval lives there); nothing deeper is.
+  const lookupPath = deptOnly && /^\/dx\/work\/[A-Za-z0-9_-]+$/.test(path) ? '/dx/work' : path
+  const feature = PATH_FEATURES[lookupPath]
+  if (deptOnly) {
+    if (!feature) {
+      if (path === '/mdm' || path.startsWith('/mdm/') || path.startsWith('/dx/')) return false
+      return path === '/' || path === ''
+    }
+    const item = OFFICER_NAV_CATALOG.find((i) => i.to === lookupPath)
+    return item ? itemVisibleTo(normalized, item) : false
+  }
   if (!feature) return true
+  const item = OFFICER_NAV_CATALOG.find((i) => i.to === path)
+  if (item) return itemVisibleTo(normalized, item)
   return officerHasFeature(role, feature)
 }
 
 export function officerNavItems(role) {
-  return OFFICER_NAV_CATALOG.filter((item) => officerHasFeature(role, item.feature))
+  return OFFICER_NAV_CATALOG.filter((item) => itemVisibleTo(role, item))
 }

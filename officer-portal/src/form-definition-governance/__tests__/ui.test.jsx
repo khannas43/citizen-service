@@ -205,7 +205,7 @@ describe('Form Definition Governance UI', () => {
     }
     const reviewButtons = screen.getAllByRole('button', { name: 'Review' })
     await user.click(reviewButtons[0])
-    await user.click(await screen.findByRole('button', { name: 'Back to Queue' }))
+    await user.click(await screen.findByRole('button', { name: /Back to Queue/ }))
     const nextButtons = await screen.findAllByRole('button', { name: 'Review' })
     await user.click(nextButtons[1])
     releaseFirst()

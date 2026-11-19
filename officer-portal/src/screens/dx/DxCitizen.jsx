@@ -5,6 +5,7 @@ import { Badge } from '../mdm/shared'
 import { Card, Tabs as KitTabs, DataTable, Banner, Facts, EmptyState } from './dxKit'
 import { Tag, CONSENT, OUTCOME, DISC, fmtTime } from './dxShared'
 import { useCitizenParams, useCitizen, Frame, Status } from './citizenShared'
+import { tr, tObj } from '../../i18n/lang'
 
 const nice = (s) => String(s).replace(/_/g, ' ')
 const NAV = [['My data', '/dx/citizen'], ['My consents', '/dx/citizen/consents'], ['Report a wrong value', '/dx/citizen/report']]
@@ -12,14 +13,14 @@ const NAV = [['My data', '/dx/citizen'], ['My consents', '/dx/citizen/consents']
 function Tabs({ here, token, operator }) {
   const nav = useNavigate()
   const q = `?token=${encodeURIComponent(token)}${operator ? `&operator=${encodeURIComponent(operator)}` : ''}`
-  return <KitTabs label="Citizen views" value={here} onChange={(p) => nav(p + q)} tabs={NAV.map(([label, id]) => ({ id, label }))} />
+  return <KitTabs label={tr('Citizen views')} value={here} onChange={(p) => nav(p + q)} tabs={NAV.map(([label, id]) => ({ id, label }))} />
 }
 
 export default function DxMyData() {
   const { token, operator, set } = useCitizenParams()
   const { data, error, loading } = useCitizen(token)
   return (
-    <Frame title="My data" intro="Everything held about the citizen, and which department each part came from." token={token} operator={operator} onToken={set}>
+    <Frame title={tr('My data')} intro="Everything held about the citizen, and which department each part came from." token={token} operator={operator} onToken={set}>
       <Tabs here="/dx/citizen" token={token} operator={operator} />
       <Status loading={loading && !data?.person} error={error} />
       {data?.person && (
@@ -27,7 +28,7 @@ export default function DxMyData() {
           <Card title={data.person.name} hint={data.note}>
             <Facts items={[['Born', data.person.dob || data.person.birth_year || '—'], ['Gender', data.person.gender || '—'], ['District', data.person.district || '—'], ['Address', data.person.address || '—']]} />
           </Card>
-          <Card title="What each department holds" flush>
+          <Card title={tr('What each department holds')} flush>
             <DataTable rows={data.held} rowKey={(h) => `${h.source_name}${h.kind}${h.as_of}`} pageSize={10} pageSizes={[10, 25]}
               search={{ placeholder: 'Search what is held', text: (h) => `${h.source_name} ${h.kind} ${JSON.stringify(h.details)}` }} csv={{ name: 'my-data' }}
               columns={[
@@ -37,8 +38,8 @@ export default function DxMyData() {
                 { key: 'details', label: 'Details', sort: false, csv: (h) => JSON.stringify(h.details), render: (h) => <span className="dxk-muted">{Object.entries(h.details).slice(0, 6).map(([k, v]) => `${nice(k)}: ${v}`).join(' · ') || h.address || '—'}</span> },
               ]} />
           </Card>
-          <Card title="Who has asked about me" flush>
-            <DataTable rows={data.asked} pageSize={10} pageSizes={[10, 25]} dense empty="Nobody has asked."
+          <Card title={tr('Who has asked about me')} flush>
+            <DataTable rows={data.asked} pageSize={10} pageSizes={[10, 25]} dense empty={tr('Nobody has asked.')}
               search={{ placeholder: 'Search requests', text: (x) => `${x.requester} ${x.question || x.kind}` }}
               columns={[
                 { key: 'ts', label: 'When', render: (x) => <span className="dxk-muted">{fmtTime(x.ts)}</span> },
@@ -64,7 +65,7 @@ export function DxMyConsents() {
     try { await mdm(`/x/citizen/${encodeURIComponent(token)}/consents/${c.id}/${what}`, { method: 'POST', body: { ...body, channel: mode.channel, operator: mode.operator } }); setTick((n) => n + 1) } catch (e) { setMsg(e.message) }
   }
   return (
-    <Frame title="My consents" intro="Each use of the citizen's data needs their agreement. They can agree to part, refuse, or withdraw at any time. A withdrawal is passed on to departments that had received data." token={token} operator={operator} onToken={set}>
+    <Frame title={tr('My consents')} intro="Each use of the citizen's data needs their agreement. They can agree to part, refuse, or withdraw at any time. A withdrawal is passed on to departments that had received data." token={token} operator={operator} onToken={set}>
       <Tabs here="/dx/citizen/consents" token={token} operator={operator} />
       <Status loading={loading && !data?.person} error={error} />
       {msg && <Banner tone="bad">{msg}</Banner>}
@@ -78,18 +79,18 @@ export function DxMyConsents() {
             { key: 'act', label: '', sort: false, render: (c) => (
               <div className="dxk-actions">
                 {c.status === 'PENDING' && <>
-                  <button type="button" className="btn-primary small" onClick={() => act(c, 'respond', { decision: 'GRANT', elements: pick[c.id] ?? null })}>I agree</button>
-                  <button type="button" className="btn-secondary small" onClick={() => act(c, 'respond', { decision: 'REFUSE' })}>I do not agree</button>
+                  <button type="button" className="btn-primary small" onClick={() => act(c, 'respond', { decision: 'GRANT', elements: pick[c.id] ?? null })}>{tr('I agree')}</button>
+                  <button type="button" className="btn-secondary small" onClick={() => act(c, 'respond', { decision: 'REFUSE' })}>{tr('I do not agree')}</button>
                 </>}
-                {c.status === 'GRANTED' && <><span className="dxk-muted">Valid until {fmtTime(c.expires_at)}</span><button type="button" className="btn-secondary small" onClick={() => act(c, 'withdraw', {})}>Withdraw my consent</button></>}
+                {c.status === 'GRANTED' && <><span className="dxk-muted">{tr('Valid until {v}', { v: fmtTime(c.expires_at) })}</span><button type="button" className="btn-secondary small" onClick={() => act(c, 'withdraw', {})}>{tr('Withdraw my consent')}</button></>}
               </div>) },
           ]} />
-      ) : <EmptyState title="No department has asked for consent." />)}
+      ) : <EmptyState title={tr('No department has asked for consent.')} />)}
     </Frame>
   )
 }
 
-const ATTRS = { name: 'Name', date_of_birth: 'Date of birth', gender: 'Gender', address: 'Address', income: 'Income', category: 'Social category', land: 'Land', electricity: 'Electricity connection', pension: 'Pension', housing: 'Housing' }
+const ATTRS = tObj({ name: 'Name', date_of_birth: 'Date of birth', gender: 'Gender', address: 'Address', income: 'Income', category: 'Social category', land: 'Land', electricity: 'Electricity connection', pension: 'Pension', housing: 'Housing' })
 
 export function DxReportWrong() {
   const { token, operator, mode, set } = useCitizenParams()
@@ -103,31 +104,31 @@ export function DxReportWrong() {
     try { const r = await mdm(`/x/citizen/${encodeURIComponent(token)}/${path}`, { method: 'POST', body: { ...body, channel: mode.channel, operator: mode.operator } }); setMsg({ ok: true, text: r.note }); setTick((n) => n + 1) } catch (e) { setMsg({ ok: false, text: e.message }) }
   }
   return (
-    <Frame title="Report a wrong value" intro="The citizen says what is wrong. It goes to the department that owns that value, and the citizen can follow it here. Nothing is changed in this system directly." token={token} operator={operator} onToken={set}>
+    <Frame title={tr('Report a wrong value')} intro="The citizen says what is wrong. It goes to the department that owns that value, and the citizen can follow it here. Nothing is changed in this system directly." token={token} operator={operator} onToken={set}>
       <Tabs here="/dx/citizen/report" token={token} operator={operator} />
       <Status loading={loading && !data?.person} error={error} />
       {data?.person && (
         <>
           <div className="dxk-split">
-            <Card title="What is wrong?">
+            <Card title={tr('What is wrong?')}>
               <div className="dxk-stackform">
-                <label className="dxk-field"><span>Which value</span><select value={f.attribute} onChange={(e) => setF({ ...f, attribute: e.target.value })}>{Object.entries(ATTRS).map(([k, n]) => <option key={k} value={k}>{n}</option>)}</select></label>
-                <label className="dxk-field"><span>Shown now</span><input value={f.current_value} onChange={(e) => setF({ ...f, current_value: e.target.value })} /></label>
-                <label className="dxk-field"><span>It should be</span><input value={f.reported_value} onChange={(e) => setF({ ...f, reported_value: e.target.value })} /></label>
-                <label className="dxk-field"><span>Anything we should know (optional)</span><input value={f.reason} onChange={(e) => setF({ ...f, reason: e.target.value })} /></label>
-                <div className="dxk-actions"><button type="button" className="btn-primary" disabled={!f.reported_value.trim()} onClick={() => post('report', f)}>Send my report</button></div>
+                <label className="dxk-field"><span>{tr('Which value')}</span><select value={f.attribute} onChange={(e) => setF({ ...f, attribute: e.target.value })}>{Object.entries(ATTRS).map(([k, n]) => <option key={k} value={k}>{n}</option>)}</select></label>
+                <label className="dxk-field"><span>{tr('Shown now')}</span><input value={f.current_value} onChange={(e) => setF({ ...f, current_value: e.target.value })} /></label>
+                <label className="dxk-field"><span>{tr('It should be')}</span><input value={f.reported_value} onChange={(e) => setF({ ...f, reported_value: e.target.value })} /></label>
+                <label className="dxk-field"><span>{tr('Anything we should know (optional)')}</span><input value={f.reason} onChange={(e) => setF({ ...f, reason: e.target.value })} /></label>
+                <div className="dxk-actions"><button type="button" className="btn-primary" disabled={!f.reported_value.trim()} onClick={() => post('report', f)}>{tr('Send my report')}</button></div>
               </div>
             </Card>
-            <Card title="Married, but not shown as married?" hint="A statement is kept as the citizen's own word and shown as unverified. It does not create a marriage record.">
+            <Card title={tr('Married, but not shown as married?')} hint={tr('A statement is kept as the citizen\'s own word and shown as unverified. It does not create a marriage record.')}>
               <div className="dxk-stackform">
-                <label className="dxk-field"><span>Spouse's name</span><input value={spouse} onChange={(e) => setSpouse(e.target.value)} /></label>
-                <div className="dxk-actions"><button type="button" className="btn-secondary" disabled={!spouse.trim()} onClick={() => post('declaration', { spouse_name: spouse })}>Record my statement</button></div>
+                <label className="dxk-field"><span>{tr('Spouse\'s name')}</span><input value={spouse} onChange={(e) => setSpouse(e.target.value)} /></label>
+                <div className="dxk-actions"><button type="button" className="btn-secondary" disabled={!spouse.trim()} onClick={() => post('declaration', { spouse_name: spouse })}>{tr('Record my statement')}</button></div>
               </div>
             </Card>
           </div>
           {msg && <Banner tone={msg.ok ? 'ok' : 'bad'}>{msg.text}</Banner>}
-          <Card title="My reports" flush>
-            <DataTable rows={data.reports} dense pageSize={10} pageSizes={[10]} empty="No reports yet."
+          <Card title={tr('My reports')} flush>
+            <DataTable rows={data.reports} dense pageSize={10} pageSizes={[10]} empty={tr('No reports yet.')}
               search={{ placeholder: 'Search reports', text: (r) => `${ATTRS[r.attribute] || r.attribute} ${r.current_value} ${r.reported_value} ${r.owner}` }}
               columns={[
                 { key: 'status', label: 'Status', render: (r) => <Tag map={DISC} value={r.status} /> },

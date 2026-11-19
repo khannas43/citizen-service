@@ -415,8 +415,9 @@
 .fr-c360-income-sub { font-size:0.72rem; color:var(--color-text-muted); margin-bottom:0.5rem; }
 .fr-c360-income-track { height:5px; background:var(--color-border-light); border-radius:3px; overflow:hidden; }
 .fr-c360-income-fill  { height:100%; background:var(--color-primary-light); border-radius:3px; transition:width 0.5s ease; }
-.fr-c360-scheme-row   { display:flex; align-items:center; justify-content:space-between; padding:0.35rem 0; border-bottom:1px dashed var(--color-border-light); }
-.fr-c360-scheme-row:last-child { border-bottom:none; }
+.fr-c360-scheme-block { padding:0.35rem 0; border-bottom:1px dashed var(--color-border-light); }
+.fr-c360-scheme-block:last-child { border-bottom:none; }
+.fr-c360-scheme-row   { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
 .fr-c360-scheme-name  { font-size:0.8rem; font-weight:600; color:var(--color-text-primary); }
 .fr-c360-status { font-size:0.62rem; font-weight:700; padding:0.1rem 0.45rem; border-radius:var(--radius-full); }
 .fr-c360-s-active     { background:var(--color-success-bg); color:var(--color-success); }

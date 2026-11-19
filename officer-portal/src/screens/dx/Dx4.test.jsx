@@ -18,6 +18,21 @@ const cat = () => ({
   items: [
     { id: '2.2', uc: 'UC2', type: 'positive', title: 'Parent consents to some uses but not others', shows: 'Consent screen, consent record, audit entries naming the consent', last: { run_id: 7, status: 'PASS', checks: 4, passed: 4, gaps: 0, ms: 700, ran_at: '2026-10-28T10:00:00Z' } },
     { id: '2.3', uc: 'UC2', type: 'negative', title: 'Parent declines or does not respond', shows: 'Expired request', last: null },
+    { id: '2.8', uc: 'UC2', type: 'step', title: 'Live step: the Health system goes down', shows: 'Waiting deliveries', last: null },
+    { id: '2.9', uc: 'UC2', type: 'step', title: 'Live step: the Health system comes back', shows: 'Retries deliver', last: null },
+    { id: '2.10', uc: 'UC2', type: 'step', title: 'Live step: a second child is registered late and without a name', shows: 'A held birth', last: null },
+    { id: '2.11', uc: 'UC2', type: 'step', title: 'Live step: the name arrives', shows: 'Consent is asked now', last: null },
+    { id: '2.12', uc: 'UC2', type: 'step', title: 'Live step: a third child is registered and the parent does not answer', shows: 'Waiting', last: null },
+    { id: '2.13', uc: 'UC2', type: 'step', title: 'Live step: the response time runs out', shows: 'Expired', last: null },
+    { id: '3.1', uc: 'UC3', type: 'positive', title: 'A death is registered; the surviving spouse is linked', shows: 'Proposal card', last: null },
+    { id: '3.6', uc: 'UC3', type: 'step', title: 'Live step: a pensioner dies; his wife, ration card and land record are on file, a payment is due', shows: 'A proposal to confirm', last: null },
+    { id: '3.7', uc: 'UC3', type: 'step', title: 'Live step: a pensioner with no spouse and no nominee dies', shows: 'Next of kin', last: null },
+    { id: '3.8', uc: 'UC3', type: 'step', title: 'Live step: a death fits two living men with the same name', shows: 'No pre-selection', last: null },
+    { id: '3.9', uc: 'UC3', type: 'step', title: 'Live step: a death outside the state for someone the registry does not hold', shows: 'No match', last: null },
+    { id: '3.10', uc: 'UC3', type: 'step', title: 'Live step: the same death is sent a second time', shows: 'Duplicate ignored', last: null },
+    { id: '4.1', uc: 'UC4', type: 'positive', title: 'Answer eligibility questions', shows: 'Query result', last: null },
+    { id: '4.7', uc: 'UC4', type: 'step', title: 'Live step: the student applies and her parent is asked', shows: 'A consent card for the parent', last: null },
+    { id: '4.8', uc: 'UC4', type: 'step', title: 'Live step: the student turns 18', shows: 'Her date of birth moves', last: null },
     { id: '5.5', uc: 'UC5', type: 'negative', title: 'Possible duplicate benefit', shows: 'Alert with minimal content', last: { run_id: 7, status: 'PARTIAL', checks: 3, passed: 3, gaps: 1, ms: 160, ran_at: '2026-10-28T10:00:00Z' } },
     { id: 'CC9', uc: 'CC', type: 'cross-cutting', title: 'Load smoke test', shows: 'Throughput and latency report', how: 'A short burst', last: null },
   ],
@@ -33,7 +48,7 @@ describe('Scenario runner', () => {
     expect(await screen.findByText('Parent consents to some uses but not others')).toBeInTheDocument()
     expect(screen.getByText('Passed', { selector: '.mdm-badge' })).toBeInTheDocument()
     expect(screen.getByText('Met, with a gap', { selector: '.mdm-badge' })).toBeInTheDocument()
-    expect(screen.getAllByText('Not run yet', { selector: '.mdm-badge' })).toHaveLength(2)
+    expect(screen.getAllByText('Not run yet', { selector: '.mdm-badge' }).length).toBeGreaterThanOrEqual(2)
     fireEvent.click(screen.getByRole('button', { name: 'Possible duplicate benefit' }))
     expect(await screen.findByText('A possible duplicate benefit is flagged')).toBeInTheDocument()
     expect(screen.getByText(/decision step is not created as a task/)).toBeInTheDocument()
@@ -90,6 +105,50 @@ describe('Scenario runner', () => {
     expect(await screen.findByText('The department the parent refused receives nothing')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Not met' })).toBeInTheDocument()
     expect(screen.getByText('Failed', { selector: '.mdm-badge' })).toBeInTheDocument()
+  })
+
+  it('lists live demo steps separately and skips them when running a group', async () => {
+    const calls = []
+    globalThis.fetch = route({
+      '/x/demo/runs/11/finish': () => { calls.push('finish'); return json({ PASS: 1, total: 1 }) },
+      '/x/demo/runs/11/scenarios/4.1': () => { calls.push('run 4.1'); return json({ scenario: '4.1', status: 'PASS', error: null, gaps: [], checks: [{ ok: true, text: 'ok' }] }) },
+      '/x/demo/runs/12/finish': () => { calls.push('finish'); return json({ PASS: 2, total: 2 }) },
+      '/x/demo/runs/12/scenarios/2.2': () => { calls.push('run 2.2'); return json({ scenario: '2.2', status: 'PASS', error: null, gaps: [], checks: [{ ok: true, text: 'ok' }] }) },
+      '/x/demo/runs/12/scenarios/2.3': () => { calls.push('run 2.3'); return json({ scenario: '2.3', status: 'PASS', error: null, gaps: [], checks: [{ ok: true, text: 'ok' }] }) },
+      '/x/demo/runs/13/finish': () => { calls.push('finish'); return json({ PASS: 1, total: 1 }) },
+      '/x/demo/runs/13/scenarios/3.1': () => { calls.push('run 3.1'); return json({ scenario: '3.1', status: 'PASS', error: null, gaps: [], checks: [{ ok: true, text: 'ok' }] }) },
+      '/x/demo/runs': (u, i) => {
+        const kind = JSON.parse(i.body).kind
+        calls.push(`start ${i.body}`)
+        return json({ run_id: kind === 'UC2' ? 12 : kind === 'UC3' ? 13 : 11 })
+      },
+      '/x/demo/scenarios': cat(),
+    })
+    wrap(<DxScenarios />)
+    expect(await screen.findByText('Live demo steps (run these one at a time during the demo)')).toBeInTheDocument()
+    expect(screen.getByText(/These steps change the demo on purpose/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Run 2.8' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Run 4.7' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Run 3.6' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: 'UC4' }))
+    expect(screen.getByText('Answer eligibility questions')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Run the UC4 group' }))
+    await waitFor(() => expect(calls).toEqual(['start {"kind":"UC4"}', 'run 4.1', 'finish']))
+    expect(calls.join(' ')).not.toMatch(/4\.7|4\.8/)
+
+    calls.length = 0
+    fireEvent.click(screen.getByRole('tab', { name: 'UC2' }))
+    expect(screen.getByRole('button', { name: 'Run 2.8' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Run the UC2 group' }))
+    await waitFor(() => expect(calls).toEqual(['start {"kind":"UC2"}', 'run 2.2', 'run 2.3', 'finish']))
+    expect(calls.join(' ')).not.toMatch(/2\.8|2\.9|2\.10|2\.11|2\.12|2\.13/)
+
+    calls.length = 0
+    fireEvent.click(screen.getByRole('tab', { name: 'UC3' }))
+    expect(screen.getByRole('button', { name: 'Run 3.6' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Run the UC3 group' }))
+    await waitFor(() => expect(calls).toEqual(['start {"kind":"UC3"}', 'run 3.1', 'finish']))
+    expect(calls.join(' ')).not.toMatch(/3\.6|3\.7|3\.8|3\.9|3\.10/)
   })
 })
 

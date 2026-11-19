@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import MdmHub from './MdmHub'
+import { setLang } from '../../i18n/lang'
 import { dqLabel, pct, fmtFresh } from './labels'
 
 const dash = {
@@ -21,7 +22,7 @@ describe('Master Data', () => {
 
   it('shows the overview with plain-language labels and the token header', async () => {
     localStorage.setItem('officer_token', 'tok')
-    render(<MemoryRouter><MdmHub /></MemoryRouter>)
+    render(<MemoryRouter initialEntries={['/mdm?tab=quality']}><MdmHub /></MemoryRouter>)
     await waitFor(() => expect(screen.getByText('People (golden records)')).toBeInTheDocument())
     expect(screen.getByText('Departments disagree on date of birth')).toBeInTheDocument()
     expect(screen.getByText(/99\.1% of links made are correct/)).toBeInTheDocument()
@@ -34,13 +35,34 @@ describe('Master Data', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('cannot be reached'))
   })
 
-  it('use cases tab lists the six situations and describes events plainly', async () => {
-    const { describeEvent } = await import('./UseCases')
+  it('describes events plainly', async () => {
+    const { describeEvent } = await import('./eventLabels')
     expect(describeEvent({ event_type: 'DEATH_REGISTERED', payload: { name: 'A B', age_at_death: 80, date_of_death: '2026-06-17', place_of_death: 'Telangana' } })).toContain('Death registered: A B')
     expect(describeEvent({ event_type: 'BIRTH_REGISTERED', payload: { child_name: null, date_of_birth: '2026-05-01' } })).toContain('name not given yet')
-    globalThis.fetch = vi.fn(async () => ({ ok: true, status: 200, json: async () => ['UC1', 'UC2', 'UC3', 'UC4', 'UC5', 'UC6'].map((id) => ({ id, title: `Title ${id}`, question: 'Q?', events: 2, open_proposals: 1, extra: null })) }))
-    render(<MemoryRouter initialEntries={['/mdm?tab=usecases']}><MdmHub /></MemoryRouter>)
-    await waitFor(() => expect(screen.getByText('Title UC6')).toBeInTheDocument())
+  })
+
+  it('opens on People, and the older use-case and overview addresses still lead somewhere useful', async () => {
+    globalThis.fetch = vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ items: [], total: 0, facets: {} }) }))
+    render(<MemoryRouter initialEntries={['/mdm']}><MdmHub /></MemoryRouter>)
+    expect(screen.getAllByRole('tab', { name: 'People', selected: true }).length).toBeGreaterThan(0)
+    expect(screen.queryByRole('tab', { name: 'Use cases' })).toBeNull()
+    expect(screen.queryByRole('tab', { name: 'Overview' })).toBeNull()
+  })
+
+  it('shows the at-a-glance picture inside Data quality', async () => {
+    render(<MemoryRouter initialEntries={['/mdm?tab=quality']}><MdmHub /></MemoryRouter>)
+    await waitFor(() => expect(screen.getByText('People (golden records)')).toBeInTheDocument())
+    expect(screen.getAllByRole('tab', { name: 'At a glance' }).length).toBeGreaterThan(0)
+  })
+
+  it('shows Master Data in Telugu when Telugu is chosen, and back in English', async () => {
+    setLang('te')
+    try {
+      render(<MemoryRouter initialEntries={['/mdm?tab=quality']}><MdmHub /></MemoryRouter>)
+      await waitFor(() => expect(screen.getByText('వ్యక్తులు (గోల్డెన్ రికార్డులు)')).toBeInTheDocument())
+      expect(screen.getByText('మాస్టర్ డేటా')).toBeInTheDocument()
+      expect(screen.getAllByRole('tab', { name: 'సమీక్ష వరుస' }).length).toBeGreaterThan(0)
+    } finally { setLang('en') }
   })
 
   it('helpers', () => {

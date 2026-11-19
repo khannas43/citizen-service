@@ -3,14 +3,44 @@ import { useLocation } from 'react-router-dom'
 import { FAMILY_API, SCHEME_API, fetchTalukasForDistrict, fetchVillagesForTaluka, searchPersons } from '../api'
 import { getOfficerDistrictScope, matchesOfficerDistrict } from '../auth'
 import DistrictScopeBanner from '../components/DistrictScopeBanner'
+import { tr } from '../i18n/lang'
 import './FamilyRegistry.css'
 
-const GUJARAT_DISTRICTS = [
-  'Ahmedabad','Surat','Vadodara','Rajkot','Mehsana','Banaskantha','Anand',
-  'Gandhinagar','Kutch','Bharuch','Junagadh','Amreli','Bhavnagar','Surendranagar',
-  'Patan','Kheda','Panchmahal','Dahod','Narmada','Navsari','Valsad','Tapi',
-  'Morbi','Jamnagar','Porbandar','Gir Somnath','Botad','Aravalli','Mahisagar',
-  'Chhota Udaipur','Devbhumi Dwarka','Sabarkantha',
+// The 33 districts of Telangana (names as used in the demo data). Mandals and villages below are read from the family registry itself.
+const TELANGANA_DISTRICTS = [
+  'Adilabad',
+  'Bhadradri Kothagudem',
+  'Hanumakonda',
+  'Hyderabad',
+  'Jagitial',
+  'Jangoan',
+  'Jayashankar Bhupalapally',
+  'Jogulamba Gadwal',
+  'Kamareddy',
+  'Karimnagar',
+  'Khammam',
+  'Kumuram Bheem Asifabad',
+  'Mahabubabad',
+  'Mahabubnagar',
+  'Mancherial',
+  'Medak',
+  'Medchal Malkajgiri',
+  'Mulugu',
+  'Nagarkurnool',
+  'Nalgonda',
+  'Narayanpet',
+  'Nirmal',
+  'Nizamabad',
+  'Peddapalli',
+  'Rajanna Sircilla',
+  'Ranga Reddy',
+  'Sangareddy',
+  'Siddipet',
+  'Suryapet',
+  'Vikarabad',
+  'Wanaparthy',
+  'Warangal',
+  'Yadadri Bhuvanagiri',
 ]
 
 const EMPTY_FILTERS = {
@@ -70,9 +100,25 @@ function fmt(n) {
   return `₹${n.toLocaleString('en-IN')}`
 }
 
+// Words typed in quick search that mean a gender, not a name/place (q does not search gender).
+const GENDER_WORDS = [
+  [/\b(females?|women|woman|girls?|ladies|lady)\b/gi, 'F'],
+  [/\b(males?|men|man|boys?|gents?)\b/gi, 'M'],
+]
+function splitGenderWords(text) {
+  let rest = text, gender = ''
+  for (const [re, g] of GENDER_WORDS) {
+    if (re.test(rest)) { gender = gender || g; rest = rest.replace(re, ' ') }
+    re.lastIndex = 0
+  }
+  return { gender, rest: rest.replace(/\s+/g, ' ').trim() }
+}
+
 function buildCriteria(query, filters) {
   const criteria = { limit: 50 }
-  const q = query.trim()
+  let q = query.trim()
+  const gw = splitGenderWords(q)
+  if (gw.gender && !String(filters.gender ?? '').trim()) { criteria.gender = gw.gender; q = gw.rest }
   if (q) criteria.q = q
   Object.entries(filters).forEach(([key, value]) => {
     const trimmed = String(value ?? '').trim()
@@ -89,6 +135,23 @@ function buildCriteria(query, filters) {
   // Require min chars for free-text quick search only (advanced filters bypass this)
   if (q && q.length < MIN_QUERY_LEN && !hasFieldFilters) return null
   return criteria
+}
+
+const sameText = (a, b) => String(a ?? '').trim().toUpperCase() === String(b ?? '').trim().toUpperCase()
+const hasText = (a, b) => String(a ?? '').toLowerCase().includes(String(b ?? '').trim().toLowerCase())
+// Safety net: whatever the server returned, never show a row that breaks an exact filter.
+function matchesCriteria(r, c) {
+  if (c.gender && String(r.gender ?? '').trim().charAt(0).toUpperCase() !== String(c.gender).trim().charAt(0).toUpperCase()) return false
+  if (c.casteCategory && !sameText(r.casteCategory, c.casteCategory)) return false
+  if (c.educationLevel && !sameText(r.educationLevel, c.educationLevel)) return false
+  if (c.maritalStatus && !sameText(r.maritalStatus, c.maritalStatus)) return false
+  if (c.employmentStatus && !sameText(r.employmentStatus, c.employmentStatus)) return false
+  if (c.relationship && !sameText(r.relationshipToHead, c.relationship)) return false
+  if (c.incomeMin != null && !((r.annualIncome ?? 0) >= c.incomeMin)) return false
+  if (c.incomeMax != null && !((r.annualIncome ?? 0) <= c.incomeMax)) return false
+  if (c.name && !hasText(r.name, c.name)) return false
+  if (c.occupation && !hasText(r.occupation, c.occupation)) return false
+  return true
 }
 
 function withDistrictScope(criteria, districtScope) {
@@ -248,14 +311,25 @@ function Citizen360({ family, income, eligibility, enrolled, selectedPersonId, o
             <div className="fr-c360-card-heading">Enrolled Schemes</div>
             {personEnrolled.length === 0 ? (
               <p className="fr-c360-none">No scheme enrollments for this person</p>
-            ) : personEnrolled.map((b) => (
-              <div key={b.id || b.schemeName} className="fr-c360-scheme-row">
-                <span className="fr-c360-scheme-name">{b.schemeName?.replace(/_/g, ' ')}</span>
-                <span className={`fr-c360-status fr-c360-s-${(b.status || '').toLowerCase()}`}>
-                  {b.status}
-                </span>
-              </div>
-            ))}
+            ) : personEnrolled.map((b) => {
+              const note = b.removalReason || b.eligibilityReason
+              return (
+                <div key={b.id || b.schemeName} className="fr-c360-scheme-block">
+                  <div className="fr-c360-scheme-row">
+                    <span className="fr-c360-scheme-name">{b.schemeName?.replace(/_/g, ' ')}</span>
+                    <span className={`fr-c360-status fr-c360-s-${(b.status || '').toLowerCase()}`}>
+                      {b.status}
+                    </span>
+                  </div>
+                  {note && (
+                    <div className="fr-c360-info-row">
+                      <span className="fr-c360-info-label">{tr('Note')}</span>
+                      <span className="fr-c360-info-value">{note}</span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
 
           {eligibleSchemes.length > 0 && (
@@ -380,6 +454,7 @@ export default function FamilyRegistry() {
   const [query, setQuery]             = useState('')
   const [filters, setFilters]         = useState(scopedFilters)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [applied, setApplied] = useState(null)
   const [results, setResults]         = useState([])
   const [searchMeta, setSearchMeta]   = useState(null)
   const [family, setFamily]           = useState(null)
@@ -418,7 +493,7 @@ export default function FamilyRegistry() {
   }, [])
 
   const runSearch = useCallback(async (criteria, isRefresh = false) => {
-    if (!criteria) { setResults([]); setSearchMeta(null); setError(null); return }
+    if (!criteria) { setResults([]); setSearchMeta(null); setError(null); setApplied(null); return }
 
     // Cancel any in-flight request
     if (abortRef.current) abortRef.current.abort()
@@ -431,6 +506,7 @@ export default function FamilyRegistry() {
       const data = await searchPersons(criteria, controller.signal)
       if (controller.signal.aborted) return
       setResults(data.results ?? [])
+      setApplied(criteria)
       setSearchMeta({
         totalMatched: data.totalMatched ?? data.results?.length ?? 0,
         limited: Boolean(data.limited),
@@ -550,7 +626,7 @@ export default function FamilyRegistry() {
         const r = await fetch(`${SCHEME_API}/v1/schemes/${s.id}/beneficiaries`)
         if (!r.ok) return []
         return (await r.json()).filter(
-          (b) => b.familyId === familyId && ['IDENTIFIED','CONFIRMED','ACTIVE'].includes(b.status)
+          (b) => b.familyId === familyId && ['IDENTIFIED','CONFIRMED','ACTIVE','REMOVED'].includes(b.status)
         )
       }))
       setEnrolled(lists.flat())
@@ -561,6 +637,7 @@ export default function FamilyRegistry() {
   const processedResults = useMemo(() => {
     let rows = [...results]
     if (districtScope) rows = rows.filter((r) => matchesOfficerDistrict(r.district, districtScope))
+    if (applied) rows = rows.filter((r) => matchesCriteria(r, applied))
     if (filterCaste)    rows = rows.filter((r) => r.casteCategory === filterCaste)
     if (filterDistrict) rows = rows.filter((r) => r.district === filterDistrict)
     rows.sort((a, b) => {
@@ -573,7 +650,7 @@ export default function FamilyRegistry() {
       return sortDir === 'asc' ? av - bv : bv - av
     })
     return rows
-  }, [results, sortField, sortDir, filterCaste, filterDistrict, districtScope])
+  }, [results, applied, sortField, sortDir, filterCaste, filterDistrict, districtScope])
 
   const totalPages   = Math.max(1, Math.ceil(processedResults.length / pageSize))
   const pageRows     = processedResults.slice((page - 1) * pageSize, page * pageSize)
@@ -647,13 +724,13 @@ export default function FamilyRegistry() {
                 onChange={(e) => handleDistrictFilterChange(e.target.value)}
               >
                 {!districtScope && <option value="">Any</option>}
-                {(districtScope ? [districtScope] : GUJARAT_DISTRICTS).map((d) => (
+                {(districtScope ? [districtScope] : TELANGANA_DISTRICTS).map((d) => (
                   <option key={d} value={d}>{d}</option>
                 ))}
               </select>
             </label>
             <label className="fr-filter-label">
-              Taluka
+              Mandal
               <select
                 value={filters.taluka}
                 disabled={!filters.district || talukaLoading}
@@ -673,7 +750,7 @@ export default function FamilyRegistry() {
                 onChange={(e) => handleFilterChange('village', e.target.value)}
               >
                 <option value="">
-                  {!filters.taluka ? 'Select taluka first' : villageLoading ? 'Loading…' : 'Any'}
+                  {!filters.taluka ? 'Select mandal first' : villageLoading ? 'Loading…' : 'Any'}
                 </option>
                 {villageOptions.map((v) => <option key={v} value={v}>{v}</option>)}
               </select>
@@ -807,6 +884,7 @@ export default function FamilyRegistry() {
                       : null}
                   </div>
                   <div className="fr-result-tags">
+                    {p.gender && <span className="fr-tag">{p.gender === 'F' ? '♀ Female' : p.gender === 'M' ? '♂ Male' : p.gender}{p.dob ? ` · ${ageFromDob(p.dob)} yrs` : ''}</span>}
                     {p.occupation && <span className="fr-tag">💼 {p.occupation}</span>}
                     {p.educationLevel && <span className="fr-tag">📚 {p.educationLevel.replace(/_/g,' ')}</span>}
                     {p.employmentStatus && <span className="fr-tag">🏢 {p.employmentStatus.replace(/_/g,' ')}</span>}
@@ -888,7 +966,7 @@ export default function FamilyRegistry() {
                 )}
               </div>
             </div>
-            <button type="button" className="btn-secondary" onClick={() => setFamily(null)}>
+            <button type="button" className="dxk-back-quiet" onClick={() => setFamily(null)}>
               ← Back to results
             </button>
           </div>

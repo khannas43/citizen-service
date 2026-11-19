@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchAllTasks } from './api'
+import ArchDataFlow from './ArchDataFlow'
 import './ArchPanel.css'
 
 const FLOWABLE_SERVICES = [
@@ -52,6 +53,7 @@ function ArchConnector({ label }) {
 export default function ArchPanel({ open, onClose, pendingCounts }) {
   const [flowableCount, setFlowableCount] = useState(null)
   const [digitCount, setDigitCount] = useState(null)
+  const [tab, setTab] = useState('arch')
 
   useEffect(() => {
     if (!open) return
@@ -98,15 +100,20 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
     <>
       <div className="arch-backdrop" onClick={onClose} aria-hidden="true" />
 
-      <aside className="arch-panel arch-panel-overlay dg-slide-right">
+      <aside className={`arch-panel arch-panel-overlay dg-slide-right${tab === 'flow' ? ' wide' : ''}`}>
         <div className="arch-panel-header">
           <span className="arch-panel-title">Citizen Services Platform Architecture</span>
           <button type="button" className="arch-close-btn" onClick={onClose} aria-label="Close">
             ✕
           </button>
         </div>
+        <div className="arch-tabs" role="tablist" aria-label="Architecture views">
+          <button type="button" role="tab" aria-selected={tab === 'arch'} className={`arch-tab${tab === 'arch' ? ' active' : ''}`} onClick={() => setTab('arch')}>Architecture</button>
+          <button type="button" role="tab" aria-selected={tab === 'flow'} className={`arch-tab${tab === 'flow' ? ' active' : ''}`} onClick={() => setTab('flow')}>Data flow</button>
+        </div>
 
-        <div className="arch-panel-body">
+        {tab === 'flow' && <div className="arch-panel-body"><ArchDataFlow /></div>}
+        {tab === 'arch' && <div className="arch-panel-body">
           <div className="arch-tier">
             <div className="arch-tier-label">Citizen Layer</div>
             <div className="arch-tier-cards">
@@ -207,7 +214,7 @@ export default function ArchPanel({ open, onClose, pendingCounts }) {
           <div className="arch-footer">
             Deployed on K3s (arm64) · Rancher Desktop · Apple Silicon · Single-node citizen namespace
           </div>
-        </div>
+        </div>}
       </aside>
     </>
   )

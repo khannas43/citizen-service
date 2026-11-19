@@ -279,7 +279,7 @@ describe('mutation sequence integrity', () => {
     await user.click(await screen.findByRole('button', { name: 'Review' }))
     await user.click(await screen.findByRole('button', { name: 'Approve' }))
     await user.click(screen.getByRole('button', { name: 'Confirm Approve' }))
-    await user.click(screen.getByRole('button', { name: 'Back to Queue' }))
+    await user.click(screen.getByRole('button', { name: /Back to Queue/ }))
     const callsBefore = state.transitionCalls.length
     await act(async () => {
       release()
@@ -319,7 +319,7 @@ describe('mutation sequence integrity', () => {
     await user.click(await screen.findByRole('button', { name: 'Review' }))
     await user.click(await screen.findByRole('button', { name: 'Approve' }))
     await user.click(screen.getByRole('button', { name: 'Confirm Approve' }))
-    await user.click(screen.getByRole('button', { name: 'Back to Queue' }))
+    await user.click(screen.getByRole('button', { name: /Back to Queue/ }))
     await act(async () => {
       release()
       await Promise.resolve()

@@ -1,4 +1,6 @@
-export const DQ_LABELS = {
+import { tr, tObj } from '../../i18n/lang'
+
+const RAW_DQ_LABELS = {
   DEAD_ACTIVE_ON_RATION_CARD: 'Death registered, still active on a ration card',
   DEAD_PENSION_STILL_ACTIVE: 'Death registered, pension still active',
   DOB_CONFLICT: 'Departments disagree on date of birth',
@@ -11,9 +13,10 @@ export const DQ_LABELS = {
   AGE_MISMATCH: 'Age on ration card does not fit date of birth',
   UNDERAGE_MARRIAGE: 'Marriage registered below the legal age',
 }
+export const DQ_LABELS = tObj(RAW_DQ_LABELS)
 export const dqLabel = (code) => DQ_LABELS[code] || code
 
-export const LINK_LABELS = {
+const RAW_LINK_LABELS = {
   AUTO_LINKED: 'Linked automatically',
   ANCHOR: 'First record of this person',
   NEW: 'Single record',
@@ -21,20 +24,25 @@ export const LINK_LABELS = {
   STEWARD_LINKED: 'Linked by a steward',
   STEWARD_SEPARATE: 'Kept separate by a steward',
 }
+export const LINK_LABELS = tObj(RAW_LINK_LABELS)
 export const linkLabel = (s) => LINK_LABELS[s] || s
 
-export const LIFE_LABELS = { DECEASED: 'Death registered', NO_DEATH_RECORD: 'No death record' }
+const RAW_LIFE_LABELS = { DECEASED: 'Death registered', NO_DEATH_RECORD: 'No death record' }
+export const LIFE_LABELS = tObj(RAW_LIFE_LABELS)
 export const lifeLabel = (s) => LIFE_LABELS[s] || s
 
-export const COMPONENT_LABELS = {
+const RAW_COMPONENT_LABELS = {
   name: 'Name', dob: 'Date of birth', gender: 'Gender', district: 'District', mandal: 'Mandal',
   village: 'Village', address: 'Address', parents: 'Parents',
 }
+export const COMPONENT_LABELS = tObj(RAW_COMPONENT_LABELS)
 
 export const SEVERITY_ORDER = { HIGH: 0, MEDIUM: 1, LOW: 2 }
-export const SEVERITY_LABELS = { HIGH: 'High', MEDIUM: 'Medium', LOW: 'Low' }
+const RAW_SEVERITY_LABELS = { HIGH: 'High', MEDIUM: 'Medium', LOW: 'Low' }
+export const SEVERITY_LABELS = tObj(RAW_SEVERITY_LABELS)
 
-export const RELATION_TEXT = { SPOUSE: 'Spouse', PARENT: 'Parent', CHILD: 'Child' }
+const RAW_RELATION_TEXT = { SPOUSE: 'Spouse', PARENT: 'Parent', CHILD: 'Child' }
+export const RELATION_TEXT = tObj(RAW_RELATION_TEXT)
 
 export function pct(n, d) {
   return d ? Math.round((100 * n) / d) : 0
@@ -48,9 +56,9 @@ export function fmtDate(v) {
 
 export function fmtFresh(hours) {
   if (hours == null) return '—'
-  if (hours <= 24) return 'Up to a day old'
-  if (hours <= 24 * 7) return 'Up to a week old'
-  if (hours <= 24 * 31) return 'Up to a month old'
-  if (hours <= 24 * 95) return 'Up to a quarter old'
-  return 'Up to a year old'
+  if (hours <= 24) return tr('Up to a day old')
+  if (hours <= 24 * 7) return tr('Up to a week old')
+  if (hours <= 24 * 31) return tr('Up to a month old')
+  if (hours <= 24 * 95) return tr('Up to a quarter old')
+  return tr('Up to a year old')
 }

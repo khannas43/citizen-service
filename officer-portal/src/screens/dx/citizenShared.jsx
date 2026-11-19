@@ -4,6 +4,7 @@ import { mdm } from '../../mdmApi'
 import { useMdm, Status } from '../mdm/shared'
 import { PersonPicker } from './dxShared'
 import { PageHeader, Card, Banner } from './dxKit'
+import { tr } from '../../i18n/lang'
 
 /** The identity reference token stands in for the citizen's own sign-in in this demonstration. */
 export function useCitizenParams() {
@@ -27,12 +28,12 @@ export function TokenPicker({ onToken, current }) {
     } catch (e) { setErr(e.message) }
   }
   return (
-    <Card title="Choose the citizen" hint="In production the citizen signs in and their identity reference is known. Here, pick the person or type the reference.">
-      <div aria-label="Choose the citizen" className="dxk-stackform">
-        <PersonPicker onPick={pick} label="Find the citizen" />
+    <Card title={tr('Choose the citizen')} hint={tr('In production the citizen signs in and their identity reference is known. Here, pick the person or type the reference.')}>
+      <div aria-label={tr('Choose the citizen')} className="dxk-stackform">
+        <PersonPicker onPick={pick} label={tr('Find the citizen')} />
         <form className="dxk-form" onSubmit={(e) => { e.preventDefault(); typed.trim() && onToken(typed.trim()) }}>
-          <label className="dxk-field"><span>Or identity reference</span><input value={typed} onChange={(e) => setTyped(e.target.value)} /></label>
-          <div><button type="submit" className="btn-secondary">Open</button></div>
+          <label className="dxk-field"><span>{tr('Or identity reference')}</span><input value={typed} onChange={(e) => setTyped(e.target.value)} /></label>
+          <div><button type="submit" className="btn-secondary">{tr('Open')}</button></div>
         </form>
         {err && <Banner tone="bad">{err}</Banner>}
       </div>
@@ -48,7 +49,7 @@ export function Frame({ title, intro, children, token, operator, onToken }) {
   return (
     <div className="mdm-hub">
       <PageHeader icon="🧑" title={title} subtitle={intro} />
-      {operator && <Banner tone="warn">Assisted visit: you are acting with operator <strong>{operator}</strong> present. Everything you record is marked as assisted.</Banner>}
+      {operator && <Banner tone="warn">{tr('Assisted visit: you are acting with operator')} <strong>{operator}</strong> {tr('present. Everything you record is marked as assisted.')}</Banner>}
       {!token ? <TokenPicker onToken={onToken} /> : children}
     </div>
   )

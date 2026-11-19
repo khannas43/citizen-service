@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { mdm } from '../../mdmApi'
+import { T, tr } from '../../i18n/lang'
 
 /** Load once and whenever deps change. Returns { data, error, loading, reload }. */
 export function useMdm(path, params, deps = []) {
@@ -19,7 +20,7 @@ export function useMdm(path, params, deps = []) {
 }
 
 export function Status({ loading, error }) {
-  if (loading) return <p className="mdm-note" role="status">Loading…</p>
+  if (loading) return <p className="mdm-note" role="status">{tr('Loading…')}</p>
   if (error) return <p className="mdm-error" role="alert">{error}</p>
   return null
 }
@@ -28,14 +29,14 @@ export function Tile({ label, value, hint, tone }) {
   return (
     <div className={`mdm-tile${tone ? ` tone-${tone}` : ''}`}>
       <div className="mdm-tile-value">{value}</div>
-      <div className="mdm-tile-label">{label}</div>
-      {hint && <div className="mdm-tile-hint">{hint}</div>}
+      <div className="mdm-tile-label">{T(label)}</div>
+      {hint && <div className="mdm-tile-hint">{T(hint)}</div>}
     </div>
   )
 }
 
 export function Badge({ children, tone = 'neutral' }) {
-  return <span className={`mdm-badge tone-${tone}`}>{children}</span>
+  return <span className={`mdm-badge tone-${tone}`}>{T(children)}</span>
 }
 
 export function Pager({ total, limit, offset, onChange }) {
@@ -44,9 +45,9 @@ export function Pager({ total, limit, offset, onChange }) {
   const to = Math.min(offset + limit, total)
   return (
     <div className="mdm-pager">
-      <span>{from}–{to} of {total.toLocaleString('en-IN')}</span>
-      <button type="button" className="btn-secondary small" disabled={offset === 0} onClick={() => onChange(Math.max(0, offset - limit))}>Previous</button>
-      <button type="button" className="btn-secondary small" disabled={to >= total} onClick={() => onChange(offset + limit)}>Next</button>
+      <span>{tr('{from}–{to} of {total}', { from, to, total: total.toLocaleString('en-IN') })}</span>
+      <button type="button" className="btn-secondary small" disabled={offset === 0} onClick={() => onChange(Math.max(0, offset - limit))}>{tr('Previous')}</button>
+      <button type="button" className="btn-secondary small" disabled={to >= total} onClick={() => onChange(offset + limit)}>{tr('Next')}</button>
     </div>
   )
 }

@@ -42,6 +42,21 @@
   color: var(--color-success, #1b7a3d);
 }
 
+.fdg-back-link {
+  background: transparent;
+  border: 0;
+  padding: 0.15rem 0.05rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-primary-light, #2b5ba8);
+  cursor: pointer;
+  text-decoration: none;
+  margin-right: auto;
+}
+.fdg-back-link:hover { text-decoration: underline; }
+.fdg-back-link:focus-visible { outline: 2px solid var(--color-primary, #1b3c74); outline-offset: 2px; }
+
 .fdg-toolbar {
   display: flex;
   flex-wrap: wrap;

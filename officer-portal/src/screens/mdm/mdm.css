@@ -79,3 +79,29 @@
 .mdm-sub.block { display: block; }
 .mdm-note-input { flex: 1 1 200px; padding: 0.4rem 0.6rem; border: 1px solid var(--color-border, #dde3ee); border-radius: 6px; font: inherit; }
 .mdm-actions { align-items: center; flex-wrap: wrap; }
+
+/* review: side by side comparison */
+.cmp-table th, .cmp-table td { vertical-align: top; }
+.cmp-table tbody th { text-align: left; font-weight: 600; white-space: nowrap; color: #475467; }
+.cmp-table .cmp-place { background: #f3f6fc; }
+.cmp-table td.cmp-same { background: #e8f5ee; } .cmp-table td.cmp-diff { background: #fdecec; }
+
+/* review comparison: verdict per row, tally, why and suggestion cards */
+.cmp-table .cmp-verdict { margin-top: .2rem; font-size: .74rem; font-weight: 600; color: #667085; }
+.cmp-table td.cmp-same .cmp-verdict { color: #067647; } .cmp-table td.cmp-diff .cmp-verdict { color: #b42318; }
+.cmp-table .cmp-tally { margin-top: .25rem; font-size: .76rem; font-weight: 500; color: #667085; }
+.cmp-table .t-ok { color: #067647; } .cmp-table .t-bad { color: #b42318; }
+.why-list { list-style: none; margin: .25rem 0 .6rem; padding: 0; display: grid; gap: .4rem; }
+.why-list li { display: flex; gap: .5rem; align-items: baseline; flex-wrap: wrap; }
+.suggest-card { border-left: 4px solid #2e5fb8; }
+.suggest-card h3 { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+
+/* person side panel */
+.peek h4 { margin: 1.1rem 0 .4rem; font-size: .85rem; color: #344054; text-transform: uppercase; letter-spacing: .03em; }
+.peek-open { display: inline-block; margin-bottom: .6rem; text-decoration: none; }
+.peek-records { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+.peek-records li { padding: .5rem .65rem; border: 1px solid #e4e9f2; border-radius: 8px; background: #fafbfd; }
+.mdm-idlink { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; }
+
+.mdm-bar-fill.tone-bad { background: #c0392b; }
+.mdm-bar-fill.tone-warn { background: #d8870f; }

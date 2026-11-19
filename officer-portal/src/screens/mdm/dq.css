@@ -1,0 +1,10 @@
+/* data quality */
+.dq .dxk-table-wrap { max-height: none; overflow-y: visible; }
+.dq-open { display: inline-flex; align-items: center; gap: .6rem; justify-content: flex-end; }
+.dq-open b { min-width: 2.6rem; text-align: right; font-weight: 600; }
+.dq-bar { width: 90px; height: 7px; border-radius: 4px; background: #e4e9f2; overflow: hidden; }
+.dq-bar i { display: block; height: 100%; background: linear-gradient(90deg, #2e5fb8, #1b3c74); }
+.dq-scope { margin-top: .4rem; }
+.dq-h { margin: 0; font-size: 1.1rem; color: #1b3c74; }
+.dq-sub { margin: .2rem 0 0; font-size: .86rem; color: #667085; max-width: 90ch; }
+.dq .dxk-table th { white-space: nowrap; }

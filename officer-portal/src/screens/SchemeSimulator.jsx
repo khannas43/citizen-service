@@ -1,8 +1,10 @@
 import { Fragment, useState, useEffect, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { fetchSchemes, runSimulation, fetchRules, saveRule as apiSaveRule, deleteRule as apiDeleteRule } from '../api'
 import CitizenProfileModal from '../components/CitizenProfileModal'
 import { getOfficerDistrictScope, matchesOfficerDistrict } from '../auth'
 import DistrictScopeBanner from '../components/DistrictScopeBanner'
+import { tr } from '../i18n/lang'
 import './SchemeSimulator.css'
 
 const ALL_CASTES = ['OBC', 'SC', 'ST', 'NT', 'GENERAL']
@@ -932,6 +934,11 @@ export default function SchemeSimulator() {
             <div className="sim-rule-applied-banner">
               ⚡ <strong>Rule applied:</strong> {result.appliedRuleName}
             </div>
+          )}
+          {schemes.find((s) => s.id === baseSchemeId)?.name === 'Higher Education Scholarship (turning 18)' && (
+            <p className="sim-sources-link" style={{ margin: '0 0 1rem' }}>
+              <Link to="/dx/checks?tab=turning18">{tr('Check these students against the sources')}</Link>
+            </p>
           )}
           <div className="sim-kpi-row">
             <div className="dg-card sim-kpi-card">
