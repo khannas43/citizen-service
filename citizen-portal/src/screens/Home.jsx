@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { loadCitizenProfile } from '../auth'
 import { displayAppNo, fetchMyApplications, certificateDownloadUrl, fetchClarifications, fetchNotifications } from '../api'
+import { fetchApprovalsSummary } from '../approvalsApi'
 import AISearch from '../components/AISearch'
 import InfoRequestSection, { hasPendingInfoRequest } from '../components/InfoRequestSection'
 import { serviceLabel, statusLabel, appMetaLabel } from '../labels'
@@ -103,6 +104,23 @@ export default function Home() {
   const [selectedApp, setSelectedApp] = useState(null)
   const [infoClarifications, setInfoClarifications] = useState([])
   const [notifications, setNotifications] = useState([])
+  const [pendingApprovals, setPendingApprovals] = useState(0)
+
+  const loadApprovalBanner = useCallback(() => {
+    fetchApprovalsSummary()
+      .then((d) => setPendingApprovals(d.pending || 0))
+      .catch(() => setPendingApprovals(0))
+  }, [])
+
+  useEffect(() => {
+    loadApprovalBanner()
+    function onFocus() { loadApprovalBanner() }
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') loadApprovalBanner()
+    })
+    return () => window.removeEventListener('focus', onFocus)
+  }, [loadApprovalBanner])
 
   // Load applications from all services
   useEffect(() => {
@@ -166,6 +184,15 @@ export default function Home() {
 
   return (
     <div className="home-screen">
+
+      {pendingApprovals > 0 && (
+        <section className="consent-card" data-testid="approvals-banner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <p style={{ margin: 0 }}>{t('approvals.banner', { count: pendingApprovals })}</p>
+          <button type="button" className="btn-primary" onClick={() => navigate('/approvals')}>
+            {t('approvals.review')}
+          </button>
+        </section>
+      )}
 
       {/* ── Welcome strip ── */}
       <section className="welcome-strip">

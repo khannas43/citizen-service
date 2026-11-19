@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { loadCitizenProfile } from '../auth'
@@ -7,6 +7,7 @@ import {
   fetchFamilyBeneficiaries,
   fetchFamilyIncome,
 } from '../api'
+import { fetchHousehold } from '../approvalsApi'
 import { splitReasons, translateCriterion, uniqueSchemeEnrollments } from '../reasonUtils'
 import MemberProfile360 from '../components/MemberProfile360'
 import SchemeRecommendations from '../components/SchemeRecommendations'
@@ -16,9 +17,32 @@ import {
   isHouseholdHead,
   isSelf,
 } from '../utils/familyAccess'
-import { LOCAL_LANG } from '../lang'
+import { LOCAL_LANG, isLocal } from '../lang'
 
 const REL_ORDER = { HEAD: 0, SPOUSE: 1, FATHER: 2, MOTHER: 3, MOTHER_IN_LAW: 3, SON: 4, DAUGHTER: 5, OTHER: 6 }
+
+/** Map master-record relationship codes onto family-registry relationshipToHead values. */
+const MASTER_TO_FAMILY_REL = {
+  SELF: ['HEAD'],
+  SPOUSE: ['SPOUSE'],
+  CHILD: ['SON', 'DAUGHTER'],
+  PARENT: ['FATHER', 'MOTHER', 'MOTHER_IN_LAW'],
+  SAME_CARD: ['OTHER'],
+}
+
+function alreadyInFamilyList(item, members) {
+  const name = (item.name || '').trim().toLowerCase()
+  if (!name || name === 'member') return false
+  // The same name in the same household is the same person. The word for the relationship differs by who is looking
+  // (the head sees a spouse, the spouse sees the head), so the name alone decides.
+  return (members || []).some((m) => (m.name || '').trim().toLowerCase() === name)
+}
+
+/** The relationship in family words (Daughter, Son, Father, Mother) when the master record allows it, otherwise the general word. */
+function relLabelOf(t, it) {
+  if (it.relationship_detail) return t('relationships.' + it.relationship_detail, it.relationship_detail)
+  return t(`myFamilyPage.masterRecord.rel.${it.relationship_to_me}`, it.relationship_to_me)
+}
 
 function relClass(rel) {
   switch (rel) {
@@ -57,6 +81,11 @@ export default function MyFamily() {
   const [profileTarget, setProfileTarget] = useState(null)
   const [profileRequireOtp, setProfileRequireOtp] = useState(false)
   const [accessDenied, setAccessDenied] = useState(null)
+  const [masterItems, setMasterItems] = useState([])
+  const [masterLoading, setMasterLoading] = useState(false)
+  const [masterError, setMasterError] = useState(null)
+  const [masterUnavailable, setMasterUnavailable] = useState(false)
+  const [masterTick, setMasterTick] = useState(0)
 
   useEffect(() => {
     if (!profile?.familyId) {
@@ -88,6 +117,32 @@ export default function MyFamily() {
       cancelled = true
     }
   }, [profile?.familyId, t])
+
+  useEffect(() => {
+    if (!profile?.aadhaarRef) return
+    let cancelled = false
+    async function loadMaster() {
+      setMasterLoading(true)
+      setMasterError(null)
+      setMasterUnavailable(false)
+      try {
+        const data = await fetchHousehold()
+        if (cancelled) return
+        setMasterItems(data.items || [])
+      } catch (err) {
+        if (cancelled) return
+        setMasterItems([])
+        if (err?.status === 404) setMasterUnavailable(true)
+        else setMasterError(t('myFamilyPage.masterRecord.error'))
+      } finally {
+        if (!cancelled) setMasterLoading(false)
+      }
+    }
+    loadMaster()
+    return () => {
+      cancelled = true
+    }
+  }, [profile?.aadhaarRef, masterTick, t])
 
   const members = [...(family?.members || [])].sort(
     (a, b) => (REL_ORDER[a.relationshipToHead] ?? 99) - (REL_ORDER[b.relationshipToHead] ?? 99)
@@ -189,53 +244,133 @@ export default function MyFamily() {
                 </button>
               )
             }
+            const masterExtra = masterItems.filter((it) => !alreadyInFamilyList(it, members))
+            // Everyone the master record shows is a family member and gets a row in the table: on the ration card, or added after a birth registration.
+            // The box below keeps only the loading, error and empty messages.
+            const masterOnCard = masterExtra
+            const masterOther = []
+            const showMasterBox = masterLoading || masterError || masterUnavailable || masterOther.length > 0 || masterExtra.length === 0
             return (
-              <div className="complaints-table-wrap card">
-                <table className="complaints-table">
-                  <thead>
-                    <tr>
-                      <th>{thSort('name', t('myFamilyPage.col.name'))}</th>
-                      <th>{thSort('relationship', t('myFamilyPage.col.relationship'))}</th>
-                      <th>{thSort('age', t('myFamilyPage.col.age'))}</th>
-                      <th>{thSort('occupation', t('myFamilyPage.col.occupation'))}</th>
-                      <th>{thSort('income', t('myFamilyPage.col.annualIncome'))}</th>
-                      <th>{thSort('caste', t('myFamilyPage.col.caste'))}</th>
-                      <th>{t('myFamilyPage.col.status')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedMembers.map((m) => {
-                      const self = isSelf(profile.aadhaarRef, m)
-                      const deceased = m.isAlive === false
-                      const viewable = memberCanView(m)
-                      return (
-                        <tr
-                          key={m.id}
-                          className={`complaints-row${viewable ? ' complaints-row--clickable' : ''}${deceased ? ' mydata-deceased' : ''}`}
-                          onClick={() => handleMemberClick(m)}
-                        >
-                          <td>
-                            <strong className={deceased ? 'struck' : ''}>{m.name}</strong>
-                            {self && <span className="enrollment-you-badge" style={{ marginLeft: '0.5rem' }}>{t('myApps.you')}</span>}
-                          </td>
-                          <td className="muted">{t('relationships.' + m.relationshipToHead, m.relationshipToHead)}</td>
-                          <td className="muted">{ageFromDob(m.dob) ?? '—'} {t('myFamilyPage.years')}</td>
-                          <td className="muted">{m.occupation || '—'}</td>
-                          <td>₹{(m.annualIncome || 0).toLocaleString('en-IN')}</td>
-                          <td className="muted">{m.casteCategory || '—'}</td>
-                          <td>
-                            {deceased
-                              ? <span className="status-badge badge-grey">{t('myFamilyPage.deceased')}</span>
-                              : viewable
-                                ? <span className="status-badge badge-green">{t('profile360.alive')}</span>
-                                : <span className="status-badge badge-grey">—</span>}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                <div className="complaints-table-wrap card">
+                  <table className="complaints-table">
+                    <thead>
+                      <tr>
+                        <th>{thSort('name', t('myFamilyPage.col.name'))}</th>
+                        <th>{thSort('relationship', t('myFamilyPage.col.relationship'))}</th>
+                        <th>{thSort('age', t('myFamilyPage.col.age'))}</th>
+                        <th>{thSort('occupation', t('myFamilyPage.col.occupation'))}</th>
+                        <th>{thSort('income', t('myFamilyPage.col.annualIncome'))}</th>
+                        <th>{thSort('caste', t('myFamilyPage.col.caste'))}</th>
+                        <th>{t('myFamilyPage.col.status')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedMembers.map((m) => {
+                        const self = isSelf(profile.aadhaarRef, m)
+                        const deceased = m.isAlive === false
+                        const viewable = memberCanView(m)
+                        return (
+                          <tr
+                            key={m.id}
+                            className={`complaints-row${viewable ? ' complaints-row--clickable' : ''}${deceased ? ' mydata-deceased' : ''}`}
+                            onClick={() => handleMemberClick(m)}
+                          >
+                            <td>
+                              <strong className={deceased ? 'struck' : ''}>{m.name}</strong>
+                              {self && <span className="enrollment-you-badge" style={{ marginLeft: '0.5rem' }}>{t('myApps.you')}</span>}
+                            </td>
+                            <td className="muted">{t('relationships.' + m.relationshipToHead, m.relationshipToHead)}</td>
+                            <td className="muted">{ageFromDob(m.dob) ?? '—'} {t('myFamilyPage.years')}</td>
+                            <td className="muted">{m.occupation || '—'}</td>
+                            <td>₹{(m.annualIncome || 0).toLocaleString('en-IN')}</td>
+                            <td className="muted">{m.casteCategory || '—'}</td>
+                            <td>
+                              {deceased
+                                ? <span className="status-badge badge-grey">{t('myFamilyPage.deceased')}</span>
+                                : viewable
+                                  ? <span className="status-badge badge-green">{t('profile360.alive')}</span>
+                                  : <span className="status-badge badge-grey">—</span>}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                      {masterOnCard.map((it) => {
+                        const displayName = isLocal(i18n.language) && it.name_te ? it.name_te : it.name
+                        return (
+                          <tr key={it.person_ref} className="complaints-row" data-testid="master-member-row">
+                            <td><strong>{displayName}</strong></td>
+                            <td className="muted">{relLabelOf(t, it)}</td>
+                            <td className="muted">{Number.isInteger(it.age) ? `${it.age} ${t('myFamilyPage.years')}` : it.age_band ? `${it.age_band} ${t('myFamilyPage.years')}` : '—'}</td>
+                            <td className="muted small" colSpan={3}>{t('myFamilyPage.masterRecord.detailsNote')}</td>
+                            <td>
+                              {it.on_ration_card && <span className="status-badge badge-green">{t('myFamilyPage.masterRecord.onRationCard')}</span>}
+                              {it.registered_via === 'BIRTH_REGISTRATION' && (
+                                <span className="muted small" style={{ display: 'block' }}>
+                                  {t('myFamilyPage.masterRecord.birthLabel')}{it.added_on ? ` · ${it.added_on}` : ''}
+                                </span>
+                              )}
+                              {!it.on_ration_card && it.registered_via !== 'BIRTH_REGISTRATION' && <span className="status-badge badge-grey">—</span>}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {showMasterBox && (
+                <section className="section-card master-household" aria-labelledby="master-household-title" style={{ marginTop: '1rem' }}>
+                  <h3 id="master-household-title" style={{ margin: '0 0 0.5rem' }}>
+                    {t('myFamilyPage.masterRecord.title')}
+                  </h3>
+                  {masterLoading && <p className="muted">{t('myFamilyPage.masterRecord.loading')}</p>}
+                  {masterUnavailable && (
+                    <p className="muted small">{t('myFamilyPage.masterRecord.unavailable')}</p>
+                  )}
+                  {masterError && (
+                    <div className="error-banner" role="alert">
+                      {masterError}{' '}
+                      <button type="button" className="link-btn" onClick={() => setMasterTick((n) => n + 1)}>
+                        {t('myFamilyPage.masterRecord.retry')}
+                      </button>
+                    </div>
+                  )}
+                  {!masterLoading && !masterError && !masterUnavailable && masterExtra.length === 0 && (
+                    <p className="muted small">{t('myFamilyPage.masterRecord.empty')}</p>
+                  )}
+                  {!masterLoading && masterOther.length > 0 && (
+                    <div className="member-grid">
+                      {masterOther.map((it) => {
+                        const displayName = isLocal(i18n.language) && it.name_te ? it.name_te : it.name
+                        return (
+                          <div key={it.person_ref} className="member-card" data-testid="master-member-card">
+                            <div className="member-card-top">
+                              <strong>{displayName}</strong>
+                              <span className="member-rel">
+                                {relLabelOf(t, it)}
+                              </span>
+                            </div>
+                            {(Number.isInteger(it.age) || it.age_band) && (
+                              <p className="member-meta muted">{Number.isInteger(it.age) ? `${it.age} ${t('myFamilyPage.years')}` : it.age_band}</p>
+                            )}
+                            {it.registered_via === 'BIRTH_REGISTRATION' && (
+                              <p className="member-meta">
+                                {t('myFamilyPage.masterRecord.birthLabel')}
+                                {it.added_on ? ` · ${it.added_on}` : ''}
+                              </p>
+                            )}
+                            {it.on_ration_card && (
+                              <p className="member-meta">{t('myFamilyPage.masterRecord.onRationCard')}</p>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </section>
+                )}
+              </>
             )
           })()}
 

@@ -10,9 +10,11 @@ import { LOCAL_LANG } from './lang'
 const DEMO_USERS = [
   { label: 'Padmavathi Goud', aadhaar: 'XXXX-XXXX-1001' },
   { label: 'Rajender Pagidipalli', aadhaar: 'XXXX-XXXX-2001' },
-  { label: 'Meera Madavi', aadhaar: 'XXXX-XXXX-3001' },
+  { label: 'Suma Pagidipalli', aadhaar: 'XXXX-XXXX-3001' },
   { label: 'Ahmed Shaikh', aadhaar: 'XXXX-XXXX-4001' },
   { label: 'Yellavva Erukala', aadhaar: 'XXXX-XXXX-5001' },
+  { label: 'Kavya Muthyala', aadhaar: 'XXXX-XXXX-2601' },
+  { label: 'Sarojini Goud', aadhaar: 'XXXX-XXXX-2701' },
 ]
 
 export default function Login() {

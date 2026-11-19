@@ -372,7 +372,7 @@ export default function CommonApplicationForm() {
 
   function goBack() {
     setStepError(null)
-    if (step === 1) navigate('/')
+    if (step === 1) navigate('/home')
     else setStep((s) => s - 1)
   }
 
@@ -473,7 +473,7 @@ export default function CommonApplicationForm() {
     return (
       <div className="card form-card">
         <div className="error-banner">{profileError || t('caf.profileUnavailable')}</div>
-        <button type="button" className="btn-ghost small" onClick={() => navigate('/')}>← {t('common.back')}</button>
+        <button type="button" className="btn-ghost small" onClick={() => navigate('/home')}>← {t('common.back')}</button>
       </div>
     )
   }
@@ -525,7 +525,7 @@ export default function CommonApplicationForm() {
         </div>
 
         <div className="caf-result-footer">
-          <button type="button" className="caf-track-btn" onClick={() => navigate('/')}>
+          <button type="button" className="caf-track-btn" onClick={() => navigate('/home')}>
             {t('caf.trackApps')}
           </button>
         </div>

@@ -28,7 +28,7 @@ export default function ApplyPage() {
   return (
     <div className="apply-page">
       <div className="apply-page-header">
-        <button type="button" className="btn-ghost small" onClick={() => navigate('/')}>
+        <button type="button" className="btn-ghost small" onClick={() => navigate('/home')}>
           ← {t('applyPage.backHome')}
         </button>
         <h1 className="apply-page-title">{t('applyPage.title')}</h1>

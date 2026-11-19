@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { loadCitizenProfile } from '../auth'
 import { fetchNotifications, markNotificationRead } from '../api'
@@ -13,6 +14,7 @@ function timeAgo(dateStr, t) {
 
 export default function NotificationBell() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const profile = loadCitizenProfile()
   const [notifications, setNotifications] = useState([])
   const [open, setOpen] = useState(false)
@@ -44,6 +46,10 @@ export default function NotificationBell() {
       setNotifications(prev =>
         prev.map(x => x.id === n.id ? { ...x, isRead: true } : x)
       )
+    }
+    if (n.serviceName === 'Approvals' && n.trackingId) {
+      setOpen(false)
+      navigate(`/approvals/${encodeURIComponent(n.trackingId)}`)
     }
   }
 

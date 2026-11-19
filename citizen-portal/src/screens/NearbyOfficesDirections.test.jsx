@@ -128,18 +128,18 @@ describe('NearbyOffices table and directions', () => {
     expect(await screen.findByText(/no matching place found/i)).toBeInTheDocument()
   })
 
-  it('offers villages for the chosen taluka and sends the village to the search', async () => {
+  it('offers villages for the chosen mandal and sends the village to the search', async () => {
     vi.mocked(fetchTalukasForDistrict).mockResolvedValue(['Dholka', 'Sanand', 'Viramgam'])
     vi.mocked(fetchVillagesForTaluka).mockResolvedValue(['Bol', 'Chandrala', 'Itola'])
     renderPage()
     await loadAhmedabad()
 
-    // Taluka list merges office talukas with the registry's.
-    const talukaSelect = screen.getByLabelText(/^taluka/i)
+    // Mandal list merges office talukas with the registry's.
+    const talukaSelect = screen.getByLabelText(/^mandal/i)
     await waitFor(() => expect(within(talukaSelect).getByRole('option', { name: 'Dholka' })).toBeInTheDocument())
     expect(within(talukaSelect).getByRole('option', { name: 'Ahmedabad City' })).toBeInTheDocument()
 
-    // Village stays disabled until a taluka is picked.
+    // Village stays disabled until a mandal is picked.
     expect(screen.getByLabelText(/^village/i)).toBeDisabled()
 
     fireEvent.change(talukaSelect, { target: { value: 'Sanand' } })
@@ -150,28 +150,28 @@ describe('NearbyOffices table and directions', () => {
     fireEvent.change(villageSelect, { target: { value: 'Bol' } })
     await waitFor(() => expect(fetchNearbyOffices.mock.calls.at(-1)[0].village).toBe('Bol'))
 
-    // Changing the taluka clears the village.
+    // Changing the mandal clears the village.
     fireEvent.change(talukaSelect, { target: { value: 'Dholka' } })
     await waitFor(() => expect(fetchVillagesForTaluka).toHaveBeenCalledWith('Ahmedabad', 'Dholka'))
     await waitFor(() => expect(fetchNearbyOffices.mock.calls.at(-1)[0].village).toBeUndefined())
   })
 
-  it('falls back to a text box when a taluka has no village list', async () => {
+  it('falls back to a text box when a mandal has no village list', async () => {
     vi.mocked(fetchVillagesForTaluka).mockResolvedValue([])
     renderPage()
     await loadAhmedabad()
-    fireEvent.change(screen.getByLabelText(/^taluka/i), { target: { value: 'Ahmedabad City' } })
-    expect(await screen.findByPlaceholderText(/no list for this taluka/i)).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText(/^mandal/i), { target: { value: 'Ahmedabad City' } })
+    expect(await screen.findByPlaceholderText(/no list for this mandal/i)).toBeInTheDocument()
   })
 
-  it('explains when a taluka has no office and the district is shown instead', async () => {
+  it('explains when a mandal has no office and the district is shown instead', async () => {
     vi.mocked(fetchNearbyOffices).mockResolvedValue({
       offices: [office], widened: true, widenedDistrict: 'Ahmedabad', demoData: true,
     })
     renderPage()
     await loadAhmedabad()
-    fireEvent.change(screen.getByLabelText(/^taluka/i), { target: { value: 'Ahmedabad City' } })
-    expect(await screen.findByText(/no office is listed in Ahmedabad City taluka yet/i)).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText(/^mandal/i), { target: { value: 'Ahmedabad City' } })
+    expect(await screen.findByText(/no office is listed in Ahmedabad City mandal yet/i)).toBeInTheDocument()
   })
 
   it('lists villages and city areas that come from the office master when the registry has none', async () => {
@@ -184,7 +184,7 @@ describe('NearbyOffices table and directions', () => {
     vi.mocked(fetchVillagesForTaluka).mockResolvedValue([])
     renderPage()
     await loadAhmedabad()
-    fireEvent.change(screen.getByLabelText(/^taluka/i), { target: { value: 'Ahmedabad City' } })
+    fireEvent.change(screen.getByLabelText(/^mandal/i), { target: { value: 'Ahmedabad City' } })
     const villageSelect = await screen.findByLabelText(/^village/i)
     await waitFor(() => expect(within(villageSelect).getByRole('option', { name: 'Navrangpura' })).toBeInTheDocument())
     expect(within(villageSelect).getByRole('option', { name: 'Maninagar' })).toBeInTheDocument()

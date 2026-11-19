@@ -19,9 +19,11 @@ const AI_FEATURE_ICONS = ['ti-message-chatbot', 'ti-target-arrow', 'ti-shield-ch
 const DEMO_USERS = [
   { label: 'Padmavathi Goud', aadhaar: 'XXXX-XXXX-1001' },
   { label: 'Rajender Pagidipalli', aadhaar: 'XXXX-XXXX-2001' },
-  { label: 'Meera Madavi', aadhaar: 'XXXX-XXXX-3001' },
+  { label: 'Suma Pagidipalli', aadhaar: 'XXXX-XXXX-3001' },
   { label: 'Ahmed Shaikh', aadhaar: 'XXXX-XXXX-4001' },
   { label: 'Yellavva Erukala', aadhaar: 'XXXX-XXXX-5001' },
+  { label: 'Kavya Muthyala', aadhaar: 'XXXX-XXXX-2601' },
+  { label: 'Sarojini Goud', aadhaar: 'XXXX-XXXX-2701' },
 ]
 
 const APPLICATION_CARDS = [
@@ -33,6 +35,7 @@ const APPLICATION_CARDS = [
 ]
 const CAROUSEL_CARDS = [...APPLICATION_CARDS, ...APPLICATION_CARDS]
 
+// Keep in step with OFFICER_ROLES in officer-portal/src/auth.js: a role missing here reaches the officer portal as UNKNOWN (one menu entry).
 const OFFICER_ROLES = [
   'DATA_ENTRY_OFFICER',
   'TALATI',
@@ -40,7 +43,13 @@ const OFFICER_ROLES = [
   'SCHEME_DEPT',
   'DEPT_ADMIN',
   'IT_ADMIN',
+  'MDM_ADMIN',
   'SENIOR_MGMT',
+  'PAYROLL_REVIEWER',
+  'FINANCE_OFFICER',
+  'HR_OFFICER',
+  'PDS_OFFICER',
+  'HEALTH_OFFICER',
 ]
 
 function readLandingLang() {

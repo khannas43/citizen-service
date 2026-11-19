@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { loadCitizenProfile } from '../auth'
 import { APIs, fetchConsents, revokeConsent, restoreConsent, fetchDataExport, submitGrievance, fetchCitizenDocuments, uploadCitizenDocument, fetchDocumentData } from '../api'
+import RequestsForYou from './RequestsForYou'
 import { cafVisibleFileName, formatCafDocType } from '../caf/cafDocumentConfig'
 
 const ACCEPTED_UPLOAD = '.pdf,.jpg,.jpeg,.png,.gif,.doc,.docx'
@@ -673,11 +674,19 @@ export default function MyData() {
         >
           🔗 {t('consents.tabConsents')}
         </button>
+        <button
+          type="button"
+          className={`mydata-tab${tab === 'requests' ? ' active' : ''}`}
+          onClick={() => setTab('requests')}
+        >
+          📨 {t('consents.tabRequests')}
+        </button>
       </div>
 
       <div className="mydata-tab-content">
         {tab === 'mydata'    && <MyDataTab profile={profile} />}
         {tab === 'consents'  && <ConsentsTab profile={profile} />}
+        {tab === 'requests'  && <RequestsForYou />}
       </div>
     </div>
   )

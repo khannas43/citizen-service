@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n'
 import { loadCitizenProfile, logoutCitizen } from '../auth'
+import { fetchApprovalsSummary } from '../approvalsApi'
 import ChatWidget from './ChatWidget'
 import NotificationBell from './NotificationBell'
 import './NotificationBell.css'
@@ -14,6 +15,8 @@ const MORE_LINKS = [
   { to: '/notifications', icon: '🔔', labelKey: 'nav.notificationsFull' },
   { to: '/contact',       icon: '📞', labelKey: 'nav.contactFull' },
   { to: '/my-consents',   icon: '🔐', labelKey: 'nav.myDataFull' },
+  { to: '/eligibility-check', icon: '🔎', labelKey: 'nav.eligibilityCheck' },
+  { to: '/nearby-offices', icon: '📍', labelKey: 'nav.nearbyOffices' },
 ]
 
 function MoreDrawer({ onClose }) {
@@ -51,6 +54,19 @@ export default function Layout() {
   const location = useLocation()
   const profile = loadCitizenProfile()
   const [moreOpen, setMoreOpen] = useState(false)
+  const [pendingApprovals, setPendingApprovals] = useState(0)
+
+  const loadBadge = useCallback(() => {
+    fetchApprovalsSummary()
+      .then((d) => setPendingApprovals(d.pending || 0))
+      .catch(() => setPendingApprovals(0))
+  }, [])
+
+  useEffect(() => {
+    loadBadge()
+    const id = setInterval(loadBadge, 30000)
+    return () => clearInterval(id)
+  }, [loadBadge])
 
   function toggleLang() {
     const next = i18n.language === 'en' ? LOCAL_LANG : 'en'
@@ -59,7 +75,8 @@ export default function Layout() {
   }
 
   const navLinks = [
-    { to: '/',              label: '📋 ' + t('myApplications'), end: true },
+    { to: '/approvals',     label: t('nav.approvals'), badge: pendingApprovals },
+    { to: '/home',          label: '🏠 ' + t('myApplications'), end: true },
     { to: '/eligibility-check', label: t('nav.eligibilityCheck') },
     { to: '/nearby-offices', label: t('nav.nearbyOffices') },
     { to: '/my-family',     label: t('myFamily') },
@@ -72,12 +89,13 @@ export default function Layout() {
   ]
 
   const mobileTabs = [
-    { to: '/',           label: '📋', text: t('nav.applications'), end: true },
+    { to: '/approvals',  label: '✅', text: t('nav.approvals'), badge: pendingApprovals },
+    { to: '/home',       label: '🏠', text: t('myApplications'), end: true },
     { to: '/my-family',  label: '👨‍👩‍👧', text: t('myFamily') },
-    { to: '/grievances', label: '⚠️',  text: t('nav.grievances') },
   ]
 
-  const moreActive = MORE_LINKS.some((l) => location.pathname === l.to)
+  const moreActive = MORE_LINKS.some((l) => location.pathname === l.to || location.pathname.startsWith(`${l.to}/`))
+    || location.pathname.startsWith('/approvals/')
 
   return (
     <div className="citizen-app">
@@ -113,6 +131,11 @@ export default function Layout() {
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
             {l.label}
+            {l.badge > 0 && (
+              <span className="bell-badge" style={{ position: 'static', marginLeft: 6 }} aria-label={t('approvals.badgeAria', { count: l.badge })}>
+                {l.badge > 9 ? '9+' : l.badge}
+              </span>
+            )}
           </NavLink>
         ))}
         <span className="nav-link nav-link-static" aria-disabled="true">
@@ -133,7 +156,14 @@ export default function Layout() {
             className={({ isActive }) => (isActive ? 'tab-item active' : 'tab-item')}
           >
             <span className="tab-icon">{tab.label}</span>
-            <span className="tab-text">{tab.text}</span>
+            <span className="tab-text">
+              {tab.text}
+              {tab.badge > 0 && (
+                <span className="bell-badge" style={{ position: 'static', marginLeft: 4 }} aria-label={t('approvals.badgeAria', { count: tab.badge })}>
+                  {tab.badge > 9 ? '9+' : tab.badge}
+                </span>
+              )}
+            </span>
           </NavLink>
         ))}
 

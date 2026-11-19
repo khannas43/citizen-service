@@ -8,6 +8,10 @@ import CommonApplicationForm from './screens/CommonApplicationForm'
 import MyFamily from './screens/MyFamily'
 import MyComplaints from './screens/MyComplaints'
 import MyConsents from './screens/MyConsents'
+import Approvals from './screens/Approvals'
+import ApprovalDetail from './screens/ApprovalDetail'
+import ReportWrongDetail from './screens/ReportWrongDetail'
+import MyReports from './screens/MyReports'
 import PaymentsBenefits from './screens/PaymentsBenefits'
 import MyCertificates from './screens/MyCertificates'
 import NotificationHub from './screens/NotificationHub'
@@ -57,7 +61,7 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/login" element={<Navigate to={authState === 'authenticated' ? '/approvals' : '/'} replace />} />
       {authState === 'unauthenticated' && (
         <>
           <Route path="/" element={<LandingPage />} />
@@ -69,7 +73,8 @@ export default function App() {
       )}
       {authState === 'authenticated' && (
       <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Navigate to="/approvals" replace />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/eligibility-check" element={<EligibilityCheck />} />
         <Route path="/nearby-offices" element={<NearbyOffices />} />
         <Route path="/schemes/:schemeId" element={<SchemeDetailsPage />} />
@@ -89,9 +94,13 @@ export default function App() {
             </Suspense>
           }
         />
-        <Route path="/my-applications" element={<Navigate to="/" replace />} />
+        <Route path="/my-applications" element={<Navigate to="/home" replace />} />
         <Route path="/my-family" element={<MyFamily />} />
         <Route path="/my-consents" element={<MyConsents />} />
+        <Route path="/approvals" element={<Approvals />} />
+        <Route path="/approvals/report" element={<ReportWrongDetail />} />
+        <Route path="/approvals/reports" element={<MyReports />} />
+        <Route path="/approvals/:key" element={<ApprovalDetail />} />
         <Route path="/grievances" element={<MyComplaints />} />
         <Route path="/my-complaints" element={<Navigate to="/grievances" replace />} />
         <Route path="/payments" element={<PaymentsBenefits />} />
