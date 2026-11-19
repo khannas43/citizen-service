@@ -261,15 +261,17 @@ function NavJourney({ journey }) {
   const tr = useTr()
   const { pathname, search } = useLocation()
   const here = `${pathname}${search}`
-  const stepHere = (st) => !st.citizen && (st.to.includes('?') ? here === st.to : pathname === st.to)
-  const hasActive = journey.steps.some(stepHere) || here === journey.to
+  // The scenario page is shared by every use case, so only this use case's own address (?uc=) counts as "here".
+  const stepHere = (st) => !st.citizen && st.to !== '/dx/scenarios' && (st.to.includes('?') ? here === st.to : pathname === st.to)
+  const onJourney = here === journey.to
+  const hasActive = onJourney
   const [open, toggle] = useOpen(`Demo/${journey.id}`, hasActive)
   const id = `nav-journey-${journey.id}`
   const base = getCitizenLandingUrl()
   return (
     <div className="nav-subgroup">
       <div className="nav-journey-head">
-        <NavLink to={journey.to} onClick={() => { if (!open) toggle() }} className={`nav-link nav-sub nav-subgroup-head${hasActive ? ' has-active' : ''}`} title={journey.label}>
+        <NavLink to={journey.to} onClick={() => { if (!open || onJourney) toggle() }} className={`nav-link nav-sub nav-subgroup-head${hasActive ? ' has-active' : ''}`} title={journey.label}>
           <span className="nav-text">{tr(journey.label)}</span>
         </NavLink>
         <button type="button" className="nav-journey-toggle" onClick={toggle} aria-expanded={open} aria-controls={id} aria-label={journey.label}>{open ? '▾' : '▸'}</button>

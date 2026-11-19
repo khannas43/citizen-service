@@ -1957,3 +1957,4 @@ input[type="date"].complaints-filter-select {
 .nav-journey-toggle { background: none; border: 0; color: inherit; cursor: pointer; padding: 6px 10px; }
 .nav-who { opacity: 0.75; font-size: 0.9em; }
 .nav-link.nav-sub.nav-sub-2 .nav-text { white-space: normal; }
+.nav-journey-head .nav-link.nav-subgroup-head { font-size: 0.76rem; }
