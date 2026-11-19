@@ -6,6 +6,7 @@ import { useMdm, Status, Badge } from '../mdm/shared'
 import { fmtTime } from './dxShared'
 import { PageHeader, Card, Stats, Tabs, DataTable, Drawer, Banner, Facts } from './dxKit'
 import { tr, tObj } from '../../i18n/lang'
+import { DEMO_JOURNEYS } from '../../navTree'
 
 export const RESULT = {
   PASS: ['Passed', 'ok'], PARTIAL: ['Met, with a gap', 'warn'], FAIL: ['Failed', 'bad'], ERROR: ['Error', 'bad'], SKIPPED: ['No data to run on', 'neutral'],
@@ -100,6 +101,8 @@ export default function DxScenarios() {
   const [rf, setRf] = useState('')
 
   const wanted = params.get('open')
+  const ucParam = (params.get('uc') || '').toUpperCase()
+  useEffect(() => { if (/^UC\d$/.test(ucParam)) setUc(ucParam) }, [ucParam])   // the menu opens this page for one use case: show its group
   useEffect(() => {
     const it = wanted && data?.items.find((i) => i.id === wanted)
     if (it) { setUc('ALL'); show(it) }
@@ -139,10 +142,10 @@ export default function DxScenarios() {
   }
 
   if (!data) return <div className="mdm-hub"><PageHeader icon="▶️" title={tr('Scenario runner')} /><Status loading={loading} error={error} /></div>
-  return <Runner {...{ data, uc, setUc, open, setOpen, detail, progress, msg, confirmReset, setConfirmReset, reset, runMany, show }} rf={rf} setRf={setRf} />
+  return <Runner {...{ journey: DEMO_JOURNEYS.find((j) => j.id.toUpperCase() === ucParam), data, uc, setUc, open, setOpen, detail, progress, msg, confirmReset, setConfirmReset, reset, runMany, show }} rf={rf} setRf={setRf} />
 }
 
-function Runner({ data, uc, setUc, open, setOpen, detail, progress, msg, confirmReset, setConfirmReset, reset, runMany, show, rf, setRf }) {
+function Runner({ journey, data, uc, setUc, open, setOpen, detail, progress, msg, confirmReset, setConfirmReset, reset, runMany, show, rf, setRf }) {
   const isStep = (i) => i.type === 'step'
   const scripted = data.items.filter((i) => !isStep(i))
   const items = scripted.filter((i) => (uc === 'ALL' || i.uc === uc) && (!rf || (rf === 'NONE' ? !i.last : rf === 'FAIL_OR_ERROR' ? (i.last?.status === 'FAIL' || i.last?.status === 'ERROR') : i.last?.status === rf)))
@@ -180,6 +183,15 @@ function Runner({ data, uc, setUc, open, setOpen, detail, progress, msg, confirm
               <button type="button" className="btn-secondary" onClick={() => setConfirmReset(false)}>{tr('Cancel')}</button>
             </div>
           </div>
+        </Card>
+      )}
+      {journey && uc === journey.id.toUpperCase() && (
+        <Card title={journey.label} tone="info">
+          <p className="mdm-sub" style={{ marginTop: 0 }}>{tr('The steps of this use case are in the left menu under Demo. Each opens the page where it happens; the person acting is in brackets.')}</p>
+          {journey.prep && <p className="mdm-sub">{tr(journey.prep)}</p>}
+          <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
+            {journey.steps.map((st, i) => <li key={i}>{tr(st.label)} <em>({st.who})</em>{st.run && <span className="mdm-sub"> · {tr('run')} {st.run}</span>}</li>)}
+          </ol>
         </Card>
       )}
       <Tabs label={tr('Group')} value={uc} onChange={setUc} tabs={['ALL', 'UC1', 'UC2', 'UC3', 'UC4', 'UC5', 'UC6', 'CC'].map((g) => ({ id: g, label: g === 'ALL' ? tr('All') : g === 'CC' ? tr('Cross-cutting') : g }))} />

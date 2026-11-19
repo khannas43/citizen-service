@@ -30,11 +30,15 @@ ELEMENTS = {
     "household_benefit": ("Housing application in household", "housing", "MEDIUM"), "marital_status": ("Marriage recorded", "marriage_register", "MEDIUM"),
     "electricity_link": ("Electricity connection linked", "electricity", "LOW"), "land_holding": ("Land held", "revenue", "HIGH"),
     "duplicate_benefit": ("Duplicate application flag", "housing", "MEDIUM"),
+    # carried by a birth event (UC2); Civil registration is the source of truth for all four
+    "child_name": ("Child's name", "crs", "MEDIUM"), "date_of_birth": ("Date of birth", "crs", "MEDIUM"),
+    "gender": ("Gender", "crs", "LOW"), "parents": ("Parents named at registration", "crs", "MEDIUM"),
 }
 # the exact feed each element is taken from, so the catalogue can link an element to its source by name
 ELEMENT_SOURCE = {"age": "crs", "residence": "pds_view", "life_status": "crs", "income_band": "revenue_certificates", "category": "revenue_certificates",
                   "household_benefit": "housing", "marital_status": "marriage_register", "electricity_link": "electricity",
-                  "land_holding": "revenue_land", "duplicate_benefit": "housing"}
+                  "land_holding": "revenue_land", "duplicate_benefit": "housing",
+                  "child_name": "crs", "date_of_birth": "crs", "gender": "crs", "parents": "crs"}
 QUERYABLE = ["age", "residence", "income_band", "category", "life_status", "household_benefit", "marital_status", "electricity_link", "land_holding"]
 
 

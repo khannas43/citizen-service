@@ -64,40 +64,40 @@ Pass for UC1: no path changes a master value except a steward's decision; a citi
 
 # UC2: Birth of a child
 
-Cast: Rajender Pagidipalli (father, sign-in 2001) and Suma Pagidipalli (mother, sign-in 3001). Scenario 2.1 links both sign-ins and gives them their own household in the registry, so the header, profile and My Family show their names (not another family's). The Health system is the one that goes down. Run first: Demo > Scenario runner, O/dx/scenarios: **Clear demo records**, then **Run the UC2 group** (7 automatic checks, 2.1 to 2.7). The live steps 2.8 to 2.13 are in the separate "Live demo steps" block and are run one at a time.
+Cast: Rajender Pagidipalli (father, sign-in 2001) and Suma Pagidipalli (mother, sign-in 3001). Scenario 2.1 links both sign-ins and gives them their own household in the registry, so the header, profile and My Family show their names (not another family's). The Health system is the one that goes down. Run first: Demo > Scenario runner, O/dx/scenarios: **Clear demo records**, then **Run the UC2 group** (7 automatic checks, 2.1 to 2.3). The live steps 2.4 to 2.13 are in the separate "Live demo steps" block and are run one at a time.
 
-## UC2 Scenario 1: A birth is registered; the parent agrees to some uses only; the Health system is down (2.1, 2.2, 2.7)
+## UC2 Scenario 1: A birth is registered; the parent agrees to some uses only; the Health system is down (2.1, 2.2, 2.3)
 
 1. Events > **Events**, O/dx/events. Search BIRTH_REGISTERED and open the newest case (O/dx/events?case=<id>). Expect: status PROCESSED; Child, Mother and Father shown as separate names (parents "matched, awaiting approval"); the strip shows "To decide" for what is still open.
 2. Decisions > **Consent**, O/dx/consent. Expect: four consent rows (Civil supplies, Health, Citizen record, Girl scheme), all "Waiting". Events > Trail (O/dx/lineage?tab=event&event=<id>): every delivery waiting, nothing delivered.
-3. Demo > Scenario runner, O/dx/scenarios, block "Live demo steps": run **2.8** "the Health system goes down". Expect: a green result.
+3. Demo > Scenario runner, O/dx/scenarios, block "Live demo steps": run **2.4** "the Health system goes down". Expect: a green result.
 4. Citizen: sign in at C/ as **3001**. Expect: the header and profile say **Suma Pagidipalli**. C/approvals shows the child; open it.
 5. Choose Mother, tick the declaration, switch OFF the girl-child scheme, leave Civil supplies, Health and Citizen record on, approve, confirm. Expect the receipt: Civil supplies "Shared", Citizen record "Shared", Health "Approved, not shared yet" (system not reachable), girl scheme "Declined". Never "Shared" for Health. Switch to Telugu (EN | తె in the header) and check the same receipt.
 6. Citizen: C/my-family. Expect: one household for Suma: Suma (head, "YOU"), Rajender (spouse), Vikram (son) and the new child **in the same table**, labelled "Added after birth registration".
 7. Citizen: sign in as **2001**. Expect: the header says Rajender Pagidipalli; C/approvals shows the card read-only, "Answered by Suma".
 8. Officer: Events > Trail, O/dx/lineage?tab=event&event=<id>. Expect: Civil supplies and Citizen record delivered; Health retrying with attempts; girl scheme blocked (parent refused), nothing sent.
 9. Decisions > **Notices**, O/dx/notices. Expect: Civil supplies has a notice to answer; Health has none (it has received nothing yet).
-10. Demo > Scenario runner: run **2.9** "the Health system is back". Citizen: refresh C/approvals/<key>. Expect: Health now "Shared". Notices: Health now has its notice. Rules and records > **Audit**, O/dx/audit: the outage, the retries and the replay are recorded.
+10. Demo > Scenario runner: run **2.5** "the Health system is back". Citizen: refresh C/approvals/<key>. Expect: Health now "Shared". Notices: Health now has its notice. Rules and records > **Audit**, O/dx/audit: the outage, the retries and the replay are recorded.
 11. Decisions > **Approvals**, O/dx/approvals, filter use case UC2. Expect: one row per action (add child to the ration card, request identity reference, any review). Open one: it names the department and the time it has. Approve one with a rationale: a too-short rationale is refused; approving before the parent answered is refused ("Waiting for consent from the parent"). After approving the ration card action: O/dx/events?case=<id> shows **To decide 0** when everything is approved (it counts only what is still open) and the parents show "linked".
 12. Decisions > **Notices**, O/dx/notices: open the Civil supplies notice. Answer it as **Applied** with a reference (for example PDS-REF-AARVI). Citizen: C/my-family. Expect: the child also shows "On the ration card".
 
-## UC2 Scenario 2: A birth with no name, registered months late (2.4, 2.5)
+## UC2 Scenario 2: A birth with no name, registered months late (2.6, 2.7)
 
 Run after Scenario 1 (the same couple).
-1. Demo > Scenario runner, O/dx/scenarios: run **2.10** "a late birth is registered without a name". Expect: green.
+1. Demo > Scenario runner, O/dx/scenarios: run **2.8** "a late birth is registered without a name". Expect: green.
 2. Events > Events, O/dx/events: open the new case. Expect: HELD; no child record, no consent asked, nothing delivered to any department.
-3. Run **2.11** "the name arrives". Events: same registration, now processed, one child (name Karthik), flagged as a late registration; a review item says "late registration". Decisions > Approvals, O/dx/approvals: the late-registration review is listed for a person, not applied automatically.
+3. Run **2.9** "the name arrives". Events: same registration, now processed, one child (name Karthik), flagged as a late registration; a review item says "late registration". Decisions > Approvals, O/dx/approvals: the late-registration review is listed for a person, not applied automatically.
 4. Citizen as **3001**: C/approvals now shows a second approval (Karthik). Expect: no duplicate or orphan child.
 
-## UC2 Scenario 3: The parent does not answer (2.3)
+## UC2 Scenario 3: The parent does not answer (2.11)
 
 1. Run **2.12**: a third child (Ishita). Citizen as **3001**, C/approvals: a pending approval. Do not answer it.
 2. Run **2.13** "the response time runs out". Citizen: refresh C/approvals. Expect: the card for Ishita reads **Expired**.
 3. Decisions > Consent, O/dx/consent. Expect: Expired. Events > Trail for the case: every department blocked, nothing delivered. Rules and records > Policy, O/dx/policy: reminders stop at the cap shown there.
 
-## UC2 Scenario 4: The parents cannot be matched (2.6)
+## UC2 Scenario 4: The parents cannot be matched (2.10)
 
-1. Scenario runner: run **2.6** (automatic). Open the evidence drawer. Expect: the parents could not be matched; no consent can be asked; every department blocked; a review task says why.
+1. Scenario runner: run **2.10** (automatic). Open the evidence drawer. Expect: the parents could not be matched; no consent can be asked; every department blocked; a review task says why.
 2. Decisions > Work queue, O/dx/work (or O/dx/approvals): find the review. Expect: an ambiguity flag; downstream notification blocked until a steward decides; the unmatched parent shows "not matched" with a reason.
 
 ## UC2 Scenario 5: Department notices, response times and bulk answers
@@ -200,7 +200,7 @@ Pass for UC4: no step changes a certificate or a master value; nothing is enroll
 
 # UC5: Household and housing
 
-Run first: copy `mdm-service/tools/demo_uc5_cases.py` to the pod and `--apply` (see the earlier pod pattern: `kubectl -n citizen cp ... $POD:/tmp/...`, then `kubectl -n citizen exec $POD -- sh -c 'cd /opt/app && PYTHONPATH=/opt/app python /tmp/demo_uc5_cases.py --apply'`). Expect five cases: duplicate benefit, deceased person active on the ration card, household conflict, no household, and a clean one.
+Run first: Demo > Scenario runner, O/dx/scenarios, group UC5: click **Clear demo records**, then run live step **5.7** "plant the five housing cases and a housing applicant" (no pod commands needed any more; `mdm-service/tools/demo_uc5_cases.py` still works for the same thing). Expect: five households (duplicate benefit, deceased person active on the ration card, household conflict, no household, and a clean one) and a housing applicant, **Meena Rathod** (citizen sign-in **2801**), with a housing consent waiting for her answer.
 
 ## UC5 Scenario 1: Work queue groups (no household, duplicate benefit, conflict, deceased on card)
 
@@ -221,8 +221,8 @@ kubectl exec -n citizen $(kubectl get pod -n citizen -l app=postgres -o name | h
 
 ## UC5 Scenario 3: Citizen housing card
 
-1. Needs a demo citizen linked to an adult with a pending housing consent. If you have one: C/approvals shows the Housing wording, what is checked, 90 days; a minor never gets an answerable card. If none exists, skip and tell me.
-2. Clean up: `--remove` for UC5.
+1. Citizen: sign in at C/ as **2801** (Meena Rathod). C/approvals shows the Housing consent card: the Housing wording, what is checked, 90 days. Answer it; a minor never gets an answerable card.
+2. Clean up: Demo > Scenario runner > **Clear demo records** removes the UC5 cases and Meena's sign-in.
 
 Pass for UC5: nothing is edited by an approval; one open item per household however many members were checked.
 

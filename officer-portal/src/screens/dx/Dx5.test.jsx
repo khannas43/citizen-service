@@ -173,7 +173,7 @@ describe('Feed quality', () => {
 describe('Story page', () => {
   it('shows each use case as a lane of real screens with the latest scenario result', async () => {
     globalThis.fetch = route({ '/x/demo/scenarios': { items: [
-      { id: '2.2', uc: 'UC2', last: { status: 'PASS' } }, { id: '2.3', uc: 'UC2', last: { status: 'PARTIAL' } }, { id: '2.4', uc: 'UC2', last: null }, { id: '3.1', uc: 'UC3', last: { status: 'FAIL' } }] } })
+      { id: '2.2', uc: 'UC2', last: { status: 'PASS' } }, { id: '2.11', uc: 'UC2', last: { status: 'PARTIAL' } }, { id: '2.6', uc: 'UC2', last: null }, { id: '3.1', uc: 'UC3', last: { status: 'FAIL' } }] } })
     wrap(<DxStory />)
     expect(await screen.findByRole('button', { name: /UC2 · A child is born/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'UC2 scenarios' })).toHaveTextContent('1 of 3 scenarios passed · 1 with a gap · 1 not run')

@@ -9,7 +9,7 @@ from __future__ import annotations
 import json, time, uuid
 from datetime import date, datetime, timedelta, timezone
 
-from . import citizen, demo_uc1, demo_uc2_login, demo_uc3_story, demo_uc4_invite, demo_uc4_story, feed, audit, events, exchange, ops, store, wave3
+from . import citizen, demo_uc1, demo_uc2_login, demo_uc3_story, demo_uc4_invite, demo_uc4_story, demo_uc5_story, feed, audit, events, exchange, ops, store, wave3
 from .db import connect
 from .exchange import PURPOSES, REF_DATE, SYSTEMS, current
 from .matching import prepare
@@ -417,7 +417,7 @@ def s_2_1(k: Kit):
     pr = showcase_couple(k)
     kw = {}
     if pr:                                                        # the showcase family's child has a proper name: a given name and the father's family name
-        given = ("Anvi", "Aarvi", "Navya", "Sahithi", "Tanvi", "Varsha")[int(k.tag, 16) % 6]      # Ishita and Karthik are kept for the live-step children (2.10 to 2.13)
+        given = ("Anvi", "Aarvi", "Navya", "Sahithi", "Tanvi", "Varsha")[int(k.tag, 16) % 6]      # Ishita and Karthik are kept for the live-step children (2.8 to 2.13)
         kw["name"] = f"{given} {pr['fname'].split()[-1]}"
     pr, res = _birth(k, pr, **kw)
     k.ok(res["status"] == "PROCESSED" and res.get("person_id"), "The child birth record is created at once; civil registration is the authority")
@@ -456,7 +456,7 @@ def s_2_2(k: Kit):
     k.ok(bool(back.get("reopened_proposal")), f"If {A} rejects its notice, it goes back to a person for review, with the department's reason", proposal=back.get("reopened_proposal"))
 
 
-def s_2_3(k: Kit):
+def s_2_11(k: Kit):
     pr, res = _birth(k)
     fl = k.flow(res["event_id"])
     c = consent_of(fl, "BIRTH_GIRL_SCHEME") if any(x["purpose"] == "BIRTH_GIRL_SCHEME" for x in fl["consents"]) else consent_of(fl, "BIRTH_HEALTH")
@@ -475,7 +475,7 @@ def s_2_3(k: Kit):
     k.ok(ref["status"] == "REFUSED", "A direct refusal is recorded and equally blocks delivery")
 
 
-def s_2_4(k: Kit):
+def s_2_6(k: Kit):
     pr = couple(k)
     reg = k.reg("B")
     first = k.event("BIRTH_REGISTERED", "UC2", birth_payload(k, pr, name=None, reg=reg), case_kind="NO_NAME")
@@ -490,7 +490,7 @@ def s_2_4(k: Kit):
     k.ok(bool(k.flow(first["event_id"])["consents"]), "Consents are requested only now that the child exists")
 
 
-def s_2_5(k: Kit):
+def s_2_7(k: Kit):
     pr, res = _birth(k, date_of_birth="2025-12-01", registration_date="2026-06-12")
     days = (date(2026, 6, 12) - date(2025, 12, 1)).days
     window = k.pol("late_event_days")
@@ -501,7 +501,7 @@ def s_2_5(k: Kit):
     k.ok(any(p["status"] == "PROPOSED" for p in k.proposals(res["event_id"])), "The item lands in review, nothing is applied")
 
 
-def s_2_6(k: Kit):
+def s_2_10(k: Kit):
     res = k.event("BIRTH_REGISTERED", "UC2", {"registration_no": f"DEMO-B-{k.tag}", "child_name": f"Parent Check {k.tag}", "gender": "M", "date_of_birth": "2026-06-10",
                                               "father_name": f"Zxqv Unknown{k.tag}", "mother_name": f"Wplm Missing{k.tag}", "place": "Medak", "registration_date": "2026-06-11"}, case_kind="PARENT_MISMATCH")
     rv = k.proposals(res["event_id"], "REVIEW_PARENTS")
@@ -511,7 +511,7 @@ def s_2_6(k: Kit):
     k.ok(not any(p["kind"] == "ADD_TO_RATION_CARD" for p in k.proposals(res["event_id"])), "No ration-card change is proposed")
 
 
-def s_2_7(k: Kit):
+def s_2_3(k: Kit):
     pr = couple(k)
     try:
         exchange.set_subscriber(k.cur, "health", False, ACTOR, "demo: stop one adapter")
@@ -552,7 +552,7 @@ def _health_trouble(k):
     return k.q("SELECT id, status FROM mdm.delivery WHERE system='health' AND kind='EVENT' AND status IN ('RETRYING','DEAD_LETTER') ORDER BY id")
 
 
-def s_2_8(k: Kit):
+def s_2_4(k: Kit):
     """Live step: Health's system goes down before the parent answers. Whatever she approves for Health will wait, not be sent."""
     _live_family(k)
     exchange.set_subscriber(k.cur, "health", False, ACTOR, "Demo: the Health system goes down")
@@ -561,7 +561,7 @@ def s_2_8(k: Kit):
     k.info("Next: Suma approves on the citizen portal. Health will show 'approved, not shared yet' while the other departments show 'shared'.")
 
 
-def s_2_9(k: Kit):
+def s_2_5(k: Kit):
     """Live step: Health's system comes back; the waiting and set-aside items are retried and delivered."""
     _live_family(k)
     exchange.set_subscriber(k.cur, "health", True, ACTOR, "Demo: the Health system is back")
@@ -573,23 +573,23 @@ def s_2_9(k: Kit):
     k.info("Next: refresh Suma's approval. Health now reads 'shared'.")
 
 
-def s_2_10(k: Kit):
+def s_2_8(k: Kit):
     """Live step: a second child is registered months late and without a name. Nothing is created until the name arrives."""
     pr = _live_family(k)
     reg = k.reg("B")
     res = k.event("BIRTH_REGISTERED", "UC2", birth_payload(k, pr, name=None, reg=reg, gender="M", date_of_birth="2025-12-01", registration_date="2026-06-12"), case_kind="NO_NAME")
     k.ok(res["status"] == "HELD", "A birth without a name is held: no child record, no consent request, nothing sent to any department")
     k.ok(not k.q("SELECT 1 FROM mdm.person p JOIN mdm.event e ON e.person_id=p.id WHERE e.id=%s", res["event_id"]), "No person exists for it, so there is nothing to duplicate or orphan downstream")
-    k.info("Next: run step 2.11, when the family gives the name.", registration=reg)
+    k.info("Next: run step 2.9, when the family gives the name.", registration=reg)
 
 
-def s_2_11(k: Kit):
+def s_2_9(k: Kit):
     """Live step: the name arrives for the held birth. The same child is created, flagged as a late registration."""
-    held = k.one("SELECT id, payload FROM mdm.event WHERE scenario='2.10' AND status='HELD' ORDER BY id DESC LIMIT 1")
+    held = k.one("SELECT id, payload FROM mdm.event WHERE scenario='2.8' AND status='HELD' ORDER BY id DESC LIMIT 1")
     if not held:
-        k.skip("Run step 2.10 first")
+        k.skip("Run step 2.8 first")
     pl = held["payload"] if isinstance(held["payload"], dict) else json.loads(held["payload"])
-    am = k.event("BIRTH_AMENDED", "UC2", {"registration_no": pl["registration_no"], "child_name": f"Karthik {pl['father_name'].split()[-1]}"}, scenario="2.10", case_kind="AMENDMENT")
+    am = k.event("BIRTH_AMENDED", "UC2", {"registration_no": pl["registration_no"], "child_name": f"Karthik {pl['father_name'].split()[-1]}"}, scenario="2.8", case_kind="AMENDMENT")
     k.ok(bool(am.get("person_id")) and am["event_id"] == held["id"], "The name is applied to the same registration; one child, no duplicate", person_id=am.get("person_id"))
     ev = k.one("SELECT status, note FROM mdm.event WHERE id=%s", held["id"])
     k.ok(ev["status"] == "PROCESSED", "The held birth is now processed")
@@ -932,6 +932,18 @@ def s_4_8(k: Kit):
     k.info("Next: Control Tower, Run daily checks now. That ends her mother's permission and asks Kavya for her own. Nothing is enrolled.")
 
 
+def s_5_7(k: Kit):
+    """Live step: plants the five housing household cases and a housing applicant (sign-in 2801) with a consent waiting for her answer."""
+    out = demo_uc5_story.plant(k.cur, ACTOR)
+    got = {r["case"]: r["reason_code"] for r in out["cases"]}
+    want = demo_uc5_story.EXPECT
+    k.ok(all(got[c] == want[c] for c in demo_uc5_story.CASES), "Each case raises the right item through the real housing check, and the clean case raises none", got=got)
+    ap = citizen.list_approvals(k.cur, demo_uc5_story.LOGIN)
+    cards = [i for i in ap["items"] if i.get("status") == "PENDING"]
+    k.ok(len(cards) >= 1, f"{demo_uc5_story.APPLICANT}, signed in as {demo_uc5_story.LOGIN}, has a housing consent card waiting for her answer", cards=len(cards))
+    k.info("Next: Decisions > Work queue shows the four housing groups. Sign in to the citizen portal as 2801 to answer the housing consent.")
+
+
 def s_4_6(k: Kit):
     a = k.ask("education", "SCHOLARSHIP_ELIGIBILITY", "RESIDENT", {}, token=f"IDR-OTHERSTATE-{k.tag}")
     k.ok(a["outcome"] == "NO_RECORD", "An applicant not known to Telangana records gets 'no record'", message=a.get("message"))
@@ -1249,7 +1261,7 @@ def c_3(k: Kit):
 
 
 def c_4(k: Kit):
-    s_2_7(k)
+    s_2_3(k)
     pr = couple(k)
     body = birth_payload(k, pr)
     first = k.event("BIRTH_REGISTERED", "UC2", body, case_kind="DEMO")
@@ -1762,6 +1774,7 @@ def reset(cur, actor: str) -> dict:
     n["uc1_citizen_demo"] = sum(demo_uc1.clear_all(cur).values())      # a count, like the other lines
     n["uc4_story"] = demo_uc4_story.clear(cur).get("people", 0)
     n["uc3_story"] = demo_uc3_story.clear(cur).get("people", 0)
+    n["uc5_story"] = demo_uc5_story.clear(cur).get("people", 0)
     demo_uc2_login.restore(cur)
     d("ledger_rows_for_new_children", "DELETE FROM mdm.exchange WHERE person_id = ANY(%s)", born)
     d("notices", "DELETE FROM mdm.dept_response WHERE event_id IN (SELECT id FROM mdm.event WHERE event_key LIKE 'DEMO-%%')")

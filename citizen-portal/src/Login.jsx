@@ -15,6 +15,7 @@ const DEMO_USERS = [
   { label: 'Yellavva Erukala', aadhaar: 'XXXX-XXXX-5001' },
   { label: 'Kavya Muthyala', aadhaar: 'XXXX-XXXX-2601' },
   { label: 'Sarojini Goud', aadhaar: 'XXXX-XXXX-2701' },
+  { label: 'Meena Rathod', aadhaar: 'XXXX-XXXX-2801' },
 ]
 
 export default function Login() {
