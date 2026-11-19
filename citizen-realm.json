@@ -219,6 +219,22 @@
         "containerId": "a88b43ad-2d7c-4f67-bd82-cfa5e67ccd5a"
       },
       {
+        "id": "c0de0001-pds0-4a11-8f01-deptrole00001",
+        "name": "PDS_OFFICER",
+        "description": "PDS_OFFICER role",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "a88b43ad-2d7c-4f67-bd82-cfa5e67ccd5a"
+      },
+      {
+        "id": "c0de0002-hlth-4a11-8f01-deptrole00002",
+        "name": "HEALTH_OFFICER",
+        "description": "HEALTH_OFFICER role",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "a88b43ad-2d7c-4f67-bd82-cfa5e67ccd5a"
+      },
+      {
         "id": "6c27d402-deb4-4f7c-a675-0634bbc9e936",
         "name": "offline_access",
         "description": "${role_offline-access}",
@@ -961,6 +977,78 @@
       },
       "realmRoles": [
         "TALATI",
+        "default-roles-citizen"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "officer123",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "state_code": [
+          "TG"
+        ]
+      }
+    },
+    {
+      "id": "c0de1001-pds0-4u11-8f01-deptuser00001",
+      "username": "pds.officer",
+      "firstName": "Civil supplies officer",
+      "email": "pds.officer@demo.gov.in",
+      "emailVerified": true,
+      "createdTimestamp": 1787156716000,
+      "enabled": true,
+      "totp": false,
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "notBefore": 0,
+      "access": {
+        "manageGroupMembership": true,
+        "view": true,
+        "mapRoles": true,
+        "impersonate": true,
+        "manage": true
+      },
+      "realmRoles": [
+        "PDS_OFFICER",
+        "default-roles-citizen"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "officer123",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "state_code": [
+          "TG"
+        ]
+      }
+    },
+    {
+      "id": "c0de1002-hlth-4u11-8f01-deptuser00002",
+      "username": "health.officer",
+      "firstName": "Health officer",
+      "email": "health.officer@demo.gov.in",
+      "emailVerified": true,
+      "createdTimestamp": 1787156716100,
+      "enabled": true,
+      "totp": false,
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "notBefore": 0,
+      "access": {
+        "manageGroupMembership": true,
+        "view": true,
+        "mapRoles": true,
+        "impersonate": true,
+        "manage": true
+      },
+      "realmRoles": [
+        "HEALTH_OFFICER",
         "default-roles-citizen"
       ],
       "credentials": [

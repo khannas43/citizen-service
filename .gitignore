@@ -75,3 +75,5 @@ yarn-error.log*
 
 # bulky all-India LGD downloads; commit the per-state CSVs made by scripts/lgd_to_csv.py instead
 state-packs/*/lgd/*.xlsx
+*.bak
+*.bak

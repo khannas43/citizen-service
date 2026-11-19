@@ -134,7 +134,7 @@ print('  done')
 PY
 
 echo "Creating realm roles..."
-for ROLE in DATA_ENTRY_OFFICER TALATI REVENUE_OFFICER SCHEME_DEPT DEPT_ADMIN IT_ADMIN SENIOR_MGMT; do
+for ROLE in DATA_ENTRY_OFFICER TALATI REVENUE_OFFICER SCHEME_DEPT DEPT_ADMIN IT_ADMIN SENIOR_MGMT PDS_OFFICER HEALTH_OFFICER; do
   curl -s -o /dev/null -X POST "${KEYCLOAK_URL}/admin/realms/citizen/roles" \
     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
     -H 'Content-Type: application/json' \
@@ -203,6 +203,8 @@ create_user "dept.admin2" "Department Admin 2" "DEPT_ADMIN"
 create_user "dept_admin"  "Department Admin"   "DEPT_ADMIN"
 create_user "it.admin"    "IT Secretary"       "IT_ADMIN"
 create_user "senior.mgmt" "Senior Management"  "SENIOR_MGMT"
+create_user "pds.officer" "Civil supplies officer" "PDS_OFFICER"
+create_user "health.officer" "Health officer" "HEALTH_OFFICER"
 
 echo "Keycloak setup complete."
 
