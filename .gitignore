@@ -77,3 +77,4 @@ yarn-error.log*
 state-packs/*/lgd/*.xlsx
 *.bak
 *.bak
+translation-service/token.rtf
