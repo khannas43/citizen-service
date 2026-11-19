@@ -1,0 +1,5 @@
+{
+  "_note": "keep: terms left exactly as written. map: English term -> the Telugu your reviewer approved (add pairs here; an empty map is fine). Reload by restarting the service.",
+  "keep": ["MDM", "PDS", "OTP", "UPI", "API", "CSV", "IDR", "DEMO", "Great Expectations", "Aarogyasri", "Rythu Bandhu", "Kalyana Lakshmi", "Shaadi Mubarak", "Mee Seva"],
+  "map": {}
+}

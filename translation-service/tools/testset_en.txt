@@ -1,0 +1,40 @@
+Birth record not found in our register.
+The date of birth does not match the school certificate.
+Rejected because the parent's name is spelled differently in the two records.
+Pension stopped after the death was confirmed on 14 March.
+The family has moved to another district; please update the address.
+Income certificate is older than six months and cannot be accepted.
+We could not verify the applicant's identity with the details provided.
+This notice was acknowledged. No further action is needed by the department.
+The ration card already lists this child under another household.
+Marriage registration is pending; the groom's age proof is missing.
+Please send the corrected record within seven working days.
+The scholarship was closed because the student has passed the final year.
+The land record shows a different owner. Contact the sub-registrar office.
+Consent was withdrawn by the parent; stop using the data for this purpose.
+Duplicate entry found. The older record has been kept and the newer one merged into it.
+The electricity connection is registered in the name of the deceased.
+Address could not be matched to a village or ward.
+The mother's name is missing from the birth certificate.
+Applicant is above the age limit for this scheme.
+The document is not readable. Please upload a clearer copy.
+Death registered at the hospital; the family has been informed.
+The nominee has been contacted and has confirmed the details.
+Household income exceeds the limit for this benefit.
+Record updated at the source. No change needed here.
+A steward has reviewed the possible match and kept the two people separate.
+The caste certificate has expired and must be renewed.
+We are unable to process this request because the department system was offline.
+The child has been added to the ration card of the family.
+Aadhaar details are not stored here; only a reference token is held.
+The request was refused because the person has not given consent for this use.
+Your report of a wrong value has been sent to the department that owns the record.
+The housing application is under review and a decision is expected within thirty days.
+Please visit the nearest service centre with the original documents.
+The widow pension was approved with effect from the first of this month.
+Gender recorded as female in one system and male in another.
+The department will correct the date of birth and confirm by next week.
+This value is correct in our records. No correction is required.
+Vehicle registration could not be linked to any person in the master record.
+The farmer's land succession has been flagged for the revenue office.
+Thank you. The matter is closed.

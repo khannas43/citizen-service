@@ -1,0 +1,82 @@
+# Self-hosted machine translation (IndicTrans2). Off by default in the MDM service (MT_ENABLED=false); this pod can be left unapplied.
+# The model is gated on Hugging Face: create the secret once access is granted
+#   kubectl -n citizen create secret generic hf-token --from-literal=token=hf_xxx
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: translation-models
+  namespace: citizen
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 4Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: translation-service
+  namespace: citizen
+  labels:
+    app: translation-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: translation-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: translation-service
+    spec:
+      containers:
+        - name: translation-service
+          image: cs-translation-service:dev
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8200
+          env:
+            - name: MT_ENGINE
+              value: "indictrans2"
+            - name: MT_LANGS
+              value: "te"
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: token
+                  optional: true
+          volumeMounts:
+            - name: models
+              mountPath: /models
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8200
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "250m"
+            limits:
+              memory: "2560Mi"
+              cpu: "2000m"
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: translation-models
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: translation-service
+  namespace: citizen
+spec:
+  selector:
+    app: translation-service
+  ports:
+    - name: http
+      port: 8200
+      targetPort: 8200
