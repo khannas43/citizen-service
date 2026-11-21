@@ -68,11 +68,11 @@ function Detail({ id, reload }) {
   return (
     <div className="dxk-stackform" aria-label={tr('Connector detail')}>
       <Facts items={[
-        ['State', <span key="s"><Tag map={CONNECTOR} value={c.status} /> {!c.available && <Badge tone="bad">{tr('Department offline')}</Badge>}</span>],
-        ['Owner', c.system_name], ['Interface', c.interface || '—'], ['Connects by', c.auth_name],
-        ['Records held', `${c.stats.records.toLocaleString('en-IN')} · latest as of ${c.stats.latest_as_of ? String(c.stats.latest_as_of).slice(0, 10) : '—'}`],
-        ['Needs a steward', `${c.stats.waiting_for_steward} identity matches · ${c.stats.open_quality_issues} quality issues`],
-        ['Events to it', Object.entries(c.deliveries).map(([k, n]) => `${k.toLowerCase().replace(/_/g, ' ')} ${n}`).join(' · ') || '—'],
+        ['State', <span key="s"><Tag map={CONNECTOR} value={c.status} /> {!c.available && <Badge tone="bad">{tr('Department offline')}</Badge>}</span>, tr('Where this feed is in its life: draft, testing, live or suspended. Only a live feed sends data into the exchange.')],
+        ['Owner', c.system_name, tr('The department that owns this data and is responsible for it.')], ['Interface', c.interface || '—', tr("The technical way the department's data reaches us, for example a REST API, a daily file or a database view.")], ['Connects by', c.auth_name, tr('How the connection is secured. Operator-keyed entry is the least reliable method and is flagged in quality checks.')],
+        ['Records held', `${c.stats.records.toLocaleString('en-IN')} · latest as of ${c.stats.latest_as_of ? String(c.stats.latest_as_of).slice(0, 10) : '—'}`, tr("Everything held from this feed since it was first loaded, with no date filter. The date is the newest record's own 'data as of' date, not the time of loading.")],
+        ['Needs a steward', `${c.stats.waiting_for_steward} identity matches · ${c.stats.open_quality_issues} quality issues`, tr("Today's open work for data stewards, not a lifetime total. Identity matches are records the system could not confidently link to a person. Quality issues are open data problems. Both fall as stewards resolve them.")],
+        ['Events to it', Object.entries(c.deliveries).map(([k, n]) => `${k.toLowerCase().replace(/_/g, ' ')} ${n}`).join(' · ') || '—', tr('Events sent to this department, such as a birth notice, grouped by delivery status. Empty for a department that only supplies data.')],
       ]} />
       {c.status !== 'ACTIVE' && (
         <>

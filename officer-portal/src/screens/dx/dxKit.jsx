@@ -274,10 +274,10 @@ function factValue(v) {
 export function Facts({ items }) {
   return (
     <dl className="dxk-facts">
-      {items.filter((i) => i && i[1] !== undefined && i[1] !== null && i[1] !== '').map(([k, v]) => {
+      {items.filter((i) => i && i[1] !== undefined && i[1] !== null && i[1] !== '').map(([k, v, hint]) => {
         const shown = factValue(v)
         if (shown === null || shown === '') return null
-        return <div key={k}><dt>{T(k)}</dt><dd>{shown}</dd></div>
+        return <div key={k} title={hint || undefined} className={hint ? 'dxk-fact-hint' : undefined}><dt>{T(k)}</dt><dd>{shown}</dd></div>
       })}
     </dl>
   )
