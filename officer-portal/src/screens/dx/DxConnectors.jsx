@@ -54,7 +54,7 @@ function Onboard({ meta, done }) {
 function Detail({ id, reload }) {
   const { data: c, error, loading, reload: again } = useMdm(`/x/connectors/${id}`, undefined, [id])
   const { data: meta } = useMdm('/x/connectors', undefined, [])
-  const [reason, setReason] = useState('')
+  const [reason, setReason] = useState(null)
   const [test, setTest] = useState(null)
   const [msg, setMsg] = useState(null)
   const [map, setMap] = useState(null)
@@ -63,6 +63,7 @@ function Detail({ id, reload }) {
     setMsg(null)
     try { const r = await mdm(path, { method: 'POST', body }); after?.(r); again(); reload() } catch (e) { setMsg(e.message) }
   }
+  const shownReason = reason ?? tr(c.status === 'ACTIVE' ? 'Suspended for review.' : 'Checks passed; approved to go live.')
   const mapping = map ?? Object.entries(c.mapping || {}).map(([field, element]) => ({ field, element }))
   return (
     <div className="dxk-stackform" aria-label={tr('Connector detail')}>
@@ -97,10 +98,10 @@ function Detail({ id, reload }) {
         <ul className="mdm-plain" aria-label={tr('Test result')}>{(test || c.last_test).checks.map((x) => <li key={x.check}>{x.ok ? '✔' : '✖'} {x.check}{x.note ? <span className="mdm-sub"> — {x.note}</span> : null}</li>)}</ul>
       )}
       <div className="dxk-stackform">
-        <label className="dxk-field"><span>{tr('Reason (recorded against your name)')}</span><input value={reason} onChange={(e) => setReason(e.target.value)} /></label>
+        <label className="dxk-field"><span>{tr('Reason (recorded against your name)')}</span><input value={shownReason} onChange={(e) => setReason(e.target.value)} /></label>
         <div className="dxk-actions">
-          {c.status !== 'ACTIVE' && <button type="button" className="btn-primary" disabled={reason.trim().length < 10} onClick={() => go(`/x/connectors/${id}/state`, { action: 'ACTIVATE', reason }, () => setReason(''))}>{tr('Make live')}</button>}
-          {c.status === 'ACTIVE' && <button type="button" className="btn-secondary" disabled={reason.trim().length < 10} onClick={() => go(`/x/connectors/${id}/state`, { action: 'SUSPEND', reason }, () => setReason(''))}>{tr('Suspend')}</button>}
+          {c.status !== 'ACTIVE' && <button type="button" className="btn-primary" disabled={shownReason.trim().length < 10} onClick={() => go(`/x/connectors/${id}/state`, { action: 'ACTIVATE', reason: shownReason }, () => setReason(null))}>{tr('Make live')}</button>}
+          {c.status === 'ACTIVE' && <button type="button" className="btn-secondary" disabled={shownReason.trim().length < 10} onClick={() => go(`/x/connectors/${id}/state`, { action: 'SUSPEND', reason: shownReason }, () => setReason(null))}>{tr('Suspend')}</button>}
         </div>
       </div>
       {msg && <Banner tone="bad">{msg}</Banner>}

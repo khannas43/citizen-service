@@ -25,13 +25,17 @@ const detail = (o = {}) => ({ id: 2, name: 'Water board', status: 'TESTING', sys
   stats: { records: 0, latest_as_of: null, waiting_for_steward: 0, open_quality_issues: 0 }, deliveries: {}, log: [{ ts: '2026-10-28T10:00:00Z', actor: 'a', action: 'TESTED', detail: {} }], ...o })
 
 describe('Connectors', () => {
-  it('will not make a feed live without a reason, and records the reason', async () => {
+  it('pre-fills a reason, refuses a too-short one, and records the reason', async () => {
     const posted = []
     globalThis.fetch = route({ '/x/connectors/2/state': (u, init) => { posted.push(JSON.parse(init.body)); return json(detail({ status: 'ACTIVE' })) }, '/x/connectors/2': detail(), '/x/connectors': meta })
     wrap(<DxConnectors />, '/dx/connectors?id=2')
     const live = await screen.findByRole('button', { name: 'Make live' })
+    const box = screen.getByLabelText(/Reason \(recorded/)
+    expect(box).toHaveValue('Checks passed; approved to go live.')
+    expect(live).toBeEnabled()
+    fireEvent.change(box, { target: { value: 'short' } })
     expect(live).toBeDisabled()
-    fireEvent.change(screen.getByLabelText(/Reason \(recorded/), { target: { value: 'Tested with the department' } })
+    fireEvent.change(box, { target: { value: 'Tested with the department' } })
     expect(live).toBeEnabled()
     fireEvent.click(live)
     await waitFor(() => expect(posted).toEqual([{ action: 'ACTIVATE', reason: 'Tested with the department' }]))

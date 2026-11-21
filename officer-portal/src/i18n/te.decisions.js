@@ -852,6 +852,8 @@ export default {
   "Field mapping": "ఫీల్డ్ అనుసంధానం",
   "Save mapping": "అనుసంధానాన్ని భద్రపరచండి",
   "Step 3: test, then make it live": "3వ దశ: పరీక్షించి, తరువాత ప్రత్యక్షం చేయండి",
+  "Checks passed; approved to go live.": "తనిఖీలు విజయవంతమయ్యాయి; ప్రత్యక్షం చేయడానికి ఆమోదించబడింది.",
+  "Suspended for review.": "సమీక్ష కోసం నిలిపివేయబడింది.",
   "Run the checks": "తనిఖీలను నడపండి",
   "Test result": "పరీక్ష ఫలితం",
   "Reason (recorded against your name)": "కారణం (మీ పేరుతో నమోదవుతుంది)",
