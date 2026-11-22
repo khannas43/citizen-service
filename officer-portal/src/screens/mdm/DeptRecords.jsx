@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useMdm, Status } from './shared'
 import { tr } from '../../i18n/lang'
 import { fmtDate } from './labels'
@@ -45,11 +46,17 @@ function Ledger({ l }) {
   )
 }
 
-function Account({ a }) {
+function Account({ a, open, toggle }) {
+  const body = `dr-body-${a.source}-${a.id}`
   return (
     <article className="ut-card" data-testid="dept-account">
-      <header className="ut-head"><div><h3 className="ut-title">{a.title}</h3><p className="ut-sub">{a.subtitle}</p></div><Pill s={a.status} /></header>
-      <div className="ut-body">
+      <button type="button" className="ut-head ut-head-btn" aria-expanded={open} aria-controls={body} onClick={toggle}>
+        <span className="ut-chev" aria-hidden="true">{open ? '▾' : '▸'}</span>
+        <span className="ut-head-text"><span className="ut-title">{a.title}</span><span className="ut-sub">{a.subtitle}</span></span>
+        <Pill s={a.status} />
+      </button>
+      {open && (
+      <div className="ut-body" id={body}>
         {a.facts.length > 0 && <dl className="ut-kv">{a.facts.map((f) => <div key={f.label}><dt>{f.label}</dt><dd>{show(f.value, f.type)}</dd></div>)}</dl>}
         {a.ledgers.map((l) => <Ledger key={l.title} l={l} />)}
         {a.benefits.length > 0 && (
@@ -70,22 +77,41 @@ function Account({ a }) {
           </section>
         )}
       </div>
+      )}
     </article>
   )
 }
 
 export default function DeptRecords({ personId }) {
   const { data, error, loading } = useMdm(`/persons/${personId}/departments`, undefined, [personId])
+  const [open, setOpen] = useState({})
   if (!data) return <Status loading={loading} error={error} />
   if (data.departments.length === 0) return <p className="mdm-sub">{tr('No department has supplied details beyond the basic record for this person.')}</p>
+  const keys = data.departments.flatMap((d) => d.accounts.map((a) => `${a.source}-${a.id}`))
+  const setAll = (v) => setOpen(Object.fromEntries(keys.map((k) => [k, v])))
+  const flip = (k) => setOpen((o) => ({ ...o, [k]: !o[k] }))
+  const openCount = keys.filter((k) => open[k]).length
   return (
     <div className="dr ut">
-      {data.departments.map((dep) => (
-        <section key={dep.source} aria-label={dep.department} className="ut">
-          <div className="ut-dept"><span aria-hidden="true">{dep.icon}</span><h2>{dep.department}</h2></div>
-          {dep.accounts.map((a) => <Account key={`${a.source}-${a.id}`} a={a} />)}
-        </section>
-      ))}
+      <div className="dr-bar">
+        <span className="mdm-sub">{tr('{n} department records', { n: keys.length })}</span>
+        <span className="dr-bar-actions">
+          <button type="button" className="btn-secondary small" disabled={openCount === keys.length} onClick={() => setAll(true)}>{tr('Expand all')}</button>
+          <button type="button" className="btn-secondary small" disabled={openCount === 0} onClick={() => setAll(false)}>{tr('Collapse all')}</button>
+        </span>
+      </div>
+      {data.departments.map((dep) => {
+        const ks = dep.accounts.map((a) => `${a.source}-${a.id}`)
+        const allOpen = ks.every((k) => open[k])
+        return (
+          <section key={dep.source} aria-label={dep.department} className="ut">
+            <button type="button" className="ut-dept ut-dept-btn" aria-expanded={allOpen} onClick={() => setOpen((o) => ({ ...o, ...Object.fromEntries(ks.map((k) => [k, !allOpen])) }))}>
+              <span aria-hidden="true">{dep.icon}</span><h2>{dep.department}</h2><span className="ut-dept-n">{ks.length}</span><span className="ut-chev" aria-hidden="true">{allOpen ? '▾' : '▸'}</span>
+            </button>
+            {dep.accounts.map((a) => { const k = `${a.source}-${a.id}`; return <Account key={k} a={a} open={!!open[k]} toggle={() => flip(k)} /> })}
+          </section>
+        )
+      })}
       <p className="ut-note">{data.note}</p>
     </div>
   )
