@@ -191,6 +191,15 @@ def person360(pid: int, cur=Depends(cur_dep), _=Depends(auth.can_read)):
             "audit": audit_rows, "could_belong": could}
 
 
+@router.get("/api/persons/{pid}/departments")
+def person_departments(pid: int, cur=Depends(cur_dep), _=Depends(auth.can_read)):
+    from . import dept_profile
+    cur.execute("SELECT 1 FROM mdm.person WHERE id=%s", (pid,))
+    if not cur.fetchone():
+        raise HTTPException(404, "Person not found")
+    return dept_profile.profile(cur, pid)
+
+
 @router.get("/api/persons/{pid}/graph")
 def person_graph(pid: int, cur=Depends(cur_dep), _=Depends(auth.can_read)):
     cur.execute("SELECT 1 FROM mdm.person WHERE id=%s", (pid,))

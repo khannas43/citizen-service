@@ -5,7 +5,7 @@ from typing import Any, Optional
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, Field
 
-from . import auth, citizen, utilities
+from . import auth, citizen, dept_profile
 from .api import cur_dep
 from .stewardship import Refused
 
@@ -136,9 +136,9 @@ def reports_list(ref: str = Depends(me), cur=Depends(cur_dep)):
     return run(citizen.list_reports, cur, ref)
 
 
-@router.get("/api/citizen/utilities")
-def my_utilities(ref: str = Depends(me), cur=Depends(cur_dep)):
-    return run(utilities.utilities, cur, ref)
+@router.get("/api/citizen/records")
+def my_records(ref: str = Depends(me), cur=Depends(cur_dep)):
+    return run(lambda: dept_profile.profile(cur, citizen.person_of(cur, ref)))
 
 
 @router.get("/api/citizen/household")

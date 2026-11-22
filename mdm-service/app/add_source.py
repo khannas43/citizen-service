@@ -206,11 +206,9 @@ def add(cur, count: int = 1000, actor: str = "loader") -> dict:
         if status == "IN_REVIEW":                          # bills follow the connection once a steward decides who it belongs to
             reviews.append((rid, _js([{"person_id": x["person_id"], "score": x["score"], "evidence": x["evidence"]} for x in cands])))
             continue
-        kids = [(SOURCE, b["bill_no"], "BILL", c["consumer_name"], None, None, None, b["issued_on"], _js(b), pid, "AUTO_LINKED", 1.0,
-                 f"Bill for connection {c['service_no']}", "{}", load_id) for b in bills]
-        kids += [(SOURCE, s["claim_id"], "SUBSIDY", c["consumer_name"], None, None, None, s["from"], _js(s), pid, "AUTO_LINKED", 1.0,
-                  f"Subsidy claim on connection {c['service_no']}", "{}", load_id) for s in subs]
-        cur.executemany(sql, kids)
+        entries = [(pid, SOURCE, c["service_no"], "BILL", b["period"], b["issued_on"], b["amount_payable"], _js(b)) for b in bills]
+        entries += [(pid, SOURCE, c["service_no"], "BENEFIT", None, s["from"], s["amount_waived"], _js(s)) for s in subs]
+        cur.executemany("INSERT INTO mdm.dept_entry (person_id, source, parent_rid, kind, period, entry_date, amount, payload) VALUES (%s,%s,%s,%s,%s,%s,%s,%s::jsonb)", entries)
         n_bills += len(bills)
         n_subs += len(subs)
     cur.executemany("INSERT INTO mdm.review_task (record_id, candidates) VALUES (%s, %s::jsonb)", reviews)
@@ -233,6 +231,7 @@ def add(cur, count: int = 1000, actor: str = "loader") -> dict:
 def remove(cur, actor: str = "loader") -> dict:
     cur.execute("SELECT DISTINCT person_id FROM mdm.source_record WHERE source=%s", (SOURCE,))
     pids = [r["person_id"] for r in cur.fetchall()]
+    cur.execute("DELETE FROM mdm.dept_entry WHERE source=%s", (SOURCE,))
     cur.execute("DELETE FROM mdm.source_record WHERE source=%s", (SOURCE,))
     cur.execute("DELETE FROM mdm.connector WHERE source=%s AND created_by='system'", (SOURCE,))
     gone = 0

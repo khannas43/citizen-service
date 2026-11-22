@@ -31,6 +31,14 @@ ELEMENTS = {
     "electricity_link": ("Electricity connection linked", "electricity", "LOW"), "water_connection": ("Water connection and meter details", "water", "LOW"), "water_payment_status": ("Water bill payment status", "water", "MEDIUM"),
     "water_subsidy": ("Water subsidy received", "water", "HIGH"), "land_holding": ("Land held", "revenue", "HIGH"),
     "duplicate_benefit": ("Duplicate application flag", "housing", "MEDIUM"),
+    # department detail, history and benefits shown to the citizen and to officers (illustrative demonstration data)
+    "electricity_payment_status": ("Electricity bill payment status", "electricity", "MEDIUM"), "electricity_subsidy": ("Electricity subsidy received", "electricity", "HIGH"),
+    "ration_card_details": ("Ration card details", "pds", "MEDIUM"), "ration_drawn": ("Ration drawn each month", "pds", "MEDIUM"), "ration_subsidy": ("Ration subsidy received", "pds", "MEDIUM"),
+    "pension_details": ("Pension details", "pension", "MEDIUM"), "pension_payments": ("Pension payments", "pension", "MEDIUM"),
+    "scholarship_details": ("Student and scholarship details", "education", "MEDIUM"), "scholarship_disbursed": ("Scholarship released", "education", "MEDIUM"),
+    "housing_sanction": ("Housing application and sanction", "housing", "MEDIUM"), "housing_instalments": ("Housing instalments released", "housing", "MEDIUM"),
+    "certificate_details": ("Revenue certificate details", "revenue", "LOW"), "land_mutations": ("Land mutation history", "revenue", "HIGH"), "farm_support": ("Crop-support payments", "revenue", "HIGH"),
+    "marriage_assistance": ("Marriage assistance received", "marriage_register", "MEDIUM"),
     # carried by a birth event (UC2); Civil registration is the source of truth for all four
     "child_name": ("Child's name", "crs", "MEDIUM"), "date_of_birth": ("Date of birth", "crs", "MEDIUM"),
     "gender": ("Gender", "crs", "LOW"), "parents": ("Parents named at registration", "crs", "MEDIUM"),
@@ -38,6 +46,10 @@ ELEMENTS = {
 # the exact feed each element is taken from, so the catalogue can link an element to its source by name
 ELEMENT_SOURCE = {"age": "crs", "residence": "pds_view", "life_status": "crs", "income_band": "revenue_certificates", "category": "revenue_certificates",
                   "household_benefit": "housing", "marital_status": "marriage_register", "electricity_link": "electricity", "water_connection": "water_board", "water_payment_status": "water_board", "water_subsidy": "water_board",
+                  "electricity_payment_status": "electricity", "electricity_subsidy": "electricity", "ration_card_details": "pds_view", "ration_drawn": "pds_view", "ration_subsidy": "pds_view",
+                  "pension_details": "pension_batch", "pension_payments": "pension_batch", "scholarship_details": "student_portal", "scholarship_disbursed": "student_portal",
+                  "housing_sanction": "housing", "housing_instalments": "housing", "certificate_details": "revenue_certificates", "land_mutations": "revenue_land", "farm_support": "revenue_land",
+                  "marriage_assistance": "marriage_register",
                   "land_holding": "revenue_land", "duplicate_benefit": "housing",
                   "child_name": "crs", "date_of_birth": "crs", "gender": "crs", "parents": "crs"}
 QUERYABLE = ["age", "residence", "income_band", "category", "life_status", "household_benefit", "marital_status", "electricity_link", "land_holding"]
