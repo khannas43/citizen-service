@@ -429,6 +429,8 @@ export default function ApplyForm({ service }) {
                   <select value={gender} onChange={(e) => setGender(e.target.value)}>
                     <option value="M">{t('genders.M')}</option>
                     <option value="F">{t('genders.F')}</option>
+                    <option value="T">{t('genders.T')}</option>
+                    <option value="N">{t('genders.N')}</option>
                   </select>
                 </label>
                 <label className="field">

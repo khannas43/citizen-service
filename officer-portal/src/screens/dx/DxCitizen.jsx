@@ -1,3 +1,4 @@
+import { genderText } from '../../gender'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { mdm } from '../../mdmApi'
@@ -26,7 +27,7 @@ export default function DxMyData() {
       {data?.person && (
         <>
           <Card title={data.person.name} hint={data.note}>
-            <Facts items={[['Born', data.person.dob || data.person.birth_year || '—'], ['Gender', data.person.gender || '—'], ['District', data.person.district || '—'], ['Address', data.person.address || '—']]} />
+            <Facts items={[['Born', data.person.dob || data.person.birth_year || '—'], ['Gender', genderText(data.person.gender) || '—'], ['District', data.person.district || '—'], ['Address', data.person.address || '—']]} />
           </Card>
           <Card title={tr('What each department holds')} flush>
             <DataTable rows={data.held} rowKey={(h) => `${h.source_name}${h.kind}${h.as_of}`} pageSize={10} pageSizes={[10, 25]}

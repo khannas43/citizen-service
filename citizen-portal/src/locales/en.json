@@ -174,7 +174,10 @@
   },
   "genders": {
     "M": "Male",
-    "F": "Female"
+    "F": "Female",
+    "T": "Transgender",
+    "N": "Not disclosed",
+    "O": "Other"
   },
   "castes": [
     "SC",
@@ -677,6 +680,8 @@
     "genderM": "Male",
     "genderF": "Female",
     "genderO": "Other",
+    "genderT": "Transgender",
+    "genderN": "Not disclosed",
     "relHead": "Head of Family",
     "relSpouse": "Spouse",
     "relSon": "Son",
@@ -790,6 +795,8 @@
     "genderF": "Female",
     "genderM": "Male",
     "genderO": "Third gender / transgender",
+    "genderT": "Transgender",
+    "genderN": "Not disclosed",
     "formTitle": "Your details",
     "selectDistrictFirst": "Select district first",
     "selectTalukaFirst": "Select mandal first",
@@ -1196,6 +1203,8 @@
     "sexFemale": "Female",
     "sexMale": "Male",
     "sexOther": "Other",
+    "sexTransgender": "Transgender",
+    "sexNotDisclosed": "Not disclosed",
     "field": {
       "address": "Address",
       "name": "Name",

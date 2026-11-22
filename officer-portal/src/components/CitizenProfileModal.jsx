@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { fetchCitizenFamily } from '../api'
 import './CitizenProfileModal.css'
 
+const GENDER_NAME = { M: 'Male', F: 'Female', T: 'Transgender', N: 'Not disclosed', O: 'Other' }
+
 function maskAadhaarRef(ref) {
   if (!ref || typeof ref !== 'string') return '—'
   const trimmed = ref.trim()
@@ -109,7 +111,7 @@ export default function CitizenProfileModal({ subject, onClose }) {
                 <span>Age</span>
                 <strong>{member.dob ? new Date().getFullYear() - new Date(member.dob).getFullYear() : '—'} yrs</strong>
               </div>
-              <div className="ben-modal-row"><span>Gender</span><strong>{member.gender || '—'}</strong></div>
+              <div className="ben-modal-row"><span>Gender</span><strong>{GENDER_NAME[member.gender] || member.gender || '—'}</strong></div>
               <div className="ben-modal-row"><span>Relationship</span><strong>{member.relationshipToHead || '—'}</strong></div>
               {member.aadhaarRef && (
                 <div className="ben-modal-row">

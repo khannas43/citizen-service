@@ -20,7 +20,8 @@ export const EDUCATION_OPTIONS = ['NONE', 'PRIMARY', 'SECONDARY', 'MATRIC', 'HIG
 export const GENDER_OPTIONS = [
   { value: 'F', labelKey: 'genderF' },
   { value: 'M', labelKey: 'genderM' },
-  { value: 'O', labelKey: 'genderO' },
+  { value: 'T', labelKey: 'genderT' },
+  { value: 'N', labelKey: 'genderN' },
 ]
 
 export const EXAM_TYPE_OPTIONS = [

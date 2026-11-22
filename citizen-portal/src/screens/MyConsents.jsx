@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { loadCitizenProfile } from '../auth'
+import { genderLabel as sharedGenderLabel } from '../genderLabel'
 import { masterAddressFields, APIs, fetchConsents, revokeConsent, restoreConsent, fetchDataExport, submitGrievance, fetchCitizenDocuments, uploadCitizenDocument, fetchDocumentData } from '../api'
 import RequestsForYou from './RequestsForYou'
 import { cafVisibleFileName, formatCafDocType } from '../caf/cafDocumentConfig'
@@ -20,7 +21,7 @@ function formatCurrency(n) {
 }
 
 function genderLabel(g, t) {
-  return { M: t('consents.genderM'), F: t('consents.genderF'), O: t('consents.genderO') }[g] || g
+  return sharedGenderLabel(g, t) || g
 }
 
 function relationshipLabel(r, t) {

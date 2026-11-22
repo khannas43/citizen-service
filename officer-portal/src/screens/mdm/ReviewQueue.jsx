@@ -1,3 +1,4 @@
+import { genderText } from '../../gender'
 import { useEffect, useState } from 'react'
 import { mdm } from '../../mdmApi'
 import { useMdm, Status, Badge, Pager } from './shared'
@@ -31,10 +32,10 @@ const bornText = (r) => r.dob || (r.birth_year ? `born ${r.birth_year}` : r.age 
 // what each column of the comparison shows for the record to place, and for a candidate (read from the person and all the records already linked to them)
 const rowsFor = (t, cands) => {
   const v = t.view
-  const place = { born: bornText(v), gender: v.gender, address: v.address, spouse: v.spouse, family: (v.family || []).join(', '), card: v.ration_card, mobile: v.mobile, name: v.name }
+  const place = { born: bornText(v), gender: genderText(v.gender), address: v.address, spouse: v.spouse, family: (v.family || []).join(', '), card: v.ration_card, mobile: v.mobile, name: v.name }
   const cand = cands.map((c) => {
     const rs = c.records || []
-    return { name: c.person.name, born: c.person.dob || (c.person.birth_year ? `born ${c.person.birth_year}` : ''), gender: c.person.gender,
+    return { name: c.person.name, born: c.person.dob || (c.person.birth_year ? `born ${c.person.birth_year}` : ''), gender: genderText(c.person.gender),
       address: [c.person.address, ...rs.map((r) => r.address)].find(Boolean) || [c.person.village, c.person.mandal, c.person.district].filter(Boolean).join(', '),
       spouse: uniq([...(c.person.spouses || []), ...rs.map((r) => r.spouse)]).join(', '), family: uniq(rs.flatMap((r) => r.family || [])).join(', '),
       card: uniq(rs.map((r) => r.ration_card)).join(', '), mobile: uniq(rs.map((r) => r.mobile)).join(', ') }
@@ -205,7 +206,7 @@ function Decide({ id, back, done, fromPerson, openPerson }) {
   const open = t.status === 'OPEN'
   const v = t.view
   const rec = recommend(t, t.candidate_details)
-  const placeLine = [bornText(v), v.gender, v.address, v.spouse && `spouse ${v.spouse}`, v.family?.length && `parents/family: ${v.family.join(', ')}`, v.ration_card && `ration card ${v.ration_card}`, v.mobile && `mobile ${v.mobile}`].filter(Boolean).join(' · ')
+  const placeLine = [bornText(v), genderText(v.gender), v.address, v.spouse && `spouse ${v.spouse}`, v.family?.length && `parents/family: ${v.family.join(', ')}`, v.ration_card && `ration card ${v.ration_card}`, v.mobile && `mobile ${v.mobile}`].filter(Boolean).join(' · ')
   const tip = (sc, ev) => <ScoreTip score={sc} ev={ev} match={match}>{pc(sc)}</ScoreTip>
   return (
     <div className="mdm-stack rv">
@@ -225,7 +226,7 @@ function Decide({ id, back, done, fromPerson, openPerson }) {
       <Collapse id="rv-record" defaultOpen title={tr('Record to place')} summary={`${t.name} · ${t.source_name}`}>
         <Facts items={[
           ['Name', t.name], ['System', t.source_name], ['Record number', t.source_rid],
-          ['Born / age', bornText(v) || undefined], ['Gender', v.gender], ['Address', v.address],
+          ['Born / age', bornText(v) || undefined], ['Gender', genderText(v.gender)], ['Address', v.address],
           ['Spouse', v.spouse], ['Parents / family', v.family?.length ? v.family.join(', ') : undefined], ['Ration card', v.ration_card], ['Mobile', v.mobile],
         ]} />
         <p className="mdm-note rv-score">{tr('{v}. Best candidate agreement: {v2}.', { v: cap(t.reason), v2: tip(t.score, t.evidence) })}</p>
@@ -244,7 +245,7 @@ function Decide({ id, back, done, fromPerson, openPerson }) {
           title={<>{c.tentative ? 'Currently grouped with' : `Candidate ${i + 1}`}: {c.person.name} {rec?.cand === i && <Badge tone={rec.action === 'LINK' ? 'ok' : 'warn'}>{tr('Suggested')}</Badge>}</>}
           summary={`${pc(c.score)} agreement · ${c.person.mdm_id} · in ${c.person.source_count} system(s) · ${c.records.length} record(s)`}
           actions={open ? <button type="button" className="btn-primary small" disabled={busy} onClick={() => submit('LINK', c.person.id)}>{c.tentative ? 'Same person — confirm this link' : 'Same person — link'}</button> : null}>
-          <p className="mdm-sub"><MdmIdLink id={c.person.id} mdmId={c.person.mdm_id} onPeek={setPeek} /> {tr('· {v} · in {source_count} system(s)', { v: [c.person.dob ? `born ${c.person.dob}` : c.person.birth_year && `born ${c.person.birth_year}`, c.person.gender, c.person.village, c.person.mandal, c.person.district].filter(Boolean).join(' · '), source_count: c.person.source_count })}</p>
+          <p className="mdm-sub"><MdmIdLink id={c.person.id} mdmId={c.person.mdm_id} onPeek={setPeek} /> {tr('· {v} · in {source_count} system(s)', { v: [c.person.dob ? `born ${c.person.dob}` : c.person.birth_year && `born ${c.person.birth_year}`, genderText(c.person.gender), c.person.village, c.person.mandal, c.person.district].filter(Boolean).join(' · '), source_count: c.person.source_count })}</p>
           <p className="mdm-note">{tr('Agreement with the record to place: {v}', { v: tip(c.score, c.evidence) })}</p>
           <EvidenceTable ev={c.evidence} />
           <details className="mdm-evidence" open><summary>{tr('Records already linked to this person ({length}), and the system each comes from', { length: c.records.length })}</summary>

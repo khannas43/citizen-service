@@ -1,3 +1,4 @@
+import { genderLabel } from '../genderLabel'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AUTH_API } from '../auth'
@@ -162,7 +163,7 @@ export default function MemberProfile360({
 
             <ProfileSection title={t('profile360.identity')}>
               <DetailRow label={t('profile360.age')} value={`${ageFromDob(member.dob) ?? '—'} ${t('myFamilyPage.years')}`} />
-              <DetailRow label={t('form.gender')} value={member.gender} />
+              <DetailRow label={t('form.gender')} value={genderLabel(member.gender, t) || member.gender} />
               <DetailRow label={t('form.aadhaarRef')} value={maskAadhaar(member.aadhaarRef)} />
               <DetailRow label={t('form.mobile')} value={maskMobile(member.mobile)} />
               <DetailRow

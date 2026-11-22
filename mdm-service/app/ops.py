@@ -60,7 +60,7 @@ STANDARDS = [
     {"id": "S1", "element": "Name", "standard": "Compared by a phonetic skeleton of each word, in any order; Telugu is transliterated first.", "example": "Venkata Ramana Reddy = Reddy V. Ramana"},
     {"id": "S2", "element": "Address", "standard": "House number separated; common abbreviations expanded; filler words dropped; compared by text similarity.", "example": "H.No 4-12, Gandhi Ngr Col. = 4 gandhi nagar colony"},
     {"id": "S3", "element": "Date of birth", "standard": "ISO 8601 (YYYY-MM-DD). Where only an age or a year is reported, the year is approximate and is never shown as a date.", "example": "1984-03-09"},
-    {"id": "S4", "element": "Gender", "standard": "M, F or unknown.", "example": "F"},
+    {"id": "S4", "element": "Gender", "standard": "M (male), F (female), T (transgender) or N (not disclosed). Left blank where a department does not state it. T and N never count against a match, because they say nothing about whether two records are the same person.", "example": "F, T or N"},
     {"id": "S5", "element": "Income", "standard": "Annual rupees. Only a band is shared, edges come from policy.", "example": "1 lakh to 2 lakh"},
     {"id": "S6", "element": "Identity reference", "standard": "Opaque token only. No identity number is held in this system.", "example": "TGREF-000123"},
     {"id": "S7", "element": "Dates in answers", "standard": "Evaluated against the reference date of the demonstration.", "example": REF_DATE.isoformat()},

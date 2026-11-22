@@ -11,7 +11,7 @@ import {
 } from '../api'
 import DistrictScopeBanner from '../components/DistrictScopeBanner'
 
-const GENDER_LABEL = { M: 'Male', F: 'Female', O: 'Other' }
+const GENDER_LABEL = { M: 'Male', F: 'Female', T: 'Transgender', N: 'Not disclosed', O: 'Other' }
 const RELATIONSHIP_LABEL = {
   HEAD: 'Head of Family', SPOUSE: 'Spouse', SON: 'Son', DAUGHTER: 'Daughter',
   FATHER: 'Father', MOTHER: 'Mother', MOTHER_IN_LAW: 'Mother-in-law', OTHER: 'Other',

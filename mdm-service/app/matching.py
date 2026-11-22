@@ -181,13 +181,17 @@ def parents_sim(a: Rec, b: Rec) -> tuple[Optional[float], str]:
     return round(best, 3), "parent name " + ("matches" if best >= 0.8 else "similar" if best >= 0.5 else "differs")
 
 
+# Transgender (T) and not disclosed (N) say nothing about whether two records are one person, so they neither support nor count against a match.
+NEUTRAL_GENDER = ("T", "N")
+
+
 def _components(a: Rec, b: Rec) -> dict:
     d, dnote, dbad = dob_sim(a, b)
     n, nnote = name_sim(a, b)
     ad, anote = addr_sim(a, b)
     pr, pnote = parents_sim(a, b)
     return {
-        "name": (n, nnote), "dob": (d, dnote), "gender": (None if not a.gender or not b.gender else (1.0 if a.gender == b.gender else 0.0), ""),
+        "name": (n, nnote), "dob": (d, dnote), "gender": (None if not a.gender or not b.gender or a.gender in NEUTRAL_GENDER or b.gender in NEUTRAL_GENDER else (1.0 if a.gender == b.gender else 0.0), ""),
         "district": (_eq(a.district, b.district), ""), "mandal": (_eq(a.mandal, b.mandal, 0.88), ""),
         "village": (_eq(a.village, b.village, 0.88), ""), "address": (ad, anote), "parents": (pr, pnote),
     }

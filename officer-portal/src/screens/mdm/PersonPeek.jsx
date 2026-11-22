@@ -1,3 +1,4 @@
+import { genderText } from '../../gender'
 import { useMdm, Status, Badge } from './shared'
 import { lifeLabel, dqLabel } from './labels'
 import { Drawer, Facts } from '../dx/dxKit'
@@ -26,7 +27,7 @@ function Body({ id }) {
       <Facts items={[
         ['MDM id', <code key="i">{p.mdm_id}</code>],
         ['Born', p.dob || p.birth_year],
-        ['Gender', p.gender],
+        ['Gender', genderText(p.gender)],
         ['Place', <Pl key="pl" parts={[p.village, p.mandal, p.district]} />],
         ['Life status', p.life_status === 'DECEASED' ? <Badge tone="bad">{lifeLabel(p.life_status)}</Badge> : lifeLabel(p.life_status)],
         ['Systems', `${p.source_count} of ${p.source_count + d.missing_sources.length}`],

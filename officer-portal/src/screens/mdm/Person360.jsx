@@ -8,6 +8,7 @@ import './person360.css'
 import './matchscore.css'
 import PersonLineage, { changeText } from '../dx/PersonLineage'
 import DeptRecords from './DeptRecords'
+import { genderText } from '../../gender'
 import { fmtTime } from '../dx/dxShared'
 import { dqLabel, fmtDate, lifeLabel, linkLabel, RELATION_TEXT, COMPONENT_LABELS } from './labels'
 import { DEFAULT_MATCH, explainScore, KIND_BADGE, EvidenceTable, pc } from './MatchScore'
@@ -114,7 +115,7 @@ export default function Person360({ id, back, openPerson }) {
   const first = d.issues.length ? 'issues' : 'exchange'
   const high = d.issues.filter((i) => i.severity === 'HIGH').length
   const conflicts = d.attributes.filter((a) => a.conflict).length
-  const sexText = p.gender === 'F' ? 'Female' : p.gender === 'M' ? 'Male' : 'Gender not stated'
+  const sexText = genderText(p.gender) || 'Gender not stated'
   return (
     <div className="mdm-stack p360">
       <Hero eyebrow={<>{tr('Person ·')} <code>{p.mdm_id}</code></>}

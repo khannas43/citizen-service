@@ -11,6 +11,8 @@ function sexLabel(t, sex) {
   if (s === 'F') return t('approvals.sexFemale')
   if (s === 'M') return t('approvals.sexMale')
   if (s === 'O') return t('approvals.sexOther')
+  if (s === 'T') return t('approvals.sexTransgender')
+  if (s === 'N') return t('approvals.sexNotDisclosed')
   return sex || '—'
 }
 

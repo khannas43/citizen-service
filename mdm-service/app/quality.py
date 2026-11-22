@@ -132,7 +132,7 @@ def _suite_for(source: str, gxe, n: int, has_asof: bool = True, cfg: dict | None
     add(gxe.ExpectColumnValuesToNotBeNull(column="name", mostly=ns), CRITICAL, f"{_pc(ns)} of records have a name", "name_present", tolerance=1 - ns)
     add(gxe.ExpectColumnValueLengthsToBeBetween(column="name", min_value=c["name_min"], max_value=c["name_max"], mostly=ns), CRITICAL,
         f"Names are between {c['name_min']} and {c['name_max']} characters", "name_length", tolerance=1 - ns)
-    add(gxe.ExpectColumnValuesToBeInSet(column="gender", value_set=["M", "F"]), CRITICAL, "Gender, where given, is M or F", "gender_valid")
+    add(gxe.ExpectColumnValuesToBeInSet(column="gender", value_set=["M", "F", "T", "N"]), CRITICAL, "Gender, where given, is M, F, T (transgender) or N (not disclosed)", "gender_valid")
     add(gxe.ExpectColumnValuesToBeBetween(column="dob_year", min_value=c["min_birth_year"], max_value=REF_DATE.year, mostly=1.0), CRITICAL,
         f"Dates of birth fall between {c['min_birth_year']} and today", "dob_range")
     add(gxe.ExpectColumnValuesToBeBetween(column="age", min_value=0, max_value=c["max_age"]), CRITICAL, f"Ages are between 0 and {c['max_age']}", "age_range")
@@ -275,7 +275,7 @@ def explain(r: dict) -> dict:
         "name_present": (f"{n} records ({pct}) have no name. More than {allowed}% is not accepted.", f"Ask {dep} to fill in the missing names. A record without a name cannot be matched to a person."),
         "name_length": (f"{n} names are shorter than {p.get('name_min')} or longer than {p.get('name_max')} characters." + (f" Found: {brk}." if brk else ""),
                         f"These are usually typing errors or placeholder text. Ask {dep} to correct them." + rule_hint),
-        "gender_valid": (f"{n} records carry a gender value that is not M or F." + (f" Found: {brk}." if brk else ""), f"Ask {dep} to map their gender codes to M or F in the feed."),
+        "gender_valid": (f"{n} records carry a gender value that is not M, F, T or N." + (f" Found: {brk}." if brk else ""), f"Ask {dep} to map their gender codes to M, F, T or N in the feed."),
         "dob_range": (f"{n} birth dates are before {p.get('min_year')} or in the future." + (f" Found: {brk}." if brk else ""),
                       f"Ask {dep} to check the date entry. A future date is usually a day, month or year typed the wrong way."),
         "age_range": (f"{n} ages are above {p.get('max_age')} or below 0." + (f" Found: {brk}." if brk else ""), f"Ask {dep} to check these records." + rule_hint),
@@ -792,7 +792,7 @@ def spread_demo_received(cur, actor: str, days: int = 60) -> dict:
     slots = []                                                  # one slot per unit of weight, so busy days get more records
     for off in range(days):
         slots += [off] * (1 if (today - timedelta(days=off)).weekday() >= 5 else 4)
-    cur.execute("""SELECT id, source, (dob IS NULL OR district IS NULL OR address IS NULL OR gender NOT IN ('M','F')) AS bad FROM mdm.source_record""")
+    cur.execute("""SELECT id, source, (dob IS NULL OR district IS NULL OR address IS NULL OR gender NOT IN ('M','F','T','N')) AS bad FROM mdm.source_record""")
     ids, offs = [], []
     for r in cur.fetchall():
         inc = INCIDENTS.get(r["source"])

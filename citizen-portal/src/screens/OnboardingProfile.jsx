@@ -1,3 +1,4 @@
+import { genderLabel } from '../genderLabel'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -151,7 +152,7 @@ export default function OnboardingProfile() {
           </div>
           <div className="profile-field-row">
             <SourceField label={t('onboarding.dob')} value={profile.dob} source={t('onboarding.viaAadhaar')} />
-            <SourceField label={t('onboarding.gender')} value={profile.gender} source={t('onboarding.viaAadhaar')} />
+            <SourceField label={t('onboarding.gender')} value={genderLabel(profile.gender, t) || profile.gender} source={t('onboarding.viaAadhaar')} />
             <SourceField label={t('onboarding.mobile')} value={profile.mobile} source={t('onboarding.viaAadhaar')} />
           </div>
         </section>

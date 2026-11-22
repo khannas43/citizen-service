@@ -96,7 +96,7 @@ const CASTE_COLORS = {
   OBC: '#1e40af', SC: '#7c3aed', ST: '#059669',
   NT: '#d97706', GENERAL: '#6b7280',
 }
-const GENDER_COLORS = { Female: '#be185d', Male: '#1d4ed8', Unknown: '#6b7280' }
+const GENDER_COLORS = { Female: '#be185d', Male: '#1d4ed8', Transgender: '#7c3aed', 'Not disclosed': '#0f766e', Unknown: '#6b7280' }
 
 function formatIncome(amount) {
   if (amount >= 100000) return `₹${(amount / 100000).toFixed(2)}L`
@@ -599,7 +599,7 @@ export default function SchemeSimulator() {
   const benRows = useMemo(() => {
     if (!result?.projectedBeneficiaries) return []
     let rows = result.projectedBeneficiaries.filter((b) => {
-      const gender = b.gender === 'F' ? 'Female' : b.gender === 'M' ? 'Male' : b.gender
+      const gender = { F: 'Female', M: 'Male', T: 'Transgender', N: 'Not disclosed' }[b.gender] || b.gender
       if (benFilterGender !== 'ALL' && gender !== benFilterGender) return false
       if (benFilterDistrict !== 'ALL' && b.district !== benFilterDistrict) return false
       if (benFilterTaluka !== 'ALL' && b.taluka !== benFilterTaluka) return false
@@ -640,7 +640,7 @@ export default function SchemeSimulator() {
   const genderPieData = useMemo(() => {
     if (!result?.genderBreakdown) return []
     return Object.entries(result.genderBreakdown).map(([key, value]) => {
-      const label = key === 'F' ? 'Female' : key === 'M' ? 'Male' : key
+      const label = { F: 'Female', M: 'Male', T: 'Transgender', N: 'Not disclosed' }[key] || key
       return {
         label,
         value,

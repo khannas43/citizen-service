@@ -292,7 +292,7 @@ def test_failed_check_says_what_was_found_with_values():
     assert {b["label"]: b["count"] for b in f["breakdown"]} == {"X": 3, "x": 2}
     assert {e["value"] for e in f["examples"]} == {"X", "x"} and len(f["examples"]) == 5 and f["districts"][0] == {"label": "Medak", "count": 4}
     e = quality.explain({**g, "tolerance": 0, "unexpected_percent": 12.5})
-    assert "5 records carry a gender value that is not M or F" in e["why"] and "X (3)" in e["why"] and "map their gender codes" in e["action"]
+    assert "5 records carry a gender value that is not M, F, T or N" in e["why"] and "X (3)" in e["why"] and "map their gender codes" in e["action"]
 
 
 def test_key_format_failures_are_classified():

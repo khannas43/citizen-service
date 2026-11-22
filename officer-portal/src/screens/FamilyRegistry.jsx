@@ -51,7 +51,7 @@ const EMPTY_FILTERS = {
 }
 
 const CASTE_COLORS = { GENERAL:'#1e40af',OBC:'#0891b2',SC:'#7c3aed',ST:'#059669',NT:'#d97706' }
-const GENDER_LABEL = { M: 'Male', F: 'Female', O: 'Other' }
+const GENDER_LABEL = { M: 'Male', F: 'Female', T: 'Transgender', N: 'Not disclosed', O: 'Other' }
 
 function genderLabel(gender) {
   if (!gender) return ''
@@ -104,6 +104,8 @@ function fmt(n) {
 const GENDER_WORDS = [
   [/\b(females?|women|woman|girls?|ladies|lady)\b/gi, 'F'],
   [/\b(males?|men|man|boys?|gents?)\b/gi, 'M'],
+  [/\b(transgender|trans)\b/gi, 'T'],
+  [/\b(not disclosed|undisclosed)\b/gi, 'N'],
 ]
 function splitGenderWords(text) {
   let rest = text, gender = ''
@@ -756,7 +758,7 @@ export default function FamilyRegistry() {
               </select>
             </label>
             {[
-              { label:'Gender', key:'gender', opts:[{v:'',l:'Any'},{v:'M',l:'Male'},{v:'F',l:'Female'}] },
+              { label:'Gender', key:'gender', opts:[{v:'',l:'Any'},{v:'M',l:'Male'},{v:'F',l:'Female'},{v:'T',l:'Transgender'},{v:'N',l:'Not disclosed'}] },
               { label:'Caste', key:'casteCategory', opts:[{v:'',l:'Any'},...['GENERAL','OBC','SC','ST','NT'].map((c)=>({v:c,l:c}))] },
               { label:'Education', key:'educationLevel', opts:[{v:'',l:'Any'},...['NONE','PRIMARY','SECONDARY','MATRIC','HIGHER_SEC','GRADUATE','POST_GRADUATE'].map((v)=>({v,l:v.replace(/_/g,' ')}))] },
               { label:'Marital Status', key:'maritalStatus', opts:[{v:'',l:'Any'},...['SINGLE','MARRIED','WIDOWED','DIVORCED','SEPARATED'].map((v)=>({v,l:v}))] },
@@ -884,7 +886,7 @@ export default function FamilyRegistry() {
                       : null}
                   </div>
                   <div className="fr-result-tags">
-                    {p.gender && <span className="fr-tag">{p.gender === 'F' ? '♀ Female' : p.gender === 'M' ? '♂ Male' : p.gender}{p.dob ? ` · ${ageFromDob(p.dob)} yrs` : ''}</span>}
+                    {p.gender && <span className="fr-tag">{p.gender === 'F' ? '♀ Female' : p.gender === 'M' ? '♂ Male' : (GENDER_LABEL[p.gender] ?? p.gender)}{p.dob ? ` · ${ageFromDob(p.dob)} yrs` : ''}</span>}
                     {p.occupation && <span className="fr-tag">💼 {p.occupation}</span>}
                     {p.educationLevel && <span className="fr-tag">📚 {p.educationLevel.replace(/_/g,' ')}</span>}
                     {p.employmentStatus && <span className="fr-tag">🏢 {p.employmentStatus.replace(/_/g,' ')}</span>}
