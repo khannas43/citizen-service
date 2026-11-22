@@ -381,8 +381,20 @@ def s_1_6(k: Kit):
 
 
 # ================================================================== UC2  A child is born
-def _birth(k: Kit, pr=None, **kw):
+# Every child the demo registers has a fixed given name, one per scenario, so the demo reads the same after every reset (the surname is the father's):
+# 2.1 Varsha, 2.2 Anvi, 2.3 Aarvi, 2.6 Harini (named later), 2.7 Navya, 2.8/2.9 Karthik, 2.11 Sahithi, 2.12/2.13 Ishita, 2.10 "Parent Check".
+CHILD = {"2.1": "Varsha", "2.2": "Anvi", "2.3": "Aarvi", "2.6": "Harini", "2.7": "Navya", "2.11": "Sahithi"}
+
+
+def child_name(pr, scenario):
+    surname = ((pr.get("fname") or "").split() or ["Reddy"])[-1]
+    return f"{CHILD[scenario]} {surname}"
+
+
+def _birth(k: Kit, pr=None, scenario=None, **kw):
     pr = pr or couple(k)
+    if scenario:
+        kw["name"] = child_name(pr, scenario)
     res = k.event("BIRTH_REGISTERED", "UC2", birth_payload(k, pr, **kw), case_kind="DEMO")
     return pr, res
 
@@ -417,8 +429,7 @@ def s_2_1(k: Kit):
     pr = showcase_couple(k)
     kw = {}
     if pr:                                                        # the showcase family's child has a proper name: a given name and the father's family name
-        given = ("Anvi", "Aarvi", "Navya", "Sahithi", "Tanvi", "Varsha")[int(k.tag, 16) % 6]      # Ishita and Karthik are kept for the live-step children (2.8 to 2.13)
-        kw["name"] = f"{given} {pr['fname'].split()[-1]}"
+        kw["name"] = child_name(pr, "2.1")                       # always Varsha: see CHILD
     pr, res = _birth(k, pr, **kw)
     k.ok(res["status"] == "PROCESSED" and res.get("person_id"), "The child birth record is created at once; civil registration is the authority")
     fl = k.flow(res["event_id"])
@@ -431,7 +442,7 @@ def s_2_1(k: Kit):
 
 
 def s_2_2(k: Kit):
-    pr, res = _birth(k)
+    pr, res = _birth(k, scenario="2.2")
     fl = k.flow(res["event_id"])
     seq = k.audit_head()
     pds, health = consent_of(fl, "BIRTH_PDS"), consent_of(fl, "BIRTH_HEALTH")
@@ -457,7 +468,7 @@ def s_2_2(k: Kit):
 
 
 def s_2_11(k: Kit):
-    pr, res = _birth(k)
+    pr, res = _birth(k, scenario="2.11")
     fl = k.flow(res["event_id"])
     c = consent_of(fl, "BIRTH_GIRL_SCHEME") if any(x["purpose"] == "BIRTH_GIRL_SCHEME" for x in fl["consents"]) else consent_of(fl, "BIRTH_HEALTH")
     mx = k.pol("max_reminders")
@@ -481,9 +492,7 @@ def s_2_6(k: Kit):
     first = k.event("BIRTH_REGISTERED", "UC2", birth_payload(k, pr, name=None, reg=reg), case_kind="NO_NAME")
     k.ok(first["status"] == "HELD", "A birth without a name is held: nothing is created yet")
     k.ok(not k.q("SELECT 1 FROM mdm.person p JOIN mdm.event e ON e.person_id=p.id WHERE e.id=%s", first["event_id"]), "No person exists for it")
-    given = ("Aarvi", "Ishita", "Navya", "Sahithi", "Tanvi", "Harini", "Varsha", "Keerthi")[int(k.tag, 16) % 8]
-    surname = (pr["fname"] or "").split()[-1] if (pr.get("fname") or "").strip() else "Reddy"
-    am = k.event("BIRTH_AMENDED", "UC2", {"registration_no": reg, "child_name": f"{given} {surname}"}, case_kind="AMENDMENT")      # the name the family gives later: a given name and the father's family name
+    am = k.event("BIRTH_AMENDED", "UC2", {"registration_no": reg, "child_name": child_name(pr, "2.6")}, case_kind="AMENDMENT")      # the name the family gives later: a given name and the father's family name
     k.ok(am.get("person_id") and am["event_id"] == first["event_id"], "The name arrives and is applied to the same subject (same event)", person_id=am.get("person_id"))
     ev = k.one("SELECT status FROM mdm.event WHERE id=%s", first["event_id"])
     k.ok(ev["status"] == "PROCESSED", "The held birth is now processed")
@@ -491,7 +500,7 @@ def s_2_6(k: Kit):
 
 
 def s_2_7(k: Kit):
-    pr, res = _birth(k, date_of_birth="2025-12-01", registration_date="2026-06-12")
+    pr, res = _birth(k, scenario="2.7", date_of_birth="2025-12-01", registration_date="2026-06-12")
     days = (date(2026, 6, 12) - date(2025, 12, 1)).days
     window = k.pol("late_event_days")
     ev = k.one("SELECT note FROM mdm.event WHERE id=%s", res["event_id"])
@@ -502,8 +511,8 @@ def s_2_7(k: Kit):
 
 
 def s_2_10(k: Kit):
-    res = k.event("BIRTH_REGISTERED", "UC2", {"registration_no": f"DEMO-B-{k.tag}", "child_name": f"Parent Check {k.tag}", "gender": "M", "date_of_birth": "2026-06-10",
-                                              "father_name": f"Zxqv Unknown{k.tag}", "mother_name": f"Wplm Missing{k.tag}", "place": "Medak", "registration_date": "2026-06-11"}, case_kind="PARENT_MISMATCH")
+    res = k.event("BIRTH_REGISTERED", "UC2", {"registration_no": f"DEMO-B-{k.tag}", "child_name": "Parent Check", "gender": "M", "date_of_birth": "2026-06-10",
+                                              "father_name": "Zxqv Unknown", "mother_name": "Wplm Missing", "place": "Medak", "registration_date": "2026-06-11"}, case_kind="PARENT_MISMATCH")
     rv = k.proposals(res["event_id"], "REVIEW_PARENTS")
     k.ok(len(rv) == 1 and ("Could not identify" in rv[0]["summary"] or "not found" in rv[0]["summary"]), "The parents cannot be matched, so a review task is raised with the ambiguity stated", summary=rv and rv[0]["summary"])
     fl = k.flow(res["event_id"])
@@ -515,7 +524,7 @@ def s_2_3(k: Kit):
     pr = couple(k)
     try:
         exchange.set_subscriber(k.cur, "health", False, ACTOR, "demo: stop one adapter")
-        res = k.event("BIRTH_REGISTERED", "UC2", birth_payload(k, pr), case_kind="OUTAGE")
+        res = k.event("BIRTH_REGISTERED", "UC2", birth_payload(k, pr, name=child_name(pr, "2.3")), case_kind="OUTAGE")
         fl = k.flow(res["event_id"])
         exchange.respond(k.cur, consent_of(fl, "BIRTH_HEALTH")["id"], "GRANT", ACTOR, note="demo")
         d = delivery_of(k.flow(res["event_id"]), "BIRTH_HEALTH")
