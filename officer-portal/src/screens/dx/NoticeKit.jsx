@@ -11,6 +11,8 @@ export const NOTICE_STATE = {
 }
 export const EVENT_LABEL = { BIRTH_REGISTERED: 'Birth registered', BIRTH_AMENDED: 'Birth amended', BIRTH_WITHDRAWN: 'Birth withdrawn', DEATH_REGISTERED: 'Death registered', MARRIAGE_REGISTERED: 'Marriage registered' }
 export const ROUTE = { FEED: 'by feed', FILE: 'by file', PORTAL: 'in the portal', SIMULATED: 'simulated' }
+/** A notice can be answered while it has no answer, and an accepted or acknowledged one can still be marked applied. */
+export const canAnswer = (n) => !n.outcome || n.outcome === 'ACCEPTED' || n.outcome === 'ACKNOWLEDGED'
 export const OUTCOME_TEXT = { ACCEPTED: 'Accept', APPLIED: 'Applied in our system', REJECTED: 'Reject', ACKNOWLEDGED: 'Acknowledge' }
 
 export function NoticeBadge({ state }) {
@@ -31,7 +33,7 @@ export const dueText = (n) => `${fmtTime(n.respond_by)}${n.rule_text ? ` (${tr('
 
 /** A demo stand-in for the department's own system. It goes through the same rules as the real feed and says SIMULATED. */
 export function SimulateAnswer({ notice, done }) {
-  const options = notice.allowed_outcomes || []
+  const options = notice.outcome ? ['APPLIED'] : (notice.allowed_outcomes || [])      // an accepted notice can still be marked applied; nothing else changes once answered
   const [outcome, setOutcome] = useState(options[0])
   const [reason, setReason] = useState('')
   const [ref, setRef] = useState('')

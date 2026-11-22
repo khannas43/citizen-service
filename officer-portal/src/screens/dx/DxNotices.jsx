@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMdm, Status } from '../mdm/shared'
 import { PageHeader, Card, Stats, DataTable, FilterSelect, Drawer, Banner, Facts, EmptyState, useServerTable } from './dxKit'
 import BulkAnswer from './BulkAnswer'
-import { NoticeBadge, SimulateAnswer, answerText, dueText, EVENT_LABEL } from './NoticeKit'
+import { NoticeBadge, SimulateAnswer, answerText, dueText, canAnswer, EVENT_LABEL } from './NoticeKit'
 import { tr } from '../../i18n/lang'
 import { Mt } from '../../i18n/mt'
 
@@ -82,7 +82,7 @@ export default function DxNotices() {
               {n.event_id && <button type="button" className="btn-secondary" onClick={() => nav(`/dx/events?case=${n.event_id}`)}>{tr('Open the event case')}</button>}
               {n.reopened_proposal && <button type="button" className="btn-secondary" onClick={() => nav('/dx/approvals')}>{tr('See the proposal sent back')}</button>}
             </div>
-            {!n.outcome
+            {canAnswer(n)
               ? <SimulateAnswer key={n.id} notice={n} done={(r) => { setOpen(null); setTick((x) => x + 1); setMsg({ ok: true, text: tr('Recorded (simulated): {outcome}', { outcome: r.outcome.toLowerCase() }) + (r.reopened_proposal ? tr('. It went back to a person for review.') : '.') }) }} />
               : <Banner tone="ok">{tr('This notice has been answered. The answer, the route and the department\'s reference are in the audit log.')}</Banner>}
           </div>

@@ -179,6 +179,7 @@ export default {
   "Notices the departments must answer": "శాఖలు సమాధానం ఇవ్వాల్సిన నోటీసులు",
   "A department answers in its own system, by feed or in the portal. A rejection comes back here to a person. Statutory notices are acknowledged, not rejected.": "శాఖ తన స్వంత వ్యవస్థలో ఫీడ్ ద్వారా లేదా పోర్టల్‌లో సమాధానం ఇస్తుంది. తిరస్కరణ ఇక్కడ ఒక వ్యక్తికి తిరిగి వస్తుంది. చట్టబద్ధమైన నోటీసులను స్వీకరిస్తారు, తిరస్కరించరు.",
   "Answer as the department": "శాఖగా సమాధానం ఇవ్వండి",
+  "Mark as applied": "అమలు చేసినట్లు నమోదు చేయండి",
   "Consent for each use": "ప్రతి ఉపయోగానికి సమ్మతి",
   "The parent decides each use separately. A use that is declined, left unanswered or withdrawn sends nothing.": "తల్లిదండ్రులు ప్రతి ఉపయోగాన్ని విడిగా నిర్ణయిస్తారు. తిరస్కరించిన, సమాధానం ఇవ్వని లేదా ఉపసంహరించిన ఉపయోగానికి ఏదీ పంపరు.",
   "Asked of {person_name} · reminders sent {reminders}": "{person_name} ను అడిగారు · పంపిన గుర్తులు {reminders}",

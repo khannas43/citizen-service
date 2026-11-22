@@ -6,7 +6,7 @@ import { useMdm, Status, Badge } from '../mdm/shared'
 import { describeEvent, EVENT_STATUS } from '../mdm/eventLabels'
 import { Tag, CONSENT, DELIVERY, ApprovalCard, ConsentAnswer, fmtTime } from './dxShared'
 import { PageHeader, Hero, Card, Stats, DataTable, Segmented, FilterSelect, EmptyState, Banner, Facts, Drawer, useServerTable } from './dxKit'
-import { NoticeBadge, SimulateAnswer, answerText, dueText } from './NoticeKit'
+import { NoticeBadge, SimulateAnswer, answerText, dueText, canAnswer } from './NoticeKit'
 import { tr } from '../../i18n/lang'
 import { Mt } from '../../i18n/mt'
 
@@ -102,7 +102,7 @@ function Case({ id, back }) {
               { key: 'respond_by', label: 'Answer due', sort: true, render: (n) => <span className={n.state === 'OVERDUE' ? 'dxk-bad' : 'dxk-muted'}>{dueText(n)}</span> },
               { key: 'state', label: 'Status', sort: true, render: (n) => <NoticeBadge state={n.state} /> },
               { key: 'answer', label: 'Their answer', sort: false, render: (n) => <span className="dxk-muted">{answerText(n)}{n.reason ? <>: <Mt text={n.reason} /></> : null}</span> },
-              { key: 'go', label: '', sort: false, render: (n) => !n.outcome && <button type="button" className="btn-secondary small" onClick={() => setAns(n)}>{tr('Answer as the department')}</button> },
+              { key: 'go', label: '', sort: false, render: (n) => canAnswer(n) && <button type="button" className="btn-secondary small" onClick={() => setAns(n)}>{n.outcome ? tr('Mark as applied') : tr('Answer as the department')}</button> },
             ]} />
         </Card>
       )}
