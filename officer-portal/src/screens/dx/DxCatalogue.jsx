@@ -45,14 +45,13 @@ export default function DxCatalogue() {
   const { data, error, loading } = useMdm('/x/catalogue', undefined, [])
   const [sens, setSens] = useState('')
   const [src, setSrc] = useState('')
-  const [qry, setQry] = useState('')
   const [detail, setDetail] = useState(null)
   if (!data) return <div className="mdm-hub"><PageHeader icon="📚" title={tr('Metadata catalogue')} /><Status loading={loading} error={error} /></div>
   const bySource = Object.fromEntries(data.sources.map((s) => [s.source, s]))
-  const rows = data.elements.filter((e) => (!sens || e.sensitivity === sens) && (!src || e.source === src) && (!qry || (qry === 'yes') === !!e.queryable))
+  const rows = data.elements.filter((e) => (!sens || e.sensitivity === sens) && (!src || e.source === src))
   const picked = src ? bySource[src] : null
-  const pick = (key) => { setSrc(key); setSens(''); setQry('') }
-  const others = [sens && tr('Sensitivity'), qry && tr('Population query')].filter(Boolean).join(', ')
+  const pick = (key) => { setSrc(key); setSens('') }
+  const others = sens ? tr('Sensitivity') : ''
   const stale = data.sources.filter((s) => s.state === 'STALE').length
   const d = detail ? bySource[detail] : null
   return (
@@ -62,7 +61,6 @@ export default function DxCatalogue() {
       <Stats items={[
         { label: 'Data elements', value: data.elements.length },
         { label: 'High sensitivity', value: data.elements.filter((e) => e.sensitivity === 'HIGH').length, tone: 'bad', active: sens === 'HIGH', onClick: () => setSens(sens === 'HIGH' ? '' : 'HIGH') },
-        { label: 'Question only', value: data.elements.filter((e) => !e.queryable).length, hint: 'not available in population queries', tone: 'warn', active: qry === 'no', onClick: () => setQry(qry === 'no' ? '' : 'no') },
         { label: 'Sources', value: data.sources.length, hint: stale ? tr('{n} not current', { n: stale }) : tr('all current'), tone: stale ? 'warn' : 'ok' },
       ]} />
       <Card title={tr('Sources')} hint={tr('Where the data comes from. A data element is only as fresh as its source.')} >
@@ -73,11 +71,10 @@ export default function DxCatalogue() {
       <Card title={picked ? tr('Data elements from {name}', { name: picked.name }) : tr('Data elements')} hint={picked ? tr('Showing only what this source supplies. Select the source again to see all.') : undefined} flush>
         <DataTable rows={rows} rowKey="element" pageSize={15} initialSort={{ key: 'name', dir: 'asc' }} csv={{ name: 'catalogue' }}
           search={{ placeholder: 'Search elements', text: (e) => `${e.name} ${e.element} ${e.authoritative}` }}
-          canClear={!!(sens || src || qry)} onClear={() => { setSens(''); setSrc(''); setQry('') }}
+          canClear={!!(sens || src)} onClear={() => { setSens(''); setSrc('') }}
           filters={<>
             <FilterSelect label={tr('Sensitivity')} value={sens} onChange={setSens} options={[['HIGH', 'High'], ['MEDIUM', 'Medium'], ['LOW', 'Low']]} />
             <FilterSelect label={tr('Source of truth')} value={src} onChange={setSrc} options={data.sources.filter((s) => s.elements.length).map((s) => [s.source, s.name])} />
-            <FilterSelect label={tr('Population query')} value={qry} onChange={setQry} options={[['yes', 'Yes'], ['no', 'Question only']]} />
           </>}
           empty={tr('No data elements match')} emptyHint={others ? tr('These filters are also set: {names}. Clear them to see more.', { names: others }) : undefined}
           columns={[
@@ -85,7 +82,6 @@ export default function DxCatalogue() {
             { key: 'authoritative', label: 'Source of truth', sort: true, render: (e) => { const s = bySource[e.source]; const [lab, tone] = STATE[s?.state] || ['', 'neutral']; return (
               <button type="button" className="mdm-link" onClick={() => setDetail(e.source)} title={`${e.authoritative}: ${lab}`}><i className={`dxk-dot tone-${tone}`} aria-hidden="true" /> {e.authoritative}<span className="dxk-sr"> ({lab})</span></button>) } },
             { key: 'sensitivity', label: 'Sensitivity', sort: true, render: (e) => <Badge tone={SENS[e.sensitivity] || 'neutral'}>{e.sensitivity.toLowerCase()}</Badge> },
-            { key: 'queryable', label: 'Population query', sort: (e) => (e.queryable ? 1 : 0), render: (e) => (e.queryable ? 'Yes' : 'Question only') },
             { key: 'purposes', label: 'Uses that allow it', align: 'num', sort: (e) => e.purposes.length, render: (e) => e.purposes.length },
           ]} />
       </Card>
