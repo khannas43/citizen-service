@@ -7,6 +7,7 @@ import { Hero, Collapse, Stats, Facts, Drawer, Banner } from '../dx/dxKit'
 import './person360.css'
 import './matchscore.css'
 import PersonLineage, { changeText } from '../dx/PersonLineage'
+import DeptRecords from './DeptRecords'
 import { fmtTime } from '../dx/dxShared'
 import { dqLabel, fmtDate, lifeLabel, linkLabel, RELATION_TEXT, COMPONENT_LABELS } from './labels'
 import { DEFAULT_MATCH, explainScore, KIND_BADGE, EvidenceTable, pc } from './MatchScore'
@@ -256,6 +257,10 @@ export default function Person360({ id, back, openPerson }) {
 
       <Collapse id="p360-lineage" title={tr('Where this came from')} summary={tr('Which departments supplied each value, and which one was chosen.')}>
         <PersonLineage personId={id} compact />
+      </Collapse>
+
+      <Collapse id="p360-departments" title={tr('Department details')} summary={tr('Connections, cards, bills, payments and benefits each department holds for this person, as the person sees them.')}>
+        <DeptRecords personId={id} />
       </Collapse>
 
       <Collapse id="p360-records" title={tr('Department records ({v})', { v: d.records.length })} summary={tr('{n} record(s) from {s} system(s), with how each was linked.', { n: d.records.length, s: p.source_count })}>
