@@ -221,7 +221,7 @@ def channels(cur, system: str | None = None) -> list[dict]:
     have = {r["system"]: r for r in cur.fetchall()}
     out = []
     for k, name in exchange.SYSTEMS.items():
-        if k in ("mdm", "crs", "marriage_register"):
+        if k in ("mdm", "crs", "marriage_register", "water"):
             continue
         if system and k != system:
             continue

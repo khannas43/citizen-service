@@ -20,7 +20,8 @@ from .survivorship import REF_DATE
 SYSTEMS = {"pds": "Civil supplies (PDS)", "health": "Health", "welfare": "Women and child welfare", "citizen": "Citizen record",
            "education": "Education / scholarship", "housing": "Housing", "pension": "Social security / pension MIS",
            "revenue": "Revenue", "electricity": "Electricity distribution", "mdm": "Master data (steward)",
-           "crs": "Civil registration", "marriage_register": "Marriage register", "identity": "Identity reference service"}
+           "crs": "Civil registration", "marriage_register": "Marriage register", "identity": "Identity reference service",
+           "water": "Water supply board"}
 
 # Display name → department code. Kept in one place for proposal.system_code and filter params.
 # Non-department actors ("MDM steward", policy officers, …) map to mdm.

@@ -33,7 +33,7 @@ CRITICAL, ADVISORY = "critical", "advisory"
 RID = {
     "crs": r"^(CRS-EVT-[0-9a-f]+(-DUP)?|[A-Z0-9]+-[A-Z]+(-\d+)?-[0-9a-f]+)$", "identity_reference": r"^IDR-[0-9A-Z]{6,}$", "pension_batch": r"^PN-\d+$",
     "revenue_certificates": r"^RV-(CC|IC)-\d+$", "revenue_land": r"^RV-LR-\d+$", "pds_view": r"^PDS-\d+$", "student_portal": r"^STU-\d+$",
-    "marriage_register": r"^(MR-\d+|[A-Z0-9]+-[A-Z]+-[0-9a-f]+)(:\w+)?$", "electricity": r"^ELEC-[0-9A-Za-z]+$", "housing": r"^HSG-[0-9A-Za-z]+$",
+    "marriage_register": r"^(MR-\d+|[A-Z0-9]+-[A-Z]+-[0-9a-f]+)(:\w+)?$", "electricity": r"^ELEC-[0-9A-Za-z]+$", "housing": r"^HSG-[0-9A-Za-z]+$", "water_board": r"^(WTR|BL)-[0-9A-Za-z-]+$",
 }
 
 # fields a feed is expected to carry, and the share of records that should have each
@@ -44,6 +44,7 @@ FIELDS = {
     "pds_view": {"gender": 0.99, "age": 0.99, "address": 0.99, "district": 0.99, "ration_card": 0.99},
     "pension_batch": {"dob": 0.95, "district": 0.99},
     "electricity": {"address": 0.99, "district": 0.99},
+    "water_board": {"address": 0.99, "district": 0.99},
     "housing": {"district": 0.99},
     "revenue_certificates": {"dob": 0.8, "address": 0.99, "district": 0.99},
     "revenue_land": {"district": 0.99},
@@ -148,7 +149,7 @@ def _suite_for(source: str, gxe, n: int, has_asof: bool = True, cfg: dict | None
     if has_asof and "freshness" not in off:
         add(gxe.ExpectColumnMaxToBeBetween(column="as_of_day", min_value=(REF_DATE - date(1970, 1, 1)).days - window_days, max_value=(REF_DATE - date(1970, 1, 1)).days + 1),
             ADVISORY, f"The latest record is no older than the feed's refresh window ({round(window_days)} day{'s' if round(window_days) != 1 else ''})", "freshness", "feed")
-    if source not in ("student_portal", "housing", "revenue_land", "electricity", "revenue_certificates") and "repeats" not in off:
+    if source not in ("student_portal", "housing", "revenue_land", "electricity", "revenue_certificates", "water_board") and "repeats" not in off:
         dup = gxe.ExpectCompoundColumnsToBeUnique(column_list=["name", "dob", "district"], mostly=0.99, row_condition="dob.notnull() and district.notnull()", condition_parser="pandas")
         add(dup, ADVISORY, "The same name, birth date and district is not repeated within the feed", "repeats", tolerance=0.01)
     return ex
@@ -162,7 +163,7 @@ def _pc(x: float) -> str:
 # ---------------------------------------------------------------------------------------------------- why a check failed
 PATTERN = {"crs": "CRS-EVT-<code> or <code>-<type>-<code>", "identity_reference": "IDR-<6 or more letters or digits>", "pension_batch": "PN-<number>",
            "revenue_certificates": "RV-CC-<number> or RV-IC-<number>", "revenue_land": "RV-LR-<number>", "pds_view": "PDS-<number>", "student_portal": "STU-<number>",
-           "marriage_register": "MR-<number>", "electricity": "ELEC-<id>", "housing": "HSG-<id>"}
+           "marriage_register": "MR-<number>", "electricity": "ELEC-<id>", "housing": "HSG-<id>", "water_board": "WTR-<id>, BL-<id> or WTR-<id>-S<n>"}
 VALUE_OF = {"rid_present": "source_rid", "rid_unique": "source_rid", "rid_format": "source_rid", "name_present": "name", "name_length": "name", "gender_valid": "gender",
             "dob_range": "dob", "age_range": "age", "birth_year_range": "birth_year", "asof_format": "as_of"}
 EXAMPLES, TOP = 50, 5

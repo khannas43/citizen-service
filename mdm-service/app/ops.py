@@ -17,7 +17,7 @@ from .stewardship import Refused
 # which department system owns each source feed
 SOURCE_SYSTEM = {"crs": "crs", "pds_view": "pds", "pension_batch": "pension", "revenue_certificates": "revenue", "revenue_land": "revenue",
                  "electricity": "electricity", "student_portal": "education", "housing": "housing", "marriage_register": "marriage_register",
-                 "identity_reference": "identity"}
+                 "identity_reference": "identity", "water_board": "water"}
 
 # where a wrong value must be corrected: the department that owns it, never the master record
 ATTR_AUTH = {"name": "crs", "date_of_birth": "crs", "gender": "crs", "life_status": "crs", "address": "pds", "ration_card": "pds",
@@ -28,7 +28,8 @@ ELEMENTS = {
     "age": ("Age", "crs", "LOW"), "residence": ("District of residence", "pds", "LOW"), "life_status": ("Death registered", "crs", "MEDIUM"),
     "income_band": ("Income band", "revenue", "HIGH"), "category": ("Social category", "revenue", "HIGH"),
     "household_benefit": ("Housing application in household", "housing", "MEDIUM"), "marital_status": ("Marriage recorded", "marriage_register", "MEDIUM"),
-    "electricity_link": ("Electricity connection linked", "electricity", "LOW"), "land_holding": ("Land held", "revenue", "HIGH"),
+    "electricity_link": ("Electricity connection linked", "electricity", "LOW"), "water_connection": ("Water connection and meter details", "water", "LOW"), "water_payment_status": ("Water bill payment status", "water", "MEDIUM"),
+    "water_subsidy": ("Water subsidy received", "water", "HIGH"), "land_holding": ("Land held", "revenue", "HIGH"),
     "duplicate_benefit": ("Duplicate application flag", "housing", "MEDIUM"),
     # carried by a birth event (UC2); Civil registration is the source of truth for all four
     "child_name": ("Child's name", "crs", "MEDIUM"), "date_of_birth": ("Date of birth", "crs", "MEDIUM"),
@@ -36,7 +37,7 @@ ELEMENTS = {
 }
 # the exact feed each element is taken from, so the catalogue can link an element to its source by name
 ELEMENT_SOURCE = {"age": "crs", "residence": "pds_view", "life_status": "crs", "income_band": "revenue_certificates", "category": "revenue_certificates",
-                  "household_benefit": "housing", "marital_status": "marriage_register", "electricity_link": "electricity",
+                  "household_benefit": "housing", "marital_status": "marriage_register", "electricity_link": "electricity", "water_connection": "water_board", "water_payment_status": "water_board", "water_subsidy": "water_board",
                   "land_holding": "revenue_land", "duplicate_benefit": "housing",
                   "child_name": "crs", "date_of_birth": "crs", "gender": "crs", "parents": "crs"}
 QUERYABLE = ["age", "residence", "income_band", "category", "life_status", "household_benefit", "marital_status", "electricity_link", "land_holding"]

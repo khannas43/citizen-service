@@ -10,10 +10,10 @@ REF_DATE = date(2026, 6, 21)      # the date of the synthetic registry
 
 DEFAULT_SURVIVORSHIP = {
     "name": ["identity_reference", "crs", "revenue_certificates", "pension_batch", "student_portal", "marriage_register",
-             "pds_view", "electricity", "revenue_land", "housing"],
+             "pds_view", "electricity", "revenue_land", "housing", "water_board"],
     "dob": ["crs", "revenue_certificates", "pension_batch", "student_portal", "marriage_register"],
     "gender": ["crs", "identity_reference", "marriage_register", "pds_view"],
-    "address": ["pds_view", "revenue_certificates", "electricity", "housing", "pension_batch", "revenue_land"],
+    "address": ["pds_view", "revenue_certificates", "electricity", "housing", "pension_batch", "revenue_land", "water_board"],
 }
 RULE_TEXT = {
     "name": "Latin-script name from the most trusted source (identity reference first)",
@@ -80,7 +80,7 @@ def build_golden(recs: list[dict], surv: dict | None = None) -> dict:
 
     # address (most recent)
     addr = [r for r in recs if r["source"] in surv["address"] and (r.get("address") or r.get("village") or r.get("mandal"))]
-    addr.sort(key=lambda r: (str(r.get("as_of") or "")[:10] == "", _neg(str(r.get("as_of") or "")[:10]), _rank(surv["address"], r["source"])))
+    addr.sort(key=lambda r: (not r.get("address"), str(r.get("as_of") or "")[:10] == "", _neg(str(r.get("as_of") or "")[:10]), _rank(surv["address"], r["source"])))
     for k in ("district", "mandal", "village", "address"):
         out[k] = None
     if addr:

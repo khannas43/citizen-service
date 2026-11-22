@@ -16,7 +16,7 @@ c = TestClient(app)
 def test_health_and_dashboard():
     assert c.get("/api/health").json()["status"] == "ok"
     d = c.get("/api/dashboard").json()
-    assert d["totals"]["persons"] > 0 and len(d["sources"]) == 10
+    assert d["totals"]["persons"] > 0 and len(d["sources"]) == 11
     assert sum(d["links"].values()) == d["totals"]["records"]
 
 

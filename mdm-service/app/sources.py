@@ -9,7 +9,7 @@ from .model import Rec
 
 # trust order used when building clusters: earlier sources anchor a person first
 SOURCE_ORDER = ["crs", "identity_reference", "pension_batch", "revenue_certificates", "pds_view", "student_portal",
-                "marriage_register", "revenue_land", "electricity", "housing"]
+                "marriage_register", "revenue_land", "electricity", "housing", "water_board"]
 
 SOURCE_INFO = {
     "crs": ("Civil registration (CRS)", "REST API + event feed", 0),
@@ -22,6 +22,7 @@ SOURCE_INFO = {
     "student_portal": ("Education / scholarship", "Web portal only (operator-keyed)", 24 * 90),
     "housing": ("Housing", "REST API", 24 * 30),
     "marriage_register": ("Marriage register", "REST API (partial coverage)", 24 * 30),
+    "water_board": ("Water supply board", "REST API", 24 * 30),
 }
 
 
@@ -95,4 +96,8 @@ def load_dir(folder: str | Path) -> list[Rec]:
             dob=_d(r["groom_dob"]), district=r["registrar_office"] or None, as_of=r["marriage_date"], raw=r)
         add(source="marriage_register", rid=r["registration_no"] + ":bride", rtype="MARRIAGE_BRIDE", name=r["bride_name_at_marriage"],
             gender="F", dob=_d(r["bride_dob"]), district=r["registrar_office"] or None, as_of=r["marriage_date"], raw=r)
+    if (d / "water_board.csv").exists():             # optional feed: present only when the board has supplied an extract
+        for r in _rows(d / "water_board.csv"):
+            add(source="water_board", rid=r["service_no"], rtype="CONNECTION", name=r["consumer_name"], district=r["district"] or None,
+                mandal=r["mandal"] or None, address=r["address_text"] or None, as_of=r["last_bill_date"] or None, raw=r)
     return recs
