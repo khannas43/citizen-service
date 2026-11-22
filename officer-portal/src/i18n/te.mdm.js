@@ -313,7 +313,6 @@ export default {
  "When a steward links a person's only record to someone else, the empty person is removed and the record now sits on the person it was linked to. Find them again in the People list by name or record number, or go back to the review queue.": "స్టీవార్డ్ ఒక వ్యక్తి ఏకైక రికార్డును మరొకరికి అనుసంధానించినప్పుడు, ఖాళీ అయిన వ్యక్తి తొలగించబడుతుంది, రికార్డు అనుసంధానించిన వ్యక్తి వద్ద ఉంటుంది. వ్యక్తుల జాబితాలో పేరు లేదా రికార్డు సంఖ్యతో వారిని మళ్లీ కనుగొనండి, లేదా సమీక్ష వరుసకు తిరిగి వెళ్లండి.",
  "Where doubtful matches stand": "సందేహాస్పద సరిపోలికల పరిస్థితి",
  "Where this came from": "ఇది ఎక్కడి నుండి వచ్చింది",
- "Where this view can mislead.": "ఈ వీక్షణ ఎక్కడ తప్పుదారి పట్టించవచ్చు.",
  "Which departments supplied each value, and which one was chosen.": "ప్రతి విలువను ఏ శాఖలు అందించాయి, ఏది ఎంపికైంది.",
  "Which source wins for each field": "ప్రతి అంశానికి ఏ మూలం ప్రాధాన్యం పొందుతుంది",
  "Who": "ఎవరు",

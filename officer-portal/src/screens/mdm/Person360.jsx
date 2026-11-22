@@ -223,10 +223,6 @@ export default function Person360({ id, back, openPerson }) {
                 ))}
               </tbody>
             </table>
-            {(hh.caveats || []).length > 0 && (
-              <div className="p360-caveats"><strong>{tr('Where this view can mislead.')}</strong>
-                <ul className="mdm-plain">{hh.caveats.map((c, i) => <li key={i}>{c}</li>)}</ul></div>
-            )}
           </>
         ) : <p className="mdm-note">{hh ? 'No ration card household was found for this person.' : 'Loading the household…'}</p>}
         {bparents.length > 0 && (

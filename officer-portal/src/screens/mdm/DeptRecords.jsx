@@ -4,7 +4,6 @@ import { tr } from '../../i18n/lang'
 import { fmtDate } from './labels'
 import './deptrecords.css'
 
-const LEVEL = { LOW: 'ok', MEDIUM: 'warn', HIGH: 'bad' }
 const rupees = (n) => `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
 const monthName = (p) => { const d = new Date(`${p}-01`); return Number.isNaN(d.getTime()) ? p : d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) }
 const show = (v, type) => (v === null || v === undefined || v === '' ? '—' : type === 'money' ? rupees(v) : type === 'date' ? fmtDate(v) : String(v))
@@ -70,7 +69,7 @@ function Account({ a, open, toggle }) {
           <section><h3 className="ut-h3">{tr('Catalogue elements this department supplied')}</h3>
             <div className="ut-els">{a.elements.map((el) => (
               <div className="ut-el" key={el.element} data-testid="data-element">
-                <div className="ut-el-top"><strong>{el.name}</strong><span className={`ut-pill ${LEVEL[el.sensitivity] || 'info'}`}>{el.sensitivity.toLowerCase()}</span></div>
+                <div className="ut-el-top"><strong>{el.name}</strong></div>
                 <p className="ut-el-src">{tr('From')} {el.source}{el.as_of ? ` · ${tr('as of')} ${fmtDate(el.as_of)}` : ''}</p>
                 <dl>{el.fields.map((f) => <div key={f.label} style={{ display: 'contents' }}><dt>{f.label}</dt><dd>{show(f.value, f.type)}</dd></div>)}</dl>
               </div>))}</div>

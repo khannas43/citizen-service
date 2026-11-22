@@ -29,7 +29,7 @@ function Overview({ params, setParams }) {
       <Banner tone="info">{tr('Read left to right. Departments hand their records in; master data links and merges them; the exchange publishes events and answers questions from the result; the departments and services on the right consume it. Select a source system to follow only its people through the columns; select it again, or use “Show all sources”, to go back.')}</Banner>
       <div className="lin-focusbar">
         {picked
-          ? <span className="lin-focus-chip">{tr('Showing:')} <strong>{picked.name}</strong><span className="lin-meta"> {tr('· columns 2 to 4 count the people this source holds, who usually sit in other systems too')}</span></span>
+          ? <span className="lin-focus-chip">{tr('Showing:')} <strong>{picked.name}</strong></span>
           : <span className="lin-meta">{tr('Showing all source systems')}</span>}
         {picked && <button type="button" className="btn-secondary small" onClick={() => pick(null)}>{tr('Show all sources')}</button>}
       </div>
@@ -63,7 +63,7 @@ function Overview({ params, setParams }) {
         <div className="lin-arrow" aria-hidden="true">➜</div>
         <div className="lin-col">
           <h3 className="lin-col-h">{tr('3 · What the exchange produces')}{scope && <small>{scope}</small>}</h3>
-          {data.outputs.map((o) => (
+          {data.outputs.filter((o) => o.kind !== 'queries').map((o) => (
             <div key={o.kind} className="lin-box out"><strong>{o.label}</strong><span className="lin-n">{n(o.count)}</span></div>
           ))}
         </div>
