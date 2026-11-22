@@ -82,3 +82,7 @@ export function withdrawConsent(consentId) {
 export function fetchHousehold() {
   return call('/household')
 }
+
+export function fetchUtilities() {
+  return call('/utilities')
+}

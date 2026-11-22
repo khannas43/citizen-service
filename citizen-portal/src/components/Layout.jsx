@@ -11,6 +11,7 @@ import { LOCAL_LANG } from '../lang'
 
 const MORE_LINKS = [
   { to: '/payments',      icon: '💰', labelKey: 'nav.paymentsFull' },
+  { to: '/utilities',     icon: '💧', labelKey: 'nav.utilitiesFull' },
   { to: '/certificates',  icon: '📄', labelKey: 'nav.certificatesFull' },
   { to: '/notifications', icon: '🔔', labelKey: 'nav.notificationsFull' },
   { to: '/contact',       icon: '📞', labelKey: 'nav.contactFull' },
@@ -82,6 +83,7 @@ export default function Layout() {
     { to: '/my-family',     label: t('myFamily') },
     { to: '/grievances',    label: t('complaints.nav') },
     { to: '/payments',      label: '💰 ' + t('nav.payments') },
+    { to: '/utilities',     label: '💧 ' + t('nav.utilities') },
     { to: '/certificates',  label: '📄 ' + t('nav.certificates') },
     { to: '/notifications', label: '🔔 ' + t('nav.notifications') },
     { to: '/contact',       label: '📞 ' + t('nav.contact') },
