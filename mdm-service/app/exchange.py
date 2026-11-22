@@ -1503,7 +1503,7 @@ def _original(cur, e: dict):
     return cur.fetchone()
 
 
-PARENT_STATE = {"LINKED": "linked", "AWAITING": "matched, awaiting approval", "DECLINED": "matched, not approved", "NOT_MATCHED": "not matched"}
+PARENT_STATE = {"LINKED": "linked", "AWAITING": "matched, awaiting an officer's approval", "DECLINED": "matched, not approved", "NOT_MATCHED": "not matched"}
 
 
 def event_parents(cur, e: dict) -> list:

@@ -81,12 +81,12 @@ describe('Data lineage', () => {
   it('flow level: the header names the mother and father as links, with where each match stands, and they are boxes in the flow', async () => {
     const parents = [{ role: 'Mother', name: 'Savitha Madavi', person_id: 21, state: 'AWAITING' }, { role: 'Father', name: 'Bhimrao Madavi', person_id: null, state: 'NOT_MATCHED' }]
     const f = { ...flow, event: { ...flow.event, citizen: 'Baby Madavi', person_id: 7, people: [{ role: null, name: 'Baby Madavi', person_id: 7 }], parents },
-      nodes: [...flow.nodes, { id: 'parent_mother', kind: 'person', label: 'Mother: Savitha Madavi', status: 'AWAITING_APPROVAL', status_text: 'matched, awaiting approval', link: '/mdm?tab=people&person=21', detail: {} }],
+      nodes: [...flow.nodes, { id: 'parent_mother', kind: 'person', label: 'Mother: Savitha Madavi', status: 'AWAITING_APPROVAL', status_text: "matched, awaiting an officer's approval", link: '/mdm?tab=people&person=21', detail: {} }],
       edges: [...flow.edges, { from: 'parent_mother', to: 'ev', label: 'mother of' }] }
     globalThis.fetch = route({ '/x/lineage/event/5': f, '/x/events': { total: 0, items: [] } })
     wrap(<DxLineage />, '/?tab=event&event=5')
     expect(await screen.findByTitle('Open Savitha Madavi')).toHaveTextContent('Savitha Madavi')
-    expect(screen.getByText(/matched, awaiting approval/, { selector: '.dxk-muted' })).toBeInTheDocument()
+    expect(screen.getByText(/matched, awaiting an officer's approval/, { selector: '.dxk-muted' })).toBeInTheDocument()
     expect(screen.queryByTitle(/^Open Bhimrao Madavi/)).toBeNull()
     expect(screen.getByText(/not matched/, { selector: '.dxk-muted' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Person: Mother: Savitha Madavi/ })).toBeInTheDocument()

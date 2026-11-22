@@ -458,7 +458,7 @@ def s_2_2(k: Kit):
     eid = res["event_id"]
     pa = k.flow(eid)["event"].get("parents") or []
     k.ok(len(pa) == 2 and all(x["state"] in ("AWAITING", "NOT_MATCHED") for x in pa),
-         "The mother and father on the registration are named; a matched parent shows as awaiting approval until a person approves", parents={x["role"]: x["state_text"] for x in pa})
+         "The mother and father on the registration are named; a matched parent shows as awaiting an officer's approval until a person approves", parents={x["role"]: x["state_text"] for x in pa})
     nt = k.one("SELECT id, rule, outcome FROM mdm.dept_response WHERE event_id=%s AND purpose='BIRTH_PDS'", eid)
     k.ok(nt and nt["outcome"] is None and nt["rule"].get("key") == "BIRTH_REGISTERED",
          f"{A} has a notice to answer, due within the time allowed for a birth registration", rule=nt and nt["rule"])

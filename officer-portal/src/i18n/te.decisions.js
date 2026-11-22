@@ -655,7 +655,7 @@ export default {
   "Search visits": "సందర్శనలను వెతకండి",
   "Operator": "ఆపరేటర్",
   "Started": "ప్రారంభమైంది",
-  "matched, awaiting approval": "సరిపోలింది, ఆమోదం కోసం వేచి ఉంది",
+  "matched, awaiting an officer's approval": "సరిపోలింది, అధికారి ఆమోదం కోసం వేచి ఉంది",
   "matched, not approved": "సరిపోలింది, ఆమోదించలేదు",
   "not matched": "సరిపోలలేదు",
   "Back to injected events": "ఇంజెక్ట్ చేసిన ఘటనలకు తిరిగి వెళ్లండి",

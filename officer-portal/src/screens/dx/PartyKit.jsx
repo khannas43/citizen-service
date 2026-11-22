@@ -5,7 +5,7 @@ import { tr } from '../../i18n/lang'
 /** One person named on an event (a parent, a bride or groom): a link to their page when matched, with where the match stands. */
 export function PartyName({ p, big }) {
   const nav = useNavigate()
-  const note = p.state === 'AWAITING' ? tr('matched, awaiting approval') : p.state === 'DECLINED' ? tr('matched, not approved') : !p.person_id ? tr('not matched') : null
+  const note = p.state === 'AWAITING' ? tr("matched, awaiting an officer's approval") : p.state === 'DECLINED' ? tr('matched, not approved') : !p.person_id ? tr('not matched') : null
   return (
     <span>
       {p.person_id
