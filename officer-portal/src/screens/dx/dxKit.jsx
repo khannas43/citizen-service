@@ -7,14 +7,14 @@ import './dxKit.css'
 
 /* Shared building blocks for the exchange screens: one look, one set of behaviours (search, filter, sort, page, export). */
 
-export function PageHeader({ icon, title, subtitle, actions, children }) {
+export function PageHeader({ icon, title, subtitle, actions, children, wideSubtitle }) {
   return (
     <header className="dxk-head">
       <div className="dxk-head-main">
         {icon && <span className="dxk-head-icon" aria-hidden="true">{icon}</span>}
-        <div className="dxk-head-titles">
+        <div className={`dxk-head-titles${wideSubtitle ? ' grow' : ''}`}>
           <h1 className="page-title dxk-title">{T(title)}</h1>
-          {subtitle && <p className="dxk-sub">{T(subtitle)}</p>}
+          {subtitle && <p className={`dxk-sub${wideSubtitle ? ' wide' : ''}`}>{T(subtitle)}</p>}
         </div>
       </div>
       {actions && <div className="dxk-head-actions">{actions}</div>}

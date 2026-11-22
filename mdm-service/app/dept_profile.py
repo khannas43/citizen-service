@@ -357,6 +357,13 @@ def addresses(cur, pid: int) -> dict:
     return {"master": ", ".join(parts) or None, "held_by": held}
 
 
+def master_address(cur, pid: int) -> dict:
+    """The master record's address in parts, so the citizen portal can show the same address the departments agree on."""
+    cur.execute("SELECT address, village, mandal, district FROM mdm.person WHERE id=%s", (pid,))
+    p = cur.fetchone() or {}
+    return {"address": p.get("address"), "village": p.get("village"), "mandal": p.get("mandal"), "district": p.get("district")}
+
+
 def profile(cur, pid: int) -> dict:
     cur.execute("SELECT id, source, source_rid, rtype, name, address, ration_card, relation, payload FROM mdm.source_record WHERE person_id=%s AND source = ANY(%s) ORDER BY id", (pid, ORDER))
     base = cur.fetchall()

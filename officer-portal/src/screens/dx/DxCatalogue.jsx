@@ -56,7 +56,7 @@ export default function DxCatalogue() {
   const d = detail ? bySource[detail] : null
   return (
     <div className="mdm-hub">
-      <PageHeader icon="📚" title={tr('Metadata catalogue')}
+      <PageHeader icon="📚" title={tr('Metadata catalogue')} wideSubtitle
         subtitle={tr('What can be shared, how sensitive it is, and which department is the source of truth for it. A wrong value is always corrected at that department. Select a source to see the data elements it supplies.')} />
       <Stats items={[
         { label: 'Data elements', value: data.elements.length },

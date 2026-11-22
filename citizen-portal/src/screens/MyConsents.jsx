@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { loadCitizenProfile } from '../auth'
-import { APIs, fetchConsents, revokeConsent, restoreConsent, fetchDataExport, submitGrievance, fetchCitizenDocuments, uploadCitizenDocument, fetchDocumentData } from '../api'
+import { masterAddressFields, APIs, fetchConsents, revokeConsent, restoreConsent, fetchDataExport, submitGrievance, fetchCitizenDocuments, uploadCitizenDocument, fetchDocumentData } from '../api'
 import RequestsForYou from './RequestsForYou'
 import { cafVisibleFileName, formatCafDocType } from '../caf/cafDocumentConfig'
 
@@ -54,6 +54,7 @@ function MyDataTab({ profile }) {
   const { t } = useTranslation()
   const [person, setPerson] = useState(null)
   const [family, setFamily] = useState(null)
+  const [master, setMaster] = useState({})
   const [loadingPerson, setLoadingPerson] = useState(true)
   const [updateModal, setUpdateModal] = useState(false)
   const [updateField, setUpdateField] = useState('')
@@ -93,11 +94,16 @@ function MyDataTab({ profile }) {
 
   useEffect(() => {
     if (!profile?.aadhaarRef) return
+    masterAddressFields().then(setMaster)
+  }, [profile?.aadhaarRef])
+
+  useEffect(() => {
+    if (!profile?.aadhaarRef) return
     fetchCitizenDocuments(profile.aadhaarRef).then(setVaultDocs).catch(() => {})
   }, [profile?.aadhaarRef])
 
   const p = person || {}
-  const f = family || {}
+  const f = { ...(family || {}), ...master }
 
   function currentValueFor(fieldKey) {
     if (!fieldKey) return ''

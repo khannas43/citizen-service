@@ -1,4 +1,5 @@
 import { LOCAL_LANG } from './lang'
+import { fetchMasterAddress } from './approvalsApi'
 const rel = (path, port) => import.meta.env.DEV ? `http://localhost:${port}${path}` : path
 
 export const APIs = {
@@ -344,6 +345,21 @@ export async function completeOnboarding(personId, payload) {
   return res.json()
 }
 
+/** The address the departments agree on (the master record), in the registry's field names. Empty when the master has none, so the registry's own address still shows. */
+export async function masterAddressFields() {
+  try {
+    const m = await fetchMasterAddress()
+    const out = {}
+    if (m.address) out.address = m.address
+    if (m.village) out.village = m.village
+    if (m.mandal) out.taluka = m.mandal
+    if (m.district) out.district = m.district
+    return out
+  } catch {
+    return {}
+  }
+}
+
 /** Fresh profile for the first-login onboarding screen — not localStorage alone */
 export async function fetchOnboardingProfile(aadhaarRef) {
   const pr = await fetch(`${APIs.family}/v1/persons/search?aadhaar=${encodeURIComponent(aadhaarRef)}`)
@@ -373,6 +389,7 @@ export async function fetchOnboardingProfile(aadhaarRef) {
     rationMaritalStatus = 'MARRIED'
   }
 
+  const master = await masterAddressFields()
   return {
     personId: String(person.id),
     familyId: person.familyId ? String(person.familyId) : null,
@@ -381,10 +398,10 @@ export async function fetchOnboardingProfile(aadhaarRef) {
     dob: person.dob || null,
     gender: person.gender || null,
     mobile: person.mobile || null,
-    address: family?.address ?? null,
-    village: family?.village ?? person.village ?? null,
-    taluka: family?.taluka ?? person.taluka ?? null,
-    district: family?.district ?? person.district ?? null,
+    address: master.address ?? family?.address ?? null,
+    village: master.village ?? family?.village ?? person.village ?? null,
+    taluka: master.taluka ?? family?.taluka ?? person.taluka ?? null,
+    district: master.district ?? family?.district ?? person.district ?? null,
     rationCardNumber: family?.rationCardNumber ?? null,
     occupation: person.occupation || null,
     annualIncome: person.annualIncome ?? null,
@@ -425,16 +442,17 @@ export async function fetchCafCommonProfile(aadhaarRef, familyIdFromSession = nu
     ])
   }
 
+  const master = await masterAddressFields()
   return {
     name: person?.name ?? null,
     aadhaarRef,
     familyId,
     personId: person?.id ? String(person.id) : null,
-    district: person?.district ?? family?.district ?? null,
-    taluka: person?.taluka ?? family?.taluka ?? null,
-    village: person?.village ?? family?.village ?? null,
+    district: master.district ?? person?.district ?? family?.district ?? null,
+    taluka: master.taluka ?? person?.taluka ?? family?.taluka ?? null,
+    village: master.village ?? person?.village ?? family?.village ?? null,
     state: family?.state ?? null,
-    address: family?.address ?? null,
+    address: master.address ?? family?.address ?? null,
     rationCardNumber: family?.rationCardNumber ?? null,
     casteCategory: person?.casteCategory ?? null,
     annualIncome: person?.annualIncome ?? income?.totalAnnualIncome ?? null,

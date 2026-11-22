@@ -83,6 +83,10 @@ export function fetchHousehold() {
   return call('/household')
 }
 
+export function fetchMasterAddress() {
+  return call('/address')
+}
+
 export function fetchRecords() {
   return call('/records')
 }

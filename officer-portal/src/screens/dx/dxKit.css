@@ -239,3 +239,6 @@ th[aria-sort] .dxk-sortbtn span { color: var(--color-accent, #e8650a); }
 .dxk-namebtn { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--color-primary, #1f4e9c); cursor: pointer; text-align: left; }
 .dxk-namebtn:hover, .dxk-namebtn:focus-visible { text-decoration: underline; }
 .dxk-bad { color: var(--color-danger, #b42318); font-size: 0.8rem; font-weight: 600; }
+
+.dxk-head-titles.grow { flex: 1; min-width: 0; container-type: inline-size; }
+.dxk-sub.wide { max-width: none; white-space: nowrap; font-size: clamp(0.62rem, 1.05cqw, 0.9rem); }

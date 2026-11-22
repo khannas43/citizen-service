@@ -136,6 +136,11 @@ def reports_list(ref: str = Depends(me), cur=Depends(cur_dep)):
     return run(citizen.list_reports, cur, ref)
 
 
+@router.get("/api/citizen/address")
+def my_address(ref: str = Depends(me), cur=Depends(cur_dep)):
+    return run(lambda: dept_profile.master_address(cur, citizen.person_of(cur, ref)))
+
+
 @router.get("/api/citizen/records")
 def my_records(ref: str = Depends(me), cur=Depends(cur_dep)):
     return run(lambda: dept_profile.profile(cur, citizen.person_of(cur, ref)))
