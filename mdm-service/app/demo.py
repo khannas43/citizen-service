@@ -622,6 +622,9 @@ def s_2_13(k: Kit):
     ev = k.one("SELECT id FROM mdm.event WHERE scenario='2.12' ORDER BY id DESC LIMIT 1")
     if not ev:
         k.skip("Run step 2.12 first")
+    cs = k.flow(ev["id"])["consents"]
+    if cs and not any(c["status"] == "PENDING" for c in cs) and all(c["status"] == "EXPIRED" for c in cs):
+        k.skip("Already done: the requests for this child have expired. To show it again, click Clear demo records and run the UC2 group, then steps 2.12 and 2.13")
     later = datetime.now(timezone.utc) + timedelta(days=k.pol("consent_response_days") + 1)
     n = 0
     for c in k.flow(ev["id"])["consents"]:
