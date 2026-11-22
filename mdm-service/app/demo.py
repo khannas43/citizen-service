@@ -596,6 +596,8 @@ def s_2_9(k: Kit):
     """Live step: the name arrives for the held birth. The same child is created, flagged as a late registration."""
     held = k.one("SELECT id, payload FROM mdm.event WHERE scenario='2.8' AND status='HELD' ORDER BY id DESC LIMIT 1")
     if not held:
+        if k.one("SELECT 1 AS x FROM mdm.event WHERE scenario='2.8' AND case_kind='AMENDMENT' LIMIT 1"):
+            k.skip("Already done: the name has been given and the child created. To show it again, click Clear demo records and run the UC2 group, then steps 2.8 and 2.9")
         k.skip("Run step 2.8 first")
     pl = held["payload"] if isinstance(held["payload"], dict) else json.loads(held["payload"])
     am = k.event("BIRTH_AMENDED", "UC2", {"registration_no": pl["registration_no"], "child_name": f"Karthik {pl['father_name'].split()[-1]}"}, scenario="2.8", case_kind="AMENDMENT")
