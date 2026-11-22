@@ -860,6 +860,7 @@ export default {
   "Everything held from this feed since it was first loaded, with no date filter. The date is the newest record's own 'data as of' date, not the time of loading.": "ఈ ఫీడ్ మొదటిసారి లోడ్ అయినప్పటి నుండి ఉన్న మొత్తం రికార్డులు, తేదీ పరిమితి లేకుండా. తేదీ అనేది కొత్త రికార్డు యొక్క 'డేటా ఉన్న తేదీ', లోడ్ చేసిన సమయం కాదు.",
   "Today's open work for data stewards, not a lifetime total. Identity matches are records the system could not confidently link to a person. Quality issues are open data problems. Both fall as stewards resolve them.": "డేటా స్టీవార్డ్‌ల కోసం ఈ రోజు పెండింగ్‌లో ఉన్న పని, మొత్తం కాదు. గుర్తింపు సరిపోలికలు అంటే ఒక వ్యక్తితో నమ్మకంగా అనుసంధానించలేని రికార్డులు. నాణ్యత సమస్యలు అంటే పరిష్కరించని డేటా లోపాలు. స్టీవార్డ్‌లు పరిష్కరించే కొద్దీ రెండూ తగ్గుతాయి.",
   "Events sent to this department, such as a birth notice, grouped by delivery status. Empty for a department that only supplies data.": "ఈ శాఖకు పంపిన ఈవెంట్‌లు, ఉదాహరణకు జనన నోటీసు, డెలివరీ స్థితి ప్రకారం. డేటా సరఫరా మాత్రమే చేసే శాఖకు ఇది ఖాళీగా ఉంటుంది.",
+  "These filters are also set: {names}. Clear them to see more.": "ఈ ఫిల్టర్లు కూడా అమలులో ఉన్నాయి: {names}. మరిన్ని చూడటానికి వాటిని తొలగించండి.",
   "Suspended for review.": "సమీక్ష కోసం నిలిపివేయబడింది.",
   "Run the checks": "తనిఖీలను నడపండి",
   "Test result": "పరీక్ష ఫలితం",

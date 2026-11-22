@@ -51,6 +51,8 @@ export default function DxCatalogue() {
   const bySource = Object.fromEntries(data.sources.map((s) => [s.source, s]))
   const rows = data.elements.filter((e) => (!sens || e.sensitivity === sens) && (!src || e.source === src) && (!qry || (qry === 'yes') === !!e.queryable))
   const picked = src ? bySource[src] : null
+  const pick = (key) => { setSrc(key); setSens(''); setQry('') }
+  const others = [sens && tr('Sensitivity'), qry && tr('Population query')].filter(Boolean).join(', ')
   const stale = data.sources.filter((s) => s.state === 'STALE').length
   const d = detail ? bySource[detail] : null
   return (
@@ -65,7 +67,7 @@ export default function DxCatalogue() {
       ]} />
       <Card title={tr('Sources')} hint={tr('Where the data comes from. A data element is only as fresh as its source.')} >
         <div className="dxk-srcgrid">
-          {data.sources.map((s) => <SourceCard key={s.source} s={s} active={src === s.source} onPick={() => setSrc(src === s.source ? '' : s.source)} onDetails={() => setDetail(s.source)} />)}
+          {data.sources.map((s) => <SourceCard key={s.source} s={s} active={src === s.source} onPick={() => pick(src === s.source ? '' : s.source)} onDetails={() => setDetail(s.source)} />)}
         </div>
       </Card>
       <Card title={picked ? tr('Data elements from {name}', { name: picked.name }) : tr('Data elements')} hint={picked ? tr('Showing only what this source supplies. Select the source again to see all.') : undefined} flush>
@@ -77,7 +79,7 @@ export default function DxCatalogue() {
             <FilterSelect label={tr('Source of truth')} value={src} onChange={setSrc} options={data.sources.filter((s) => s.elements.length).map((s) => [s.source, s.name])} />
             <FilterSelect label={tr('Population query')} value={qry} onChange={setQry} options={[['yes', 'Yes'], ['no', 'Question only']]} />
           </>}
-          empty={tr('No data elements match')}
+          empty={tr('No data elements match')} emptyHint={others ? tr('These filters are also set: {names}. Clear them to see more.', { names: others }) : undefined}
           columns={[
             { key: 'name', label: 'Element', sort: true, render: (e) => <><span className="dxk-main">{e.name}</span><div className="mdm-sub">{e.element}</div></> },
             { key: 'authoritative', label: 'Source of truth', sort: true, render: (e) => { const s = bySource[e.source]; const [lab, tone] = STATE[s?.state] || ['', 'neutral']; return (
@@ -94,7 +96,7 @@ export default function DxCatalogue() {
           <h3 className="dxk-drawer-h">{tr('Data elements it supplies')}</h3>
           {d.elements.length ? <ul className="dxk-list">{d.elements.map((k) => { const e = data.elements.find((x) => x.element === k); return <li key={k}>{e?.name || k} <span className="mdm-sub">{k}</span></li> })}</ul>
             : <p className="mdm-sub">{tr('It supplies data to the master record but is not the source of truth for any element in this catalogue.')}</p>}
-          {d.elements.length > 0 && <button type="button" className="btn-secondary small" onClick={() => { setSrc(d.source); setDetail(null) }}>{tr('Show these in the table')}</button>}
+          {d.elements.length > 0 && <button type="button" className="btn-secondary small" onClick={() => { pick(d.source); setDetail(null) }}>{tr('Show these in the table')}</button>}
         </>}
       </Drawer>
     </div>
