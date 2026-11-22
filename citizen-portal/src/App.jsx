@@ -13,7 +13,7 @@ import ApprovalDetail from './screens/ApprovalDetail'
 import ReportWrongDetail from './screens/ReportWrongDetail'
 import MyReports from './screens/MyReports'
 import PaymentsBenefits from './screens/PaymentsBenefits'
-import MyUtilities from './screens/MyUtilities'
+import MyRecords from './screens/MyRecords'
 import MyCertificates from './screens/MyCertificates'
 import NotificationHub from './screens/NotificationHub'
 import ContactCentre from './screens/ContactCentre'
@@ -105,7 +105,8 @@ export default function App() {
         <Route path="/grievances" element={<MyComplaints />} />
         <Route path="/my-complaints" element={<Navigate to="/grievances" replace />} />
         <Route path="/payments" element={<PaymentsBenefits />} />
-        <Route path="/utilities" element={<MyUtilities />} />
+        <Route path="/records" element={<MyRecords />} />
+        <Route path="/utilities" element={<Navigate to="/records" replace />} />
         <Route path="/certificates" element={<MyCertificates />} />
         <Route path="/notifications" element={<NotificationHub />} />
         <Route path="/contact" element={<ContactCentre />} />

@@ -62,3 +62,9 @@
   .ut-head, .ut-body { padding: var(--space-4); }
   .ut-el dl { grid-template-columns: 1fr; }
 }
+
+.ut-dept { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-4) 0 0; }
+.ut-dept h2 { margin: 0; font-size: var(--text-xl); color: var(--color-primary-dark); }
+.ut-dept span { font-size: 1.4rem; }
+.ut-bar-null { display: none; }
+.ut-table .num.w { color: var(--color-success); }

@@ -83,6 +83,6 @@ export function fetchHousehold() {
   return call('/household')
 }
 
-export function fetchUtilities() {
-  return call('/utilities')
+export function fetchRecords() {
+  return call('/records')
 }
