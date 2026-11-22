@@ -68,3 +68,13 @@
 .ut-dept span { font-size: 1.4rem; }
 .ut-bar-null { display: none; }
 .ut-table .num.w { color: var(--color-success); }
+
+.ut-tools { display: flex; gap: var(--space-2); justify-content: flex-end; }
+.ut-box { border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface, #fff); overflow: hidden; }
+.ut-box-head { all: unset; box-sizing: border-box; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); cursor: pointer; }
+.ut-box-head:hover { background: var(--color-bg-subtle, rgba(0,0,0,.03)); }
+.ut-box-head:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
+.ut-box-head .ut-dept { margin: 0; }
+.ut-box-meta { display: inline-flex; align-items: center; gap: var(--space-3); color: var(--color-text-secondary); font-size: var(--text-sm, 0.9rem); }
+.ut-chev { font-size: 1.1rem; }
+.ut-box-body { padding: 0 var(--space-4) var(--space-4); border-top: 1px solid var(--color-border); padding-top: var(--space-4); }

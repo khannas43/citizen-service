@@ -9,6 +9,7 @@ export default function MyRecords() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [state, setState] = useState({ loading: true })
+  const [open, setOpen] = useState({})              // department source -> expanded; collapsed by default
 
   const load = useCallback(() => {
     fetchRecords()
@@ -54,12 +55,24 @@ export default function MyRecords() {
         )}
       </article>
       {d.departments.length === 0 && <p className="ut-note">{t('records.none', { defaultValue: 'No department records are linked to you yet.' })}</p>}
-      {d.departments.map((dep) => (
-        <section key={dep.source} aria-label={dep.department} className="ut">
-          <div className="ut-dept"><span aria-hidden="true">{dep.icon}</span><h2>{dep.department}</h2></div>
-          {dep.accounts.map((a) => <DeptAccount key={`${a.source}-${a.id}`} a={a} />)}
-        </section>
-      ))}
+      {d.departments.length > 0 && (
+        <div className="ut-tools">
+          <button type="button" className="btn-secondary" onClick={() => setOpen(Object.fromEntries(d.departments.map((x) => [x.source, true])))}>{t('records.expandAll', { defaultValue: 'Expand all' })}</button>
+          <button type="button" className="btn-secondary" onClick={() => setOpen({})}>{t('records.collapseAll', { defaultValue: 'Collapse all' })}</button>
+        </div>
+      )}
+      {d.departments.map((dep) => {
+        const isOpen = !!open[dep.source]
+        return (
+          <section key={dep.source} aria-label={dep.department} className="ut-box">
+            <button type="button" className="ut-box-head" aria-expanded={isOpen} onClick={() => setOpen((o) => ({ ...o, [dep.source]: !o[dep.source] }))}>
+              <span className="ut-dept"><span aria-hidden="true">{dep.icon}</span><h2>{dep.department}</h2></span>
+              <span className="ut-box-meta">{t('records.count', { count: dep.accounts.length, defaultValue: '{{count}} record(s)' })}<span className="ut-chev" aria-hidden="true">{isOpen ? '▾' : '▸'}</span></span>
+            </button>
+            {isOpen && <div className="ut ut-box-body">{dep.accounts.map((a) => <DeptAccount key={`${a.source}-${a.id}`} a={a} />)}</div>}
+          </section>
+        )
+      })}
       <p className="ut-note">{d.note}</p>
     </div>
   )

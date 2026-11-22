@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 vi.mock('../approvalsApi', () => {
@@ -31,6 +31,7 @@ import MyRecords from './MyRecords'
 describe('My department records', () => {
   it('shows one section per department with the passbook, benefits and supplied details', async () => {
     render(<MemoryRouter><MyRecords /></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: 'Expand all' }))
     expect(await screen.findByRole('heading', { name: /Water connection WTR-000177/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Water' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Pension' })).toBeInTheDocument()
@@ -38,5 +39,17 @@ describe('My department records', () => {
     expect(screen.getByText('Free Household Water Allowance')).toBeInTheDocument()
     expect(screen.getByTestId('data-element')).toHaveTextContent('From Water supply board')
     expect(screen.getByText('Part paid')).toBeInTheDocument()
+  })
+
+  it('keeps each department collapsed until opened, and Collapse all closes them again', async () => {
+    render(<MemoryRouter><MyRecords /></MemoryRouter>)
+    const water = await screen.findByRole('button', { name: /Water/ })
+    expect(water).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('table', { name: /passbook/i })).not.toBeInTheDocument()
+    fireEvent.click(water)
+    expect(water).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('table', { name: /passbook/i })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse all' }))
+    expect(screen.queryByRole('table', { name: /passbook/i })).not.toBeInTheDocument()
   })
 })
