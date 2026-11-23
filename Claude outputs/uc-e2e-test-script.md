@@ -122,32 +122,32 @@ Pass for UC2: no data moved before Suma answered; "Shared" is never shown for so
 
 # UC3: Death of a family member
 
-Cast (planted by scenario 3.1): Ramaiah Goud (pensioner, dies in 3.6), Sarojini Goud (his wife, sign-in **2701**), Narsimha Chary (no spouse or nominee), two men named Gangadhar Rao. Run first: Demo > Scenario runner, O/dx/scenarios: **Clear demo records**, then **Run the UC3 group** (3.1 to 3.5 automatic; 3.1 plants the cast). Live steps 3.6 to 3.10 are in the "Live demo steps" block.
+Cast (planted by scenario 3.1): Ramaiah Goud (pensioner, dies in 3.2), Sarojini Goud (his wife, sign-in **2701**), Narsimha Chary (no spouse or nominee), two men named Gangadhar Rao. Run first: Demo > Scenario runner, O/dx/scenarios: **Clear demo records**, then **Run the UC3 group** (3.1, 3.3, 3.4, 3.6 and 3.9 are automatic; 3.1 plants the cast). Live steps 3.2, 3.5, 3.7, 3.8 and 3.10 are in the "Live demo steps" block.
 
-## UC3 Scenario 1: The automatic checks (3.1 to 3.5)
+## UC3 Scenario 1: The automatic checks (3.1, 3.3, 3.4, 3.6 and 3.9)
 
-1. Scenario runner: expect 3.1 to 3.5 green. Open the evidence drawer of each: 3.1 proposal not action; 3.2 the stop needs an authorised officer and a reason; 3.3 no record is not "alive"; 3.4 no spouse or two men fit one name; 3.5 a payment in flight is untouched.
+1. Scenario runner: expect 3.1, 3.3, 3.4, 3.6 and 3.9 green. Open the evidence drawer of each: 3.1 proposal not action; 3.3 the stop needs an authorised officer and a reason; 3.4 a payment in flight is untouched and a repeat is ignored; 3.6 no spouse, or two men fit one name; 3.9 no record is not "alive".
 
-## UC3 Scenario 2: A pensioner with a wife dies; every follow-up is only proposed (3.1, 3.2, 3.5)
+## UC3 Scenario 2: A pensioner with a wife dies; every follow-up is only proposed (3.1, 3.2, 3.3, 3.4, 3.5)
 
 1. Operations > **Beneficiaries**, O/beneficiaries, scheme "Old Age Pension (family review)". Expect: Ramaiah, Narsimha and the two Gangadhar Raos Confirmed, "Receiving the pension". Operations > **Families**, O/families: Ramaiah's household with Sarojini.
-2. Scenario runner: run **3.6** (Ramaiah dies). Decisions > **Approvals**, O/dx/approvals (or Events > Events, O/dx/events). Expect: one proposal "Confirm that Ramaiah Goud ... is the person below", the matched person pre-selected; nobody is marked deceased yet.
+2. Scenario runner: run **3.2** (Ramaiah dies). Decisions > **Approvals**, O/dx/approvals (or Events > Events, O/dx/events). Expect: one proposal "Confirm that Ramaiah Goud ... is the person below", the matched person pre-selected; nobody is marked deceased yet.
 3. Open it, confirm with a reason. Expect: four follow-ups, all only proposals: stop the pension (urgent: a payment is due, dated to the next cycle, the payment in flight is left alone), mark him deceased on the ration card, note the death on the land record, contact Sarojini. Beneficiaries: Ramaiah's note says the stop waits for an officer's approval. Families: Ramaiah shown as no longer alive.
 4. Approve the pension stop: first without a reason (refused), then with a reason. Expect: approved; the pension department has a notice (Decisions > **Notices**, O/dx/notices). Beneficiaries: Ramaiah **Removed**, "Pension stopped from ... Approved by <officer>".
 5. Approve "Contact Sarojini". Citizen: sign in at C/ as **2701**. Expect: C/approvals shows a read-only "A notice about a family member" card; open it: the death is confirmed, the pension in his name is approved to stop, an officer will contact her, nothing is applied to her automatically. Check it in Telugu too. Beneficiaries: a new row for Sarojini, "May be eligible for family pension".
-6. Run **3.10**: the same death again. Events: shown as a duplicate; no second proposal.
+6. Run **3.5**: the same death again. Events: shown as a duplicate; no second proposal.
 
-## UC3 Scenario 3: A pensioner with no spouse or nominee (3.4)
+## UC3 Scenario 3: A pensioner with no spouse or nominee (3.6, 3.7)
 
 1. Run **3.7**. Decisions > Approvals: confirm it with a reason. Expect: a task to trace the next of kin; the pension stop is only a proposal; no spouse notice exists.
 
-## UC3 Scenario 4: One death fits two living men (3.4 dispute)
+## UC3 Scenario 4: One death fits two living men (3.6, 3.8)
 
 1. Run **3.8**. Decisions > Approvals: open the proposal. Expect: flagged ambiguous, nobody pre-selected, both men shown with their details. Try approving without choosing: refused ("Choose one"). No follow-ups exist while it is unresolved. Choose one with a reason (or reject).
 
-## UC3 Scenario 5: A death outside the state for someone with no record (3.3)
+## UC3 Scenario 5: A death outside the state for someone with no record (3.9, 3.10)
 
-1. Run **3.9**. Events > Events, O/dx/events: the registration shows "No match ... does not mean the person is alive"; no proposal.
+1. Run **3.10**. Events > Events, O/dx/events: the registration shows "No match ... does not mean the person is alive"; no proposal.
 2. Connect & reference > Ask and verify > **Verification**, O/dx/verify: ask the pension department whether a death is registered for that person. Expect: "no record", not "no".
 
 Pass for UC3: nothing stops without an approval and a reason; no department record is edited; a missing record is never read as alive or dead; the payment in flight is untouched; Sarojini sees only what an officer approved and is never enrolled automatically.

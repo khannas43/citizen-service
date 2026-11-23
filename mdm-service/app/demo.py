@@ -671,7 +671,7 @@ def uc3_plant(k: Kit):
     """Plants the UC3 story cast: Ramaiah Goud (pensioner, wife signs in as 2701), Narsimha Chary (no kin), two men named Gangadhar Rao."""
     out = demo_uc3_story.plant(k.cur, ACTOR)
     k.info("UC3 cast planted. Ramaiah Goud (pensioner, wife Sarojini signs in as XXXX-XXXX-2701), Narsimha Chary (no spouse or nominee), two men named Gangadhar Rao. "
-           "Next: run the live steps 3.6 to 3.10 one at a time and act on each in the officer portal", beneficiary_rows=out["beneficiary_rows"])
+           "Next: run the live steps 3.2, 3.5, 3.7, 3.8 and 3.10 one at a time, when the story reaches them, and act on each in the officer portal", beneficiary_rows=out["beneficiary_rows"])
     for note in out["notes"]:
         k.info("Registry layer: " + note)
     _login_check(k, ["XXXX-XXXX-2701"])
@@ -692,7 +692,7 @@ def s_3_1(k: Kit):
     k.ok(k.person(fx["person_id"])["life_status"] == "DECEASED", "The master record shows the death only after confirmation")
 
 
-def s_3_2(k: Kit):
+def s_3_3(k: Kit):
     fx = death_fixture(k, spouse=True)
     res, cd = _death(k, fx)
     k.approve(cd[0], person_id=fx["person_id"])
@@ -716,8 +716,8 @@ def s_3_2(k: Kit):
     k.info("Approving is limited to these roles in the API", roles=sorted(auth.WRITE_ROLES))
 
 
-def s_3_3(k: Kit):
-    ghost = {"name": f"Demo Nobody{k.tag}", "age": 71}
+def s_3_9(k: Kit):
+    ghost = {"name": "Demo Nobody", "age": 71}
     res = k.event("DEATH_REGISTERED", "UC3", death_payload(k, ghost, place="Maharashtra"), case_kind="OUTSIDE_STATE")
     k.ok(res["status"] == "NO_MATCH", "A death for someone not in the registry matches nobody")
     k.ok(not k.proposals(res["event_id"]), "No proposal is raised")
@@ -730,7 +730,7 @@ def s_3_3(k: Kit):
     k.ok(cd and cd[0]["detail"].get("outside_state") is True, "A real person's death outside the state is flagged for the officer to weigh", place="Maharashtra")
 
 
-def s_3_4(k: Kit):
+def s_3_6(k: Kit):
     fx = death_fixture(k, spouse=False)
     res, cd = _death(k, fx)
     k.approve(cd[0], person_id=fx["person_id"])
@@ -746,7 +746,7 @@ def s_3_4(k: Kit):
     k.ok(len(cd2[0]["options"]) >= 2, "Both candidates are shown to the officer with their details")
 
 
-def s_3_5(k: Kit):
+def s_3_4(k: Kit):
     fx = death_fixture(k, spouse=True, urgent=True)
     res, cd = _death(k, fx)
     k.approve(cd[0], person_id=fx["person_id"])
@@ -768,7 +768,7 @@ def _live_death(k: Kit, key, **kw):
     return fx, res, k.proposals(res["event_id"], "CONFIRM_DEATH")
 
 
-def s_3_6(k: Kit):
+def s_3_2(k: Kit):
     """Live step: the death of Ramaiah Goud, a pensioner with a wife, a ration card, a land record and a payment due in four days."""
     fx, res, cd = _live_death(k, "ramaiah")
     k.ok(len(cd) == 1 and cd[0]["status"] == "PROPOSED", "The death is a proposal for an officer to confirm; nothing has changed")
@@ -797,9 +797,9 @@ def s_3_8(k: Kit):
     k.info("Next, as the officer: the proposal cannot be approved until one man is chosen; no follow-up exists while it is unresolved. Reject it if the registration cannot be tied to either, or choose the right man with a reason.")
 
 
-def s_3_9(k: Kit):
+def s_3_10(k: Kit):
     """Live step: a death registered outside the state for someone the registry does not hold."""
-    ghost = {"name": f"Mohan Lal Verma {k.tag}", "age": 68}
+    ghost = {"name": "Mohan Lal Verma", "age": 68}
     res = k.event("DEATH_REGISTERED", "UC3", death_payload(k, ghost, place="Maharashtra"), case_kind="LIVE")
     k.ok(res["status"] == "NO_MATCH" and not k.proposals(res["event_id"]), "Nobody matches, no proposal is raised, and nobody is marked deceased")
     ev = k.one("SELECT note FROM mdm.event WHERE id=%s", res["event_id"])
@@ -807,11 +807,11 @@ def s_3_9(k: Kit):
     k.info("Next: Events shows this registration with the note. A question about this person to the pension department answers 'no record', not 'no'.")
 
 
-def s_3_10(k: Kit):
+def s_3_5(k: Kit):
     """Live step: the registry sends Ramaiah's death a second time."""
-    prev = k.one("SELECT payload FROM mdm.event WHERE scenario='3.6' AND event_type='DEATH_REGISTERED' ORDER BY id DESC LIMIT 1")
+    prev = k.one("SELECT payload FROM mdm.event WHERE scenario='3.2' AND event_type='DEATH_REGISTERED' ORDER BY id DESC LIMIT 1")
     if not prev:
-        k.skip("Run step 3.6 first")
+        k.skip("Run step 3.2 first")
     pl = prev["payload"] if isinstance(prev["payload"], dict) else json.loads(prev["payload"])
     again = k.event("DEATH_REGISTERED", "UC3", pl, case_kind="DUPLICATE_OF_PREVIOUS")
     k.ok(again["status"] == "DUPLICATE", "A repeat of the same registration is ignored")

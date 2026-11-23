@@ -36,14 +36,14 @@ def test_catalogue_lists_48_scripted_scenarios_and_9_cross_cutting_tests():
         by_uc[i["uc"]] = by_uc.get(i["uc"], 0) + 1
     assert by_uc == {"UC1": 6, "UC2": 13, "UC3": 10, "UC4": 8, "UC5": 6, "UC6": 5, "CC": 9}
     by_id = {i["id"]: i for i in cat["items"]}
-    for sid in ("2.4", "2.5", "2.8", "2.9", "2.12", "2.13", "3.6", "3.7", "3.8", "3.9", "3.10", "4.7", "4.8"):
+    for sid in ("2.4", "2.5", "2.8", "2.9", "2.12", "2.13", "3.2", "3.5", "3.7", "3.8", "3.10", "4.7", "4.8"):
         assert sid in ids and by_id[sid]["type"] == "step", sid
     assert all(i["title"] and i["shows"] for i in cat["items"])
 
 
 def test_runner_runs_scenarios_step_by_step_and_records_evidence():
     rid = c.post("/api/x/demo/runs", json={"kind": "test"}).json()["run_id"]
-    for sid in ("2.2", "3.2", "4.5"):
+    for sid in ("2.2", "3.3", "4.5"):
         r = c.post(f"/api/x/demo/runs/{rid}/scenarios/{sid}")
         assert r.status_code == 200, r.text
         body = r.json()
@@ -53,7 +53,7 @@ def test_runner_runs_scenarios_step_by_step_and_records_evidence():
     done = c.post(f"/api/x/demo/runs/{rid}/finish").json()
     assert done["total"] == 3 and done["FAIL"] == 0 and done["ERROR"] == 0
     got = c.get(f"/api/x/demo/runs/{rid}").json()
-    assert [x["scenario"] for x in got["results"]] == ["2.2", "3.2", "4.5"]
+    assert [x["scenario"] for x in got["results"]] == ["2.2", "3.3", "4.5"]
     assert c.get("/api/x/demo/runs/latest").json()["id"] >= rid
     assert c.get("/api/audit/verify").json()["ok"] is True
 

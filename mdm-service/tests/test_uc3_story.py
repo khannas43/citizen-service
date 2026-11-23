@@ -46,10 +46,10 @@ def test_plant_live_confirm_followups_notice_clear():
         if not _has_schema(cur, "family_registry") or not _has_schema(cur, "scheme_engine"):
             assert out["notes"], "expected notes about registry rows that could not be written"
 
-        # Live step 3.6: register Ramaiah's death (proposal only).
-        k = demo.Kit(cur, "3.6")
-        demo.clear_events(cur, "3.6", "test")
-        demo.s_3_6(k)
+        # Live step 3.2: register Ramaiah's death (proposal only).
+        k = demo.Kit(cur, "3.2")
+        demo.clear_events(cur, "3.2", "test")
+        demo.s_3_2(k)
         assert any(c.get("ok") for c in k.checks), k.checks
         cur.execute(
             "SELECT id, options, detail FROM mdm.proposal WHERE kind='CONFIRM_DEATH' AND status='PROPOSED' "
@@ -145,12 +145,12 @@ def test_plant_live_confirm_followups_notice_clear():
 
 
 def test_scripted_uc3_still_passes_after_live_steps():
-    """3.1 plants; live steps 3.6–3.10 run; then 3.2–3.5 still pass on other (non-DEMO-UC3) pensioners."""
-    for sid in ("3.1", "3.6", "3.7", "3.8", "3.9", "3.10"):
+    """3.1 plants; the live steps 3.2, 3.5, 3.7, 3.8 and 3.10 run; then 3.3, 3.4, 3.6 and 3.9 still pass on other (non-DEMO-UC3) pensioners."""
+    for sid in ("3.1", "3.2", "3.5", "3.7", "3.8", "3.10"):
         r = demo.run_one(sid)
         assert r["status"] in ("PASS", "PARTIAL", "SKIPPED"), (sid, r["status"], r.get("error"),
             [c["text"] for c in (r.get("checks") or []) if not c.get("ok")])
-    for sid in ("3.2", "3.3", "3.4", "3.5"):
+    for sid in ("3.3", "3.4", "3.6", "3.9"):
         r = demo.run_one(sid)
         assert r["status"] in ("PASS", "PARTIAL"), (sid, r["status"], r.get("error"),
             [c["text"] for c in (r.get("checks") or []) if not c.get("ok")])
