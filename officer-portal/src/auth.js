@@ -256,7 +256,8 @@ const ROLE_FEATURES = {
   ],
   IT_ADMIN: ['home', 'ops', 'reports', 'analytics', 'expenditureIntegrity', 'dataImport', 'moneyOverview', 'mdm'],
   // master data administrator: every Data Exchange screen, the daily checks and the reports (the service still decides what each call may do)
-  MDM_ADMIN: ['home', 'tasks', 'reports', 'analytics', 'mdm', 'mdmDept'],
+  // also the Beneficiaries and Family Registry screens: the UC3, UC4 and UC5 demo stories open them as this officer
+  MDM_ADMIN: ['home', 'tasks', 'reports', 'analytics', 'mdm', 'mdmDept', 'beneficiaries', 'families'],
   SENIOR_MGMT: ['moneyOverview', 'coverage', 'analytics', 'reports'],
   // payroll and finance roles work in Expenditure Integrity only (Keycloak roles to be created; the screen and service already honour them)
   PAYROLL_REVIEWER: ['home', 'expenditureIntegrity'],
